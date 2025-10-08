@@ -13,6 +13,11 @@ class AMobileSpaceGameMode : public AGameModeBase
 
 public:
 	AMobileSpaceGameMode();
+
+public:
+
+	virtual void BeginPlay() override;
+
 };
 
 

@@ -9,3 +9,10 @@ AMobileSpaceGameMode::AMobileSpaceGameMode()
 	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 }
 
+void AMobileSpaceGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Mobile Space Game Mode Initialized"));
+}
+
