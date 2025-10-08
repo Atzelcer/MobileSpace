@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MobileSpacePawn.h"
 #include "MobileSpaceProjectile.h"
@@ -19,35 +19,53 @@ const FName AMobileSpacePawn::FireForwardBinding("FireForward");
 const FName AMobileSpacePawn::FireRightBinding("FireRight");
 
 AMobileSpacePawn::AMobileSpacePawn()
-{	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
-	// Create the mesh component
+{
+	// Cargar la malla de la nave
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("StaticMesh'/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO'"));
+
+	// Crear el componente de malla
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	
-	// Cache our sound effect
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
-	FireSound = FireAudio.Object;
 
-	// Create a camera boom...
+	if (ShipMesh.Succeeded())
+	{
+		ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
+	}
+
+	// 🔹 Forzar tamaño reducido del mesh
+	//ShipMeshComponent->SetMobility(EComponentMobility::Movable);
+	//ShipMeshComponent->SetAbsolute(true, true, true);
+	//ShipMeshComponent->SetWorldScale3D(FVector(0.35f, 0.35f, 0.35f)); // 35% del tamaño original
+	//ShipMeshComponent->SetRelativeScale3D(FVector(0.35f, 0.35f, 0.35f));
+
+	// Cargar sonido de disparo
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
+	if (FireAudio.Succeeded())
+	{
+		FireSound = FireAudio.Object;
+	}
+
+	// Crear el brazo de cámara (Spring Arm)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when ship does
-	CameraBoom->TargetArmLength = 1200.f;
-	CameraBoom->SetRelativeRotation(FRotator(-80.f, 0.f, 0.f));
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	CameraBoom->SetUsingAbsoluteRotation(true); // Que no rote con la nave
+	CameraBoom->bDoCollisionTest = false;       // No queremos que se retraiga al chocar
 
-	// Create a camera...
+	// 🔹 Ajuste de cámara tipo arcade
+	CameraBoom->TargetArmLength = 850.f;             // Más cerca que el original (1200)
+	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f)); // Menos inclinada
+
+	// Crear la cámara
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	CameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;	// Camera does not rotate relative to arm
+	CameraComponent->bUsePawnControlRotation = false;
 
-	// Movement
+	// Parámetros de movimiento
 	MoveSpeed = 1000.0f;
-	// Weapon
-	GunOffset = FVector(90.f, 0.f, 0.f);
+
+	// Parámetros del arma
+	GunOffset = FVector(150.f, 0.f, 0.f);
 	FireRate = 0.1f;
 	bCanFire = true;
 }
