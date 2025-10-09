@@ -58,7 +58,7 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	// Solo agrega impulso y reproduce el efecto de hit si golpea física
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 20.0f, GetActorLocation());
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
 	}
 
 	
