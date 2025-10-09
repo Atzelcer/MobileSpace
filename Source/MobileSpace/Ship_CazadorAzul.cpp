@@ -10,6 +10,6 @@ AShip_CazadorAzul::AShip_CazadorAzul()
 	if (ShipMeshAsset.Succeeded())
 	{
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
-		ShipMesh->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
+		ShipMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 	}
 }

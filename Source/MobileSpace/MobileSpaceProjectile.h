@@ -22,6 +22,11 @@ class AMobileSpaceProjectile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
+	UParticleSystemComponent* ParticleProjectile;
+	UParticleSystemComponent* ParticleHit;
+
+
+
 public:
 	AMobileSpaceProjectile();
 
