@@ -29,7 +29,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 	ShipMeshComponent->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 	
 	// Cache our sound effect
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Sci-Fi_Gun_1-1.Sci-Fi_Gun_1-1'"));
 	FireSound = FireAudio.Object;
 
 	// No camera setup - using fixed camera from GameMode
