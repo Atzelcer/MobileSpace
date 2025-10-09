@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "MobileSpaceGameMode.generated.h"
-
+/**
+ * 
+ */
 UCLASS(MinimalAPI)
 class AMobileSpaceGameMode : public AGameModeBase
 {
@@ -14,9 +16,24 @@ class AMobileSpaceGameMode : public AGameModeBase
 public:
 	AMobileSpaceGameMode();
 
-public:
-
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	// TArray to hold the enemy ships in formation
+	
+
+	// Fixed camera for top-down view
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class ACameraActor* FixedCamera;
+
+protected:
+	
+	// Function to setup fixed camera
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+	void SetupFixedCamera();
+
+
 
 };
 

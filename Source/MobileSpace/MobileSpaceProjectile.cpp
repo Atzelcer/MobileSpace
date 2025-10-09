@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AMobileSpaceProjectile::AMobileSpaceProjectile() 
 {
@@ -31,15 +32,36 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
+	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
+	ParticleProjectile->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Trail05_Red.P_Projectile_Trail05_Red'"));
+	if (ParticleAsset.Succeeded())
+	{
+		ParticleProjectile->SetTemplate(ParticleAsset.Object);
+	}
+
+	ParticleHit = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleHit"));
+	ParticleHit->SetupAttachment(RootComponent);
+	ParticleHit->bAutoActivate = true;
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleHitAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Trail03_Purple.P_Projectile_Trail03_Purple'"));
+	if (ParticleHitAsset.Succeeded())
+	{
+		ParticleHit->SetTemplate(ParticleHitAsset.Object);
+	}
+
 }
 
 void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Only add impulse and destroy projectile if we hit a physics
+	// Solo agrega impulso y reproduce el efecto de hit si golpea física
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
 	}
+
+	
 
 	Destroy();
 }
