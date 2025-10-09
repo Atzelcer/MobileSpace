@@ -30,8 +30,8 @@ public class MobileSpace : ModuleRules
             "SlateCore"
         });
 
-        bEnableExceptions = true;
-        bUseRTTI = true;
+        //bEnableExceptions = true;
+        //bUseRTTI = true;
         //bEnableUndefinedIdentifierWarnings = false;
     }
 }
