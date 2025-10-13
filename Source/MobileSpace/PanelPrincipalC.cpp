@@ -31,7 +31,8 @@ void UPanelPrincipalC::OnJugarClicked()
 		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
 		if (HUD)
 		{
-			HUD->OcultarPanelPrincipal();
+			//RemoveFromParent();
+			HUD->MostrarModoJuego();
 		}
 	}
 
@@ -40,12 +41,30 @@ void UPanelPrincipalC::OnJugarClicked()
 
 void UPanelPrincipalC::OnAjustesClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Abrir ajustes"));
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PlayerController)
+	{
+		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
+		if (HUD)
+		{
+			//RemoveFromParent();
+			HUD->MostrarAjustes();	
+		}
+	}
 }
 
 void UPanelPrincipalC::OnCreditosClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Abrir creditos"));
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PlayerController)
+	{
+		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
+		if (HUD)
+		{
+			//RemoveFromParent();
+			HUD->MostrarCreditos();
+		}
+	}
 }
 
 void UPanelPrincipalC::OnSalirClicked()
