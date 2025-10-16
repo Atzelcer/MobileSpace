@@ -12,6 +12,7 @@
 #include "Engine/StaticMesh.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "Particles/ParticleSystemComponent.h"
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
 const FName AMobileSpacePawn::MoveRightBinding("MoveRight");
@@ -40,6 +41,21 @@ AMobileSpacePawn::AMobileSpacePawn()
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
 	bCanFire = true;
+
+	//partycle
+	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleTrail"));
+	ParticleTrail->SetupAttachment(RootComponent);
+	ParticleTrail->SetRelativeLocation(FVector(-100.0f, 0.f, 0.f));
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Fireball05_Orange.P_Projectile_Fireball05_Orange'"));
+	if (ParticleAsset.Succeeded())
+	{
+		ParticleTrail->SetTemplate(ParticleAsset.Object);
+		//desactivado al inicio
+		ParticleTrail->bAutoActivate = true;
+		
+	}
+
 }
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)

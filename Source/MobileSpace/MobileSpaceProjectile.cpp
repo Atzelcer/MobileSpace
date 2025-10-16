@@ -36,7 +36,7 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
 	ParticleProjectile->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Trail05_Red.P_Projectile_Trail05_Red'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Fireball05_Orange.P_Projectile_Fireball05_Orange'"));
 	if (ParticleAsset.Succeeded())
 	{
 		ParticleProjectile->SetTemplate(ParticleAsset.Object);
