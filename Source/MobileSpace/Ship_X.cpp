@@ -5,6 +5,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "TimerManager.h"
+#include "Components/BoxComponent.h"
+#include "MobileSpaceProjectile.h"
+
 
 // Sets default values
 AShip_X::AShip_X()
@@ -15,30 +18,18 @@ AShip_X::AShip_X()
 	// Create and setup the mesh component
 	ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMesh;
+
+
+	ShipCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShipCollision"));
+	ShipCollision->SetupAttachment(ShipMesh);
+	ShipCollision->SetBoxExtent(FVector(100.f, 100.f, 100.f));
+	// IMPORTANTE: Enlazar evento de colisión
+	ShipCollision->OnComponentBeginOverlap.AddDynamic(this, &AShip_X::OnShipHit);
+
+	// Configurar colisión para que genere eventos
+	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ShipCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	
-	// Initialize default values
-	MoveSpeed = 500.0f;
-	HorizontalSpeed = 500.0f;
-	bInFormation = false;
-	bAttacking = false;
-	FormationPosition = FVector::ZeroVector;
-	
-	// Initialize movement limits and direction (X-Y plane)
-	bMovingRight = true;
-	LeftLimit = -800.0f;
-	RightLimit = 800.0f;
-	FrontLimit = 200.0f; // Y positive (toward player)
-	BackLimit = 800.0f;  // Y negative (away from player)
-	
-	// Initialize creative movement flags
-	bMovingDown = false;
-	bZigzagMode = false;
-	bPulseMode = false;
-	bSerpentineMode = false;
-	VerticalSpeed = 100.0f;
-	PulseIntensity = 50.0f;
-	ZigzagCounter = 0;
-	ZigzagSteps = 3;
 }
 
 // Called when the game starts or when spawned
@@ -46,8 +37,7 @@ void AShip_X::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Start in formation behavior
-	JoinFormation();
+	
 }
 
 // Called every frame
@@ -55,114 +45,41 @@ void AShip_X::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	// Update movement based on current state
-	UpdateMovement(DeltaTime);
 }
 
-void AShip_X::UpdateMovement(float DeltaTime)
+void AShip_X::OnShipHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// Base class: Simple horizontal movement only (X-Y plane)
-	if (bInFormation && !bAttacking)
-	{
-		FVector CurrentPos = GetActorLocation();
-		
-		// Simple horizontal movement on X axis
-		if (bMovingRight)
-		{
-			CurrentPos.X += HorizontalSpeed * DeltaTime;
-			if (CurrentPos.X >= RightLimit)
-			{
-				bMovingRight = false;
-			}
-		}
-		else
-		{
-			CurrentPos.X -= HorizontalSpeed * DeltaTime;
-			if (CurrentPos.X <= LeftLimit)
-			{
-				bMovingRight = true;
-			}
-		}
-		
-		SetActorLocation(CurrentPos);
-	}
-	else if (bAttacking)
-	{
-		// Attack pattern: move toward player (Y axis toward 0)
-		FVector CurrentLocation = GetActorLocation();
-		FVector AttackDirection = FVector(0, -1, 0); // Move toward player on Y axis
-		
-		FVector NewLocation = CurrentLocation + AttackDirection * MoveSpeed * DeltaTime;
-		SetActorLocation(NewLocation);
-		
-		// Return to formation after going off screen
-		if (NewLocation.Y < -1000.0f)
-		{
-			ReturnToFormation();
-		}
-	}
-}
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TEXT("Ship collision detected!"));
+    }
 
-void AShip_X::StartAttackPattern()
-{
-	bAttacking = true;
-	bInFormation = false;
-	
-	// Schedule to return to formation after a delay
-	GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &AShip_X::ReturnToFormation, 5.0f, false);
-}
+    if (!OtherActor || OtherActor == this)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Collision with self or null!"));
+        }
+        return;
+    }
 
-void AShip_X::ReturnToFormation()
-{
-	bAttacking = false;
-	bInFormation = true;
-	
-	// Clear any existing timer
-	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
-}
+    if (GEngine)
+    {
+        FString ActorName = OtherActor->GetName();
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, FString::Printf(TEXT("Collided with: %s"), *ActorName));
+    }
 
-void AShip_X::SetFormationPosition(FVector NewPosition)
-{
-	FormationPosition = NewPosition;
-}
+    // Detectar si es el proyectil del jugador
+    if (OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("HIT BY PLAYER PROJECTILE! Destroying ship..."));
+        }
 
-void AShip_X::JoinFormation()
-{
-	bInFormation = true;
-	bAttacking = false;
-}
+        // Destruir la nave enemiga
+        Destroy();
 
-void AShip_X::StartAttack()
-{
-	StartAttackPattern();
-}
-
-void AShip_X::ActivateZigzagMode()
-{
-	bZigzagMode = true;
-	bPulseMode = false;
-	bSerpentineMode = false;
-	ZigzagCounter = 0;
-}
-
-void AShip_X::ActivatePulseMode()
-{
-	bZigzagMode = false;
-	bPulseMode = true;
-	bSerpentineMode = false;
-}
-
-void AShip_X::ActivateSerpentineMode()
-{
-	bZigzagMode = false;
-	bPulseMode = false;
-	bSerpentineMode = true;
-}
-
-void AShip_X::ActivateNormalMode()
-{
-	bZigzagMode = false;
-	bPulseMode = false;
-	bSerpentineMode = false;
+    }
 }
 

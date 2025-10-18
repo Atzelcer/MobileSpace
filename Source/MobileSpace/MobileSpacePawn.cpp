@@ -12,6 +12,7 @@
 #include "Engine/StaticMesh.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "Particles/ParticleSystemComponent.h"
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
 const FName AMobileSpacePawn::MoveRightBinding("MoveRight");
@@ -26,7 +27,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	ShipMeshComponent->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
+	ShipMeshComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0));
 	
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Sci-Fi_Gun_1-1.Sci-Fi_Gun_1-1'"));
@@ -40,6 +41,20 @@ AMobileSpacePawn::AMobileSpacePawn()
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
 	bCanFire = true;
+
+	//partycle
+	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleTrail"));
+	ParticleTrail->SetupAttachment(ShipMeshComponent);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_ElectricBall01_Yellow.P_Projectile_ElectricBall01_Yellow'"));
+	if (ParticleAsset.Succeeded())
+	{
+		ParticleTrail->SetTemplate(ParticleAsset.Object);
+		ParticleTrail->SetRelativeLocation(FVector(-500.f, 0.f, 0.f));
+		ParticleTrail->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
+		
+	}
+
 }
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -109,6 +124,8 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 		const FVector FireDirection = FVector(1.f, 0.f, 0.f);
 		FireShot(FireDirection);
 	}
+	
+
 }
 
 void AMobileSpacePawn::FireShot(FVector FireDirection)

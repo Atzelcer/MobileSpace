@@ -18,7 +18,10 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
 	ProjectileMesh->SetupAttachment(RootComponent);
 	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);		// set up a notification for when this component hits something
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);
+	// En MobileSpaceProjectile.cpp (constructor)
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);// set up a notification for when this component hits something
 	RootComponent = ProjectileMesh;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
@@ -30,13 +33,14 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
 
+
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 
 	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
 	ParticleProjectile->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Trail05_Red.P_Projectile_Trail05_Red'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Fireball05_Orange.P_Projectile_Fireball05_Orange'"));
 	if (ParticleAsset.Succeeded())
 	{
 		ParticleProjectile->SetTemplate(ParticleAsset.Object);
