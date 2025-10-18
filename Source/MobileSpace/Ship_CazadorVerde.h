@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Ship_X.h"
+#include "MoveComponent.h"
+#include "AtackComponent.h"
 #include "Ship_CazadorVerde.generated.h"
-
 /**
  * 
  */
@@ -18,22 +19,34 @@ public:
 
 	AShip_CazadorVerde();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UMoveComponent* MoveComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UAtackComponent* AttackComp;
+
+
+	// Patrón de ataque que usará este enemigo
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	EAtackPattern AttackPattern = EAtackPattern::Single;
+
+	// Tiempo entre disparos
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float TimeBetweenShots = 2.0f;
+
 protected:
 	// Override movement behavior for this specific ship type
 	virtual void BeginPlay() override;
-	virtual void UpdateMovement(float DeltaTime) override;
-	virtual void StartAttackPattern() override;
 
-	// Timer to change movement patterns
-	FTimerHandle PatternChangeTimer;
-
-public:
-	// Functions to change movement patterns
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void CycleMovementPattern();
+	virtual void Tick(float DeltaTime) override;
 
 private:
-	// Simple attack timing
-	float AttackTime = 0.0f;
+	FTimerHandle FireTimerHandle;
+	void AutoFire();
+	
+
+
+
+
 	
 };

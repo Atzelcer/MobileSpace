@@ -27,7 +27,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	ShipMeshComponent->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
+	ShipMeshComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0));
 	
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Sci-Fi_Gun_1-1.Sci-Fi_Gun_1-1'"));
@@ -44,15 +44,14 @@ AMobileSpacePawn::AMobileSpacePawn()
 
 	//partycle
 	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleTrail"));
-	ParticleTrail->SetupAttachment(RootComponent);
-	ParticleTrail->SetRelativeLocation(FVector(-100.0f, 0.f, 0.f));
+	ParticleTrail->SetupAttachment(ShipMeshComponent);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Fireball05_Orange.P_Projectile_Fireball05_Orange'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_ElectricBall01_Yellow.P_Projectile_ElectricBall01_Yellow'"));
 	if (ParticleAsset.Succeeded())
 	{
 		ParticleTrail->SetTemplate(ParticleAsset.Object);
-		//desactivado al inicio
-		ParticleTrail->bAutoActivate = true;
+		ParticleTrail->SetRelativeLocation(FVector(-500.f, 0.f, 0.f));
+		ParticleTrail->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
 		
 	}
 
@@ -125,6 +124,8 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 		const FVector FireDirection = FVector(1.f, 0.f, 0.f);
 		FireShot(FireDirection);
 	}
+	
+
 }
 
 void AMobileSpacePawn::FireShot(FVector FireDirection)
