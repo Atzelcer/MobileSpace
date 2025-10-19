@@ -1,50 +1,39 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
-
+// HUDmain.cpp
 #include "HUDmain.h"
 #include "PanelPrincipalC.h"
+#include "ModoJuegoC.h"
+#include "AjustesC.h"
+#include "CreditosC.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/AudioComponent.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "ModoJuegoC.h"
-#include "AjustesC.h"
-#include "CreditosC.h"
+#include "GameFramework/PlayerController.h"
 
 AHUDmain::AHUDmain()
 {
 	static ConstructorHelpers::FClassFinder<UPanelPrincipalC> PanelPrincipalBPClass(TEXT("/Game/WIDGETS/PanelPrincipal.PanelPrincipal_C"));
 	if (PanelPrincipalBPClass.Succeeded())
-	{
 		PanelPrincipalClass = PanelPrincipalBPClass.Class;
-	}
 
 	static ConstructorHelpers::FClassFinder<UModoJuegoC> ModoJuegoBPClass(TEXT("/Game/WIDGETS/ModoJuego.ModoJuego_C"));
 	if (ModoJuegoBPClass.Succeeded())
-	{
 		ModoJuegoClass = ModoJuegoBPClass.Class;
-	}
 
 	static ConstructorHelpers::FClassFinder<UAjustesC> AjustesBPClass(TEXT("/Game/WIDGETS/Ajustes.Ajustes_C"));
 	if (AjustesBPClass.Succeeded())
-	{
 		AjustesClass = AjustesBPClass.Class;
-	}
 
 	static ConstructorHelpers::FClassFinder<UCreditosC> CreditosBPClass(TEXT("/Game/WIDGETS/Creditos.Creditos_C"));
 	if (CreditosBPClass.Succeeded())
-	{
 		CreditosClass = CreditosBPClass.Class;
-	}
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
 	if (MusicaAsset.Succeeded())
-	{
 		MusicaInicio = MusicaAsset.Object;
-	}
-
 }
-
 
 void AHUDmain::BeginPlay()
 {
@@ -52,35 +41,28 @@ void AHUDmain::BeginPlay()
 	MostrarPanelPrincipal();
 }
 
-// Widget Panel Principal
-
 void AHUDmain::MostrarPanelPrincipal()
 {
 	if (!PanelPrincipalInstance && PanelPrincipalClass)
-	{
 		PanelPrincipalInstance = CreateWidget<UPanelPrincipalC>(GetWorld(), PanelPrincipalClass);
-	}
 
 	if (PanelPrincipalInstance && !PanelPrincipalInstance->IsInViewport())
 	{
 		PanelPrincipalInstance->AddToViewport();
 		ReproducirMusicaInicio();
+		ConfigurarInputController();
 	}
 }
-
 
 void AHUDmain::OcultarPanelPrincipal()
 {
 	if (PanelPrincipalInstance && PanelPrincipalInstance->IsInViewport())
 	{
 		PanelPrincipalInstance->RemoveFromParent();
-
+		DetenerMusicaInicio();
+		RemoverInputController();
 	}
 }
-
-
-// Widget Mostrar Modo Juego
-
 
 void AHUDmain::MostrarModoJuego()
 {
@@ -91,14 +73,11 @@ void AHUDmain::MostrarModoJuego()
 		ModoJuegoInstance->AddToViewport();
 }
 
-
 void AHUDmain::OcultarModoJuego()
 {
 	if (ModoJuegoInstance && ModoJuegoInstance->IsInViewport())
 		ModoJuegoInstance->RemoveFromParent();
 }
-
-// Widget Mostrar Ajustes
 
 void AHUDmain::MostrarAjustes()
 {
@@ -115,12 +94,11 @@ void AHUDmain::OcultarAjustes()
 		AjustesInstance->RemoveFromParent();
 }
 
-// Widget Mostrar Creditos
-
 void AHUDmain::MostrarCreditos()
 {
 	if (!CreditosInstance && CreditosClass)
 		CreditosInstance = CreateWidget<UCreditosC>(GetWorld(), CreditosClass);
+
 	if (CreditosInstance && !CreditosInstance->IsInViewport())
 		CreditosInstance->AddToViewport();
 }
@@ -131,26 +109,17 @@ void AHUDmain::OcultarCreditos()
 		CreditosInstance->RemoveFromParent();
 }
 
-
-// Audio General
-
 void AHUDmain::ReproducirMusicaInicio()
 {
 	if (MusicaInicio)
-	{
 		MusicaComponent = UGameplayStatics::SpawnSound2D(GetWorld(), MusicaInicio, 0.6f, 1.0f, 0.0f, nullptr, true);
-	}
 }
 
 void AHUDmain::DetenerMusicaInicio()
 {
 	if (MusicaComponent && MusicaComponent->IsPlaying())
-	{
-		MusicaComponent->Stop();
-	}
+		MusicaComponent->FadeOut(1.0f, 0.0f);
 }
-
-// Configuracion UI Controller
 
 void AHUDmain::ConfigurarInputController()
 {
@@ -172,4 +141,12 @@ void AHUDmain::RemoverInputController()
 		PlayerController->bShowMouseCursor = false;
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
+}
+
+void AHUDmain::OcultarTodo()
+{
+	OcultarPanelPrincipal();
+	OcultarModoJuego();
+	OcultarAjustes();
+	OcultarCreditos();
 }

@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// HUDmain.h
 #pragma once
 
 #include "CoreMinimal.h"
@@ -15,67 +14,50 @@ public:
 	AHUDmain();
 
 protected:
-
 	virtual void BeginPlay() override;
 
-	// Widget Panel Principal
-
-
 public:
-
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UPanelPrincipalC> PanelPrincipalClass;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UPanelPrincipalC* PanelPrincipalInstance;
-
-	// Widget Modo Juego
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UModoJuegoC> ModoJuegoClass;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UModoJuegoC* ModoJuegoInstance;
 
-
-	// Widget Ajustes
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UAjustesC> AjustesClass;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UAjustesC* AjustesInstance;
 
-	// Widget Creditos
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UCreditosC> CreditosClass;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UCreditosC* CreditosInstance;
-
-
-	// Audio General
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	class USoundBase* MusicaInicio;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UAudioComponent* MusicaComponent;
-
-public:
 
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void ReproducirMusicaInicio();
 
 	UFUNCTION(BlueprintCallable, Category = "Audio")
-	void DetenerMusicaInicio();\
+	void DetenerMusicaInicio();
 
-	// Configuracion UI Controller
-	UFUNCTION(BlueprintCallable, Category = "controllers")
+	UFUNCTION(BlueprintCallable, Category = "Controllers")
 	void ConfigurarInputController();
 
-	UFUNCTION(BlueprintCallable, Category = "controllers")
+	UFUNCTION(BlueprintCallable, Category = "Controllers")
 	void RemoverInputController();
-
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void MostrarPanelPrincipal();
@@ -89,7 +71,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarModoJuego();
 
-
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void MostrarAjustes();
 
@@ -102,4 +83,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarCreditos();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarTodo();
 };

@@ -6,21 +6,26 @@
 #include "Blueprint/UserWidget.h"
 #include "CreditosC.generated.h"
 
-
 UCLASS()
 class MOBILESPACE_API UCreditosC : public UUserWidget
 {
 	GENERATED_BODY()
-	
 
 public:
-
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_volver;
 
+	// TextBlock que contiene los créditos
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* V_Creditos_A;
+
 	UFUNCTION()
 	void OnVolverClicked();
 
+private:
+	float ScrollSpeed;
+	float StartY;
 };
