@@ -6,9 +6,7 @@
 #include "Ship_X.h"
 #include "Ship_CazadorAzul.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class MOBILESPACE_API AShip_CazadorAzul : public AShip_X
 {
