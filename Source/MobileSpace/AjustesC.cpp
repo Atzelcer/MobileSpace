@@ -78,7 +78,7 @@ void UAjustesC::OnVolverClicked()
 	if (HUD)
 	{
 		RemoveFromParent();
-		HUD->MostrarPanelPrincipal();
+		//HUD->MostrarPanelPrincipal();
 	}
 }
 

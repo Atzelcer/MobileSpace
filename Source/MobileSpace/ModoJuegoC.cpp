@@ -31,10 +31,11 @@ void UModoJuegoC::OnAventuraClicked()
         AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
         if (HUD)
         {
-            RemoveFromParent();
+			HUD->MostrarPantallaCarga();
 			HUD->OcultarPanelPrincipal();
-			HUD->DetenerMusicaInicio();
-            HUD->RemoverInputController();
+            HUD->OcultarModoJuego();
+			/*HUD->DetenerMusicaInicio();
+            HUD->RemoverInputController();*/
         }
     }
     //UGameplayStatics::OpenLevel(GetWorld(), FName("MapaAventura"));

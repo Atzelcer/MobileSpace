@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "HUDmain.h"
+#include "Widget_pause.h"
 
 void UPanelPrincipalC::NativeConstruct()
 {
@@ -39,6 +40,7 @@ void UPanelPrincipalC::OnJugarClicked()
 	//UGameplayStatics::OpenLevel(GetWorld(), FName("StarterMap"));
 }
 
+
 void UPanelPrincipalC::OnAjustesClicked()
 {
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -52,6 +54,7 @@ void UPanelPrincipalC::OnAjustesClicked()
 		}
 	}
 }
+
 
 void UPanelPrincipalC::OnCreditosClicked()
 {

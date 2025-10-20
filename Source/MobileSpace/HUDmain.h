@@ -11,12 +11,15 @@ class MOBILESPACE_API AHUDmain : public AHUD
 	GENERATED_BODY()
 
 public:
+
 	AHUDmain();
 
 protected:
+
 	virtual void BeginPlay() override;
 
 public:
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UPanelPrincipalC> PanelPrincipalClass;
 
@@ -43,6 +46,25 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	class USoundBase* MusicaInicio;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UWidgetPantallaCarga> PantallaCargaClass;
+
+	UPROPERTY(Transient)
+	class UWidgetPantallaCarga* PantallaCargaInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UWidget_ON_GAME> WidgetOnGameClass;
+
+	UPROPERTY(Transient)
+	class UWidget_ON_GAME* WidgetOnGameInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UWidget_pause> WidgetPauseClass;
+
+	UPROPERTY(Transient)
+	class UWidget_pause* WidgetPauseInstance;
+
 
 	UPROPERTY(Transient)
 	class UAudioComponent* MusicaComponent;
@@ -84,5 +106,31 @@ public:
 	void OcultarCreditos();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
+	void MostrarPantallaCarga();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarPantallaCarga();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void MostrarOnGame();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarOnGame();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void MostrarPause();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarPause();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarTodo();
+
+
+	//Handler for timer to hide loading screen
+
+	FTimerHandle TimerHandle_OcultarPantallaCarga;
+	FTimerHandle TimerHandle_ConteoPantallaCarga;
+	int32 TiempoRestantePantallaCarga;
+
 };
