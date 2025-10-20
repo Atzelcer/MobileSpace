@@ -52,6 +52,7 @@ void AMobileSpaceGameMode::SetupFixedCamera()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
 	// Position for top-down view (like classic arcade games)
+	//FVector CameraLocation = FVector(-163190.0f, 6103422.0f, 9825.0f); // High above the map
 	FVector CameraLocation = FVector(0.0f, 0.0f, 2000.0f); // High above the map
 	FRotator CameraRotation = FRotator(-90.0f, 0.0f, 0.0f); // Looking straight down
 	
