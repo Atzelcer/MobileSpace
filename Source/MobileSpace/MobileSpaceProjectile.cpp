@@ -17,6 +17,7 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
 	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
 	ProjectileMesh->SetupAttachment(RootComponent);
+	ProjectileMesh->SetVisibility(false);
 	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);
 	// En MobileSpaceProjectile.cpp (constructor)
@@ -40,10 +41,11 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
 	ParticleProjectile->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Fireball05_Orange.P_Projectile_Fireball05_Orange'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/TurretVFX/Sources/Particle/P_Pentagon.P_Pentagon'"));
 	if (ParticleAsset.Succeeded())
 	{
 		ParticleProjectile->SetTemplate(ParticleAsset.Object);
+		ParticleProjectile->SetRelativeScale3D(FVector(5.0, 5.0, 5.0));
 	}
 
 	ParticleHit = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleHit"));
