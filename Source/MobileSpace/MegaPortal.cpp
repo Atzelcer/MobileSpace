@@ -1,99 +1,85 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MegaPortal.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "AventuraManager.h"
 #include "MobileSpacePawn.h"
 
-// Sets default values
 AMegaPortal::AMegaPortal()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 
 	CollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->InitCapsuleSize(100.f, 200.f);
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	RootComponent = CollisionComponent;
+
+	NiagaraPortalComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraPortalComponent"));
+	NiagaraPortalComponent->SetupAttachment(RootComponent);
 }
 
-
-
-// Called when the game starts or when spawned
 void AMegaPortal::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	AActor* FoundManager = UGameplayStatics::GetActorOfClass(GetWorld(), AAventuraManager::StaticClass());
 	if (FoundManager)
-	{
 		AventuraManagerRef = Cast<AAventuraManager>(FoundManager);
-	}
+
+	CargarNiagaraSystems();
+	EscogerEfectoAleatorio();
 }
 
-
-
-
-// Called every frame
 void AMegaPortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
-
 
 void AMegaPortal::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor && OtherActor->IsA(AMobileSpacePawn::StaticClass()))
 	{
 		if (AventuraManagerRef)
-		{
 			AventuraManagerRef->SiguienteNivel();
-		}
-		this->Destroy();
+
+		Destroy();
 	}
 }
 
-
-
-void AMegaPortal::EstablecerMalla(UStaticMesh* NuevaMalla)
+void AMegaPortal::CargarNiagaraSystems()
 {
-	if (MeshPortal && NuevaMalla)
-	{
-		MeshPortal->SetStaticMesh(NuevaMalla);
-		UE_LOG(LogTemp, Warning, TEXT("Malla del portal establecida manualmente."));
-	}
+	auto Cargar = [](const TCHAR* Path) -> UNiagaraSystem*
+		{
+			return LoadObject<UNiagaraSystem>(nullptr, Path);
+		};
+
+	NiagaraSystems = {
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Fire_EllipsePortal.P_Fire_EllipsePortal")),
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Fog_CapturePortal.P_Fog_CapturePortal")),
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Futuristic_CapturePortal.P_Futuristic_CapturePortal")),
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Level_LowPolyPortal_Blue.P_Level_LowPolyPortal_Blue")),
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Level_LowPolyPortal_Yellow.P_Level_LowPolyPortal_Yellow")),
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_LowPoly_CapturePortal_01.P_LowPoly_CapturePortal_01")),
+		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_LowPoly_CapturePortal_02.P_LowPoly_CapturePortal_02"))
+	};
 }
 
-
-void AMegaPortal::EscogerMallaAleatoria()
+void AMegaPortal::EscogerEfectoAleatorio()
 {
-	int32 RandomIndex = FMath::RandRange(1, 3);
+	if (NiagaraSystems.Num() == 0) return;
 
-	UStaticMesh* MallaSeleccionada = nullptr;
+	int32 Index = FMath::RandRange(0, NiagaraSystems.Num() - 1);
+	UNiagaraSystem* EfectoSeleccionado = NiagaraSystems[Index];
 
-	switch (RandomIndex)
+	if (EfectoSeleccionado && NiagaraPortalComponent)
 	{
-	case 1:
-		MallaSeleccionada = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Meshes/M_PortalTipo1.M_PortalTipo1"));
-		break;
-	case 2:
-		MallaSeleccionada = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Meshes/M_PortalTipo2.M_PortalTipo2"));
-		break;
-	case 3:
-		MallaSeleccionada = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Meshes/M_PortalTipo3.M_PortalTipo3"));
-		break;
-	default:
-		break;
-	}
-
-	if (MallaSeleccionada)
-	{
-		MeshPortal->SetStaticMesh(MallaSeleccionada);
-		UE_LOG(LogTemp, Warning, TEXT("Malla aleatoria seleccionada: %d"), RandomIndex);
+		NiagaraPortalComponent->SetAsset(EfectoSeleccionado);
+		NiagaraPortalComponent->Activate(true);
+		UE_LOG(LogTemp, Warning, TEXT("Efecto Niagara seleccionado: %d"), Index);
 	}
 }
+
+

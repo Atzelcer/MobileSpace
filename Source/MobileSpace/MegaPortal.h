@@ -7,41 +7,39 @@
 #include "MegaPortal.generated.h"
 
 class UCapsuleComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
 class AAventuraManager;
 
 UCLASS()
 class MOBILESPACE_API AMegaPortal : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
 	AMegaPortal();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+public:
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
-
-	UFUNCTION()
-	void EstablecerMalla(UStaticMesh* NuevaMalla);
-
-	UFUNCTION()
-	void EscogerMallaAleatoria();
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* MeshPortal;
+	UNiagaraComponent* NiagaraPortalComponent;
 
 	UPROPERTY()
 	AAventuraManager* AventuraManagerRef;
+
+	// Lista de posibles efectos Niagara
+	UPROPERTY()
+	TArray<UNiagaraSystem*> NiagaraSystems;
+
+	void CargarNiagaraSystems();
+	void EscogerEfectoAleatorio();
 };
