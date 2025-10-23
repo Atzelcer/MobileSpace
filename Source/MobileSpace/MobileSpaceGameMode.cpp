@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "HUDmain.h"
-
+#include "MegaPortal.h"
 
 AMobileSpaceGameMode::AMobileSpaceGameMode()
 {
@@ -31,6 +31,20 @@ void AMobileSpaceGameMode::BeginPlay()
 	}
 	// Setup fixed camera
 	SetupFixedCamera();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FVector PortalLocation(1610.0f, -250.0f, 210.0f);
+		FRotator PortalRotation(0.0f, 0.0f, 0.0f);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AMegaPortal* Portal = World->SpawnActor<AMegaPortal>(AMegaPortal::StaticClass(), PortalLocation, PortalRotation, SpawnParams);
+		if (Portal)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MegaPortal spawneado correctamente en (1610, -250, 160)"));
+		}
+	}
 }
 
 void AMobileSpaceGameMode::Tick(float DeltaSeconds)
