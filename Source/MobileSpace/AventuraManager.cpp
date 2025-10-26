@@ -8,7 +8,7 @@
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
 #include "EngineUtils.h"
-
+#include "MegaPortal.h"
 
 // Sets default values
 AAventuraManager::AAventuraManager()
@@ -220,10 +220,27 @@ void AAventuraManager::Nivel1()
 	//	}
 	//	Next_Oleada = true;
 	//}
+
+
 }
 
 void AAventuraManager::Nivel2()
 {
+
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FVector PortalLocation(1610.0f, -250.0f, 210.0f);
+		FRotator PortalRotation(0.0f, 0.0f, 0.0f);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AMegaPortal* Portal = World->SpawnActor<AMegaPortal>(AMegaPortal::StaticClass(), PortalLocation, PortalRotation, SpawnParams);
+		if (Portal)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MegaPortal spawneado correctamente en (1610, -250, 160)"));
+		}
+	}
 }
 
 void AAventuraManager::Nivel3()

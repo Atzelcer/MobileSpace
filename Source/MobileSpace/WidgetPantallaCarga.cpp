@@ -32,15 +32,15 @@ void UWidgetPantallaCarga::NativeConstruct()
 	{
 		if (UTexture2D* Tex = LoadObject<UTexture2D>(nullptr, *Ruta))
 			FondosCarga.Add(Tex);
-		else if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("No se encontró: %s"), *Ruta));
+		//else if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("No se encontró: %s"), *Ruta));
 	}
 
-	if (GEngine)
-	{
-		FString Msg = FString::Printf(TEXT("WidgetPantallaCarga: %d texturas cargadas"), FondosCarga.Num());
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, Msg);
-	}
+	//if (GEngine)
+	//{
+	//	FString Msg = FString::Printf(TEXT("WidgetPantallaCarga: %d texturas cargadas"), FondosCarga.Num());
+	//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, Msg);
+	//}
 
 	// Mostrar un fondo inicial
 	MostrarFondoAleatorio();
@@ -62,23 +62,23 @@ void UWidgetPantallaCarga::MostrarFondoAleatorio()
 	if (!Image_carga_level)
 	{
 		bDatosValidos = false;
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("WidgetPantallaCarga: Image_carga_level es NULL"));
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("WidgetPantallaCarga: Image_carga_level es NULL"));
 	}
 
 	if (FondosCarga.Num() == 0)
 	{
 		bDatosValidos = false;
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("WidgetPantallaCarga: No hay texturas cargadas"));
+		/*if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("WidgetPantallaCarga: No hay texturas cargadas"));*/
 	}
 
-	if (!bDatosValidos)
-	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("WidgetPantallaCarga: No se puede mostrar fondo (datos inválidos)"));
-		return;
-	}
+	//if (!bDatosValidos)
+	//{
+	//	if (GEngine)
+	//		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("WidgetPantallaCarga: No se puede mostrar fondo (datos inválidos)"));
+	//	return;
+	//}
 
 	int32 IndexAleatorio = FMath::RandRange(0, FondosCarga.Num() - 1);
 	UTexture2D* FondoElegido = FondosCarga[IndexAleatorio];
@@ -90,19 +90,19 @@ void UWidgetPantallaCarga::MostrarFondoAleatorio()
 		Brush.ImageSize = FVector2D(1920.f, 1080.f);
 		Image_carga_level->SetBrush(Brush);
 
-		if (GEngine)
-		{
-			FString Msg = FString::Printf(TEXT("WidgetPantallaCarga: Fondo aplicado (índice %d)"), IndexAleatorio);
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, Msg);
-		}
+		//if (GEngine)
+		//{
+		//	FString Msg = FString::Printf(TEXT("WidgetPantallaCarga: Fondo aplicado (índice %d)"), IndexAleatorio);
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, Msg);
+		//}
 	}
 	else
 	{
-		if (GEngine)
-		{
-			FString MsgError = FString::Printf(TEXT("WidgetPantallaCarga: Fondo NULL (índice %d)"), IndexAleatorio);
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, MsgError);
-		}
+		//if (GEngine)
+		//{
+		//	FString MsgError = FString::Printf(TEXT("WidgetPantallaCarga: Fondo NULL (índice %d)"), IndexAleatorio);
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, MsgError);
+		//}
 	}
 }
 

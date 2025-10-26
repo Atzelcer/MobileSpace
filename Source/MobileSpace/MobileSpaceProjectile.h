@@ -9,7 +9,7 @@
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
 
-UCLASS(config=Game)
+UCLASS(config = Game)
 class AMobileSpaceProjectile : public AActor
 {
 	GENERATED_BODY()
@@ -39,4 +39,3 @@ public:
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 };
-

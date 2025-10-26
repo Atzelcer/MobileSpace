@@ -20,7 +20,9 @@ public class MobileSpace : ModuleRules
             "Niagara",
             "AIModule",
             "NavigationSystem",
-            "GameplayTasks"
+            "GameplayTasks",
+            "Sockets",        
+            "Networking"    
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]
@@ -30,8 +32,9 @@ public class MobileSpace : ModuleRules
             "SlateCore"
         });
 
-        //bEnableExceptions = true;
-        //bUseRTTI = true;
-        //bEnableUndefinedIdentifierWarnings = false;
+        // Opcionales si planeas hacer builds Android con red
+        //bEnableExceptions = true;   // permite uso seguro de excepciones C++
+        //bUseRTTI = true;            // habilita runtime type info
+        //bEnableUndefinedIdentifierWarnings = false; // opcional para compatibilidad
     }
 }

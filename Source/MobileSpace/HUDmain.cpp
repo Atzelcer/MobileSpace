@@ -14,6 +14,14 @@
 #include "WidgetPantallaCarga.h"
 #include "Widget_ON_GAME.h"
 #include "Widget_pause.h"
+#include "Widget_Modo_multijugador.h"
+#include "WidgetSalaEspera.h"
+#include "WidgetPCMulti.h"
+#include "WidgetOnGameMulti.h"
+#include "FacadeGameManager.h"
+#include "EngineUtils.h"
+#include "AventuraManager.h"
+#include "MultiplayerManager.h"
 
 AHUDmain::AHUDmain()
 {
@@ -51,6 +59,22 @@ AHUDmain::AHUDmain()
 	if (PauseBPClass.Succeeded())
 		WidgetPauseClass = PauseBPClass.Class;
 
+	static ConstructorHelpers::FClassFinder<UWidget_Modo_multijugador> ModoMultijugadorBPClass(TEXT("/Game/WIDGETS/PanelMultijugador.PanelMultijugador_C"));
+	if (ModoMultijugadorBPClass.Succeeded())
+		ModoMultijugadorClass = ModoMultijugadorBPClass.Class;
+
+	static ConstructorHelpers::FClassFinder<UWidgetSalaEspera> SalaEsperaBP(TEXT("/Game/WIDGETS/SalaEspera.SalaEspera_C"));
+	if (SalaEsperaBP.Succeeded())
+		WidgetSalaEsperaClass = SalaEsperaBP.Class;
+
+	static ConstructorHelpers::FClassFinder<UWidgetPCMulti> PCMultiBP(TEXT("/Game/WIDGETS/PantallaCargaMulti.PantallaCargaMulti_C"));
+	if (PCMultiBP.Succeeded())
+		WidgetPCMultiClass = PCMultiBP.Class;
+
+	static ConstructorHelpers::FClassFinder<UWidgetOnGameMulti> OnGameMultiBP(TEXT("/Game/WIDGETS/EnGame_multijugador.EnGame_multijugador_C"));
+	if (OnGameMultiBP.Succeeded())
+		WidgetOnGameMultiClass = OnGameMultiBP.Class;
+
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
 	if (MusicaAsset.Succeeded())
 		MusicaInicio = MusicaAsset.Object;
@@ -59,8 +83,54 @@ AHUDmain::AHUDmain()
 void AHUDmain::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	for (TActorIterator<AFacadeGameManager> It(World); It; ++It)
+	{
+		FacadeRef = *It;
+		break;
+	}
+
+	if (!FacadeRef)
+	{
+		FActorSpawnParameters Params;
+		Params.Owner = this;
+		FacadeRef = World->SpawnActor<AFacadeGameManager>(
+			AFacadeGameManager::StaticClass(),
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			Params
+		);
+	}
+
 	MostrarPanelPrincipal();
 }
+
+
+void AHUDmain::ModoAventura()
+{
+	if (!FacadeRef)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No existe referencia a FacadeGameManager."));
+		return;
+	}
+
+	FacadeRef->IniciarModoAventura();
+}
+
+void AHUDmain::ModoMultijugador()
+{
+	if (!FacadeRef)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No existe referencia a FacadeGameManager."));
+		return;
+	}
+
+	FacadeRef->IniciarModoMultijugador();
+}
+
 
 void AHUDmain::MostrarPanelPrincipal()
 {
@@ -221,6 +291,120 @@ void AHUDmain::OcultarPause()
 	{
 		WidgetPauseInstance->RemoveFromParent();
 		UGameplayStatics::SetGamePaused(GetWorld(), false);
+	}
+}
+
+void AHUDmain::MostrarModoMultijugador()
+{
+	if (!ModoMultijugadorInstance && ModoMultijugadorClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		ModoMultijugadorInstance = CreateWidget<UWidget_Modo_multijugador>(PC, ModoMultijugadorClass);
+
+		if (ModoMultijugadorInstance)
+			ModoMultijugadorInstance->MostrarVentana(false);
+	}
+
+	if (ModoMultijugadorInstance && !ModoMultijugadorInstance->IsInViewport())
+	{
+		ModoMultijugadorInstance->AddToViewport();
+	}
+}
+
+
+void AHUDmain::OcultarModoMultijugador()
+{
+	if (ModoMultijugadorInstance && ModoMultijugadorInstance->IsInViewport())
+	{
+		ModoMultijugadorInstance->RemoveFromParent();
+		//UGameplayStatics::SetGamePaused(GetWorld(), false);
+	}
+}
+
+void AHUDmain::MostrarSalaEspera()
+{
+	if (!WidgetSalaEsperaInstance && WidgetSalaEsperaClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		WidgetSalaEsperaInstance = CreateWidget<UWidgetSalaEspera>(PC, WidgetSalaEsperaClass);
+	}
+	if (WidgetSalaEsperaInstance && !WidgetSalaEsperaInstance->IsInViewport())
+	{
+		WidgetSalaEsperaInstance->AddToViewport();
+		//WidgetSalaEsperaInstance->IrAPantallaCarga();
+
+	}
+}
+
+void AHUDmain::OcultarSalaEspera()
+{
+	if (WidgetSalaEsperaInstance && WidgetSalaEsperaInstance->IsInViewport())
+	{
+		WidgetSalaEsperaInstance->RemoveFromParent();
+	}
+}
+
+void AHUDmain::MostrarPantallaCargaMulti()
+{
+	if (!WidgetPCMultiInstance && WidgetPCMultiInstance)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		WidgetPCMultiInstance = CreateWidget<UWidgetPCMulti>(PC, WidgetPCMultiClass);
+	}
+
+	if (WidgetPCMultiInstance && !WidgetPCMultiInstance->IsInViewport())
+	{
+		WidgetPCMultiInstance->AddToViewport();
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &AHUDmain::OcultarPantallaCargaMulti, 3.0f, false);
+	}
+}
+
+
+void AHUDmain::OcultarPantallaCargaMulti()
+{
+	if (WidgetPCMultiInstance && WidgetPCMultiInstance->IsInViewport())
+	{
+		DetenerMusicaInicio();
+		RemoverInputController();
+		MostrarOnGameMulti();
+
+		WidgetPCMultiInstance->RemoveFromParent();
+	}
+}
+
+
+void AHUDmain::MostrarOnGameMulti()
+{
+	if (!WidgetOnGameMultiInstance && WidgetOnGameMultiClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		WidgetOnGameMultiInstance = CreateWidget<UWidgetOnGameMulti>(PC, WidgetOnGameMultiClass);
+	}
+	if (WidgetOnGameMultiInstance && !WidgetOnGameMultiInstance->IsInViewport())
+	{
+		WidgetOnGameMultiInstance->AddToViewport();
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PC)
+		{
+			UGameplayStatics::SetGamePaused(GetWorld(), false);
+			OcultarPantallaCargaMulti();
+			// Mostrar cursor pero mantener control del juego
+			PC->bShowMouseCursor = true;
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(WidgetOnGameInstance->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PC->SetInputMode(InputMode);
+		}
+	}
+}
+
+void AHUDmain::OcultarOnGameMulti()
+{
+	if (WidgetOnGameMultiInstance && WidgetOnGameMultiInstance->IsInViewport())
+	{
+		WidgetOnGameMultiInstance->RemoveFromParent();
 	}
 }
 

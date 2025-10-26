@@ -8,7 +8,7 @@
 #include "Engine/StaticMesh.h"
 #include "Particles/ParticleSystemComponent.h"
 
-AMobileSpaceProjectile::AMobileSpaceProjectile() 
+AMobileSpaceProjectile::AMobileSpaceProjectile()
 {
 	// Static reference to the mesh to use for the projectile
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("/Game/TwinStick/Meshes/TwinStickProjectile.TwinStickProjectile"));
@@ -67,7 +67,7 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
 	}
 
-	
+
 
 	Destroy();
 }
