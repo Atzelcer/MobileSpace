@@ -15,6 +15,8 @@ AMobileSpaceGameMode::AMobileSpaceGameMode()
 	// set default pawn class to our character class
 	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 	HUDClass = AHUDmain::StaticClass();
+	bUseSeamlessTravel = true;
+
 }
 
 void AMobileSpaceGameMode::BeginPlay()

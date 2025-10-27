@@ -24,6 +24,8 @@ AShipMultijugador::AShipMultijugador()
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
 		ShipMesh->SetRelativeScale3D(FVector(0.3f));
 	}
+	ShipMesh->SetIsReplicated(true);
+	SetReplicateMovement(true);
 
 	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailFX"));
 	ParticleTrail->SetupAttachment(ShipMesh);
@@ -34,7 +36,6 @@ AShipMultijugador::AShipMultijugador()
 	CantidadMisiles = 5;
 	CantidadEscudos = 3;
 	LimiteDisparo = 1.0f;
-
 	bCanFire = true;
 }
 
@@ -60,7 +61,6 @@ void AShipMultijugador::BeginPlay()
 void AShipMultijugador::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (IsLocallyControlled() && WidgetMultiInstance)
 	{
 		ActualizarHUD();
@@ -78,7 +78,6 @@ void AShipMultijugador::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void AShipMultijugador::ActualizarHUD()
 {
 	if (!WidgetMultiInstance) return;
-
 	WidgetMultiInstance->ActualizarVida(VidaActual, VidaMaxima);
 	WidgetMultiInstance->ActualizarLimiteDisparo(LimiteDisparo, 1.0f);
 	WidgetMultiInstance->ActualizarVelocidad(VelocidadActual);
@@ -114,7 +113,6 @@ void AShipMultijugador::Server_FireShot_Implementation()
 {
 	FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 90.f;
 	FRotator SpawnRotation = GetActorRotation();
-
 	UWorld* World = GetWorld();
 	if (World)
 	{
@@ -130,7 +128,6 @@ void AShipMultijugador::ResetFire()
 void AShipMultijugador::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
 	DOREPLIFETIME(AShipMultijugador, VidaActual);
 	DOREPLIFETIME(AShipMultijugador, VelocidadActual);
 }

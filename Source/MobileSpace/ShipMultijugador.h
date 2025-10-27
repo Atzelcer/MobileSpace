@@ -21,7 +21,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// === Componentes ===
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	class UStaticMeshComponent* ShipMesh;
 
@@ -34,7 +33,6 @@ public:
 	UPROPERTY()
 	class UWidgetOnGameMulti* WidgetMultiInstance;
 
-	// === Atributos ===
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Stats")
 	float VidaActual;
 
@@ -53,10 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float LimiteDisparo;
 
-	// === Actualizaciones ===
 	void ActualizarHUD();
-
-	// === Movimiento y Disparo ===
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void FireShot();
@@ -69,7 +64,6 @@ public:
 private:
 	bool bCanFire;
 	FTimerHandle FireTimerHandle;
-
 	void ResetFire();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

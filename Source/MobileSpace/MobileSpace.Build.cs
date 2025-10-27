@@ -21,8 +21,10 @@ public class MobileSpace : ModuleRules
             "AIModule",
             "NavigationSystem",
             "GameplayTasks",
-            "Sockets",        
-            "Networking"    
+            "Sockets",
+            "Networking",
+            "OnlineSubsystem",
+            "OnlineSubsystemUtils"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]
@@ -32,9 +34,9 @@ public class MobileSpace : ModuleRules
             "SlateCore"
         });
 
-        // Opcionales si planeas hacer builds Android con red
-        //bEnableExceptions = true;   // permite uso seguro de excepciones C++
-        //bUseRTTI = true;            // habilita runtime type info
-        //bEnableUndefinedIdentifierWarnings = false; // opcional para compatibilidad
+        DynamicallyLoadedModuleNames.AddRange(new string[]
+        {
+            "OnlineSubsystemNull"
+        });
     }
 }

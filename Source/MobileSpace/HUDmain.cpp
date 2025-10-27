@@ -328,11 +328,12 @@ void AHUDmain::MostrarSalaEspera()
 		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		WidgetSalaEsperaInstance = CreateWidget<UWidgetSalaEspera>(PC, WidgetSalaEsperaClass);
 	}
+
 	if (WidgetSalaEsperaInstance && !WidgetSalaEsperaInstance->IsInViewport())
 	{
 		WidgetSalaEsperaInstance->AddToViewport();
-		//WidgetSalaEsperaInstance->IrAPantallaCarga();
 
+		GetWorldTimerManager().SetTimer(TimerHandle_OcultarPantallaCarga, this, &AHUDmain::MostrarPantallaCargaMulti, 3.0f, false);
 	}
 }
 

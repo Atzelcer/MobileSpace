@@ -5,26 +5,26 @@
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Net/UnrealNetwork.h"
 
 AProjectileMultijugador::AProjectileMultijugador()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true; // Importante para red
+	bReplicates = true;
 
-	// --- Malla del proyectil ---
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/TwinStick/Meshes/TwinStickProjectile.TwinStickProjectile"));
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
-	RootComponent = ProjectileMesh;
-
+	SetRootComponent(ProjectileMesh);
 	if (MeshAsset.Succeeded())
+	{
 		ProjectileMesh->SetStaticMesh(MeshAsset.Object);
-
+	}
 	ProjectileMesh->SetCollisionProfileName("Projectile");
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileMultijugador::OnHit);
 	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	ProjectileMesh->SetCollisionResponseToAllChannels(ECR_Overlap);
+	ProjectileMesh->SetIsReplicated(true);
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileMultijugador::OnHit);
 
-	// --- Movimiento ---
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
 	ProjectileMovement->InitialSpeed = 3500.f;
@@ -34,7 +34,6 @@ AProjectileMultijugador::AProjectileMultijugador()
 
 	InitialLifeSpan = 2.5f;
 
-	// --- Partículas ---
 	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailFX"));
 	ParticleTrail->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Trail03_Purple.P_Projectile_Trail03_Purple'"));
@@ -59,10 +58,9 @@ void AProjectileMultijugador::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AProjectileMultijugador::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+void AProjectileMultijugador::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HasAuthority()) // Solo el servidor destruye
+	if (HasAuthority())
 	{
 		Destroy();
 	}
