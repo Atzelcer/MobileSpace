@@ -20,6 +20,19 @@ protected:
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "GameMode")
+	void ModoAventura();
+
+	UFUNCTION(BlueprintCallable, Category = "GameMode")
+	void ModoMultijugador();
+
+private:
+
+	UPROPERTY()
+	class AFacadeGameManager* FacadeRef;
+
+public:
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UPanelPrincipalC> PanelPrincipalClass;
 
@@ -56,6 +69,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UWidget_ON_GAME> WidgetOnGameClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UWidget_Modo_multijugador> ModoMultijugadorClass;
+
+	UPROPERTY(Transient)
+	class UWidget_Modo_multijugador* ModoMultijugadorInstance;
+
 	UPROPERTY(Transient)
 	class UWidget_ON_GAME* WidgetOnGameInstance;
 
@@ -64,6 +83,24 @@ public:
 
 	UPROPERTY(Transient)
 	class UWidget_pause* WidgetPauseInstance;
+
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	class TSubclassOf<class UWidgetSalaEspera> WidgetSalaEsperaClass;
+
+	UPROPERTY(Transient)
+	class UWidgetSalaEspera* WidgetSalaEsperaInstance;
+
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	TSubclassOf<class UWidgetPCMulti> WidgetPCMultiClass;
+
+	UPROPERTY(Transient)
+	UWidgetPCMulti* WidgetPCMultiInstance;
+
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	class TSubclassOf<class UWidgetOnGameMulti> WidgetOnGameMultiClass;
+
+	UPROPERTY(Transient)
+	class UWidgetOnGameMulti* WidgetOnGameMultiInstance;
 
 
 	UPROPERTY(Transient)
@@ -124,10 +161,32 @@ public:
 	void OcultarPause();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
+	void MostrarModoMultijugador();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarModoMultijugador();
+
+
+	UFUNCTION(BlueprintCallable)
+	void MostrarSalaEspera();
+
+	UFUNCTION(BlueprintCallable)
+	void OcultarSalaEspera();
+
+	UFUNCTION(BlueprintCallable)
+	void MostrarPantallaCargaMulti();
+
+	UFUNCTION(BlueprintCallable)
+	void OcultarPantallaCargaMulti();
+
+	UFUNCTION(BlueprintCallable)
+	void MostrarOnGameMulti();
+
+	UFUNCTION(BlueprintCallable)
+	void OcultarOnGameMulti();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarTodo();
-
-
-	//Handler for timer to hide loading screen
 
 	FTimerHandle TimerHandle_OcultarPantallaCarga;
 	FTimerHandle TimerHandle_ConteoPantallaCarga;

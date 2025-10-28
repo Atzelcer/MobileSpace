@@ -44,7 +44,18 @@ void UModoJuegoC::OnAventuraClicked()
 
 void UModoJuegoC::OnMultijugadorClicked()
 {
-    /*UGameplayStatics::OpenLevel(GetWorld(), FName("MapaMultijugador"));*/
+    APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    if (PC)
+    {
+        AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+        if (HUD)
+        {
+            HUD->MostrarModoMultijugador();
+            //HUD->OcultarPanelPrincipal();
+            //HUD->OcultarModoJuego();
+
+        }
+    }
 }
 
 
