@@ -4,7 +4,6 @@
 #include "Ship_CazadorVerde.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
-#include "MoveComponent.h"
 #include "AtackComponent.h"
 #include "Engine/Engine.h"
 #include "TimerManager.h"
@@ -18,9 +17,7 @@ AShip_CazadorVerde::AShip_CazadorVerde()
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
 		ShipMesh->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
 	}
-	// En el constructor .cpp
-	MoveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("MoveComponent"));
-
+	// Crear componente de ataque (MoveComp ya se hereda del padre)
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 
 	
@@ -41,7 +38,7 @@ void AShip_CazadorVerde::BeginPlay()
 	// O cambiar cada 5 segundos
 	FTimerHandle PatternTimer;
 	GetWorld()->GetTimerManager().SetTimer(PatternTimer, [this]() {
-		MoveComp->StartPattern(EMovementPattern::Loop);
+		MoveComp->StartPattern(EMovementPattern::Linear);
 		}, 5.0f, false);
 
 

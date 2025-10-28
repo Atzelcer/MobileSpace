@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Ship_X.h"
+#include "AtackComponent.h"
 #include "Ship_CazadorDelta.generated.h"
 
 /**
@@ -17,5 +18,23 @@ class MOBILESPACE_API AShip_CazadorDelta : public AShip_X
 public:
 
 	AShip_CazadorDelta();
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UAtackComponent* AttackComp;
+
+	// Patrón de ataque que usará este enemigo
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	EAtackPattern AttackPattern = EAtackPattern::Burst;
+
+	// Tiempo entre disparos
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float TimeBetweenShots = 2.5f;
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	FTimerHandle FireTimerHandle;
+	void AutoFire();
 };

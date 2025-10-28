@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "Components/BoxComponent.h"
 #include "MobileSpaceProjectile.h"
+#include "MoveComponent.h"
 
 
 // Sets default values
@@ -19,14 +20,24 @@ AShip_X::AShip_X()
 	ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMesh;
 
-
 	ShipCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShipCollision"));
 	ShipCollision->SetupAttachment(ShipMesh);
 	ShipCollision->SetBoxExtent(FVector(100.f, 100.f, 100.f));
-	// IMPORTANTE: Enlazar evento de colisi髇
+	// IMPORTANTE: Enlazar evento de colisi贸n
 	ShipCollision->OnComponentBeginOverlap.AddDynamic(this, &AShip_X::OnShipHit);
+	
+	// 隆CREAR EL COMPONENTE DE MOVIMIENTO CHISTOSO!
+	MoveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("MoveComponent"));
+	if (MoveComp)
+	{
+		// Configurar valores por defecto para m贸vil
+		MoveComp->Speed = 400.0f;
+		MoveComp->Amplitude = 250.0f;
+		MoveComp->Frequency = 1.5f;
+		MoveComp->bUseBounds = true;
+	}
 
-	// Configurar colisi髇 para que genere eventos
+	// Configurar colisi锟絥 para que genere eventos
 	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	ShipCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	
@@ -37,7 +48,11 @@ void AShip_X::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	// Iniciar patr贸n de movimiento por defecto
+	if (MoveComp)
+	{
+		MoveComp->StartPattern(EMovementPattern::Elliptical); // Patr贸n b谩sico por defecto
+	}
 }
 
 // Called every frame

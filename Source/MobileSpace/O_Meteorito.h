@@ -17,5 +17,6 @@ class MOBILESPACE_API AO_Meteorito : public AObstaculos
 public:
 
 	AO_Meteorito();
+
 	
 };

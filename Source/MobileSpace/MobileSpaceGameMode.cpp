@@ -9,40 +9,57 @@
 #include "Engine/World.h"
 #include "HUDmain.h"
 #include "MegaPortal.h"
+#include "AventuraManager.h"
 
 AMobileSpaceGameMode::AMobileSpaceGameMode()
 {
 	// set default pawn class to our character class
 	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 	HUDClass = AHUDmain::StaticClass();
+	
+	// Initialize pointers
+	AventuraManager = nullptr;
 }
 
 void AMobileSpaceGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
-
-	// También puedes ocultar el cursor si quieres
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PlayerController)
+	
+	if (GEngine)
 	{
-		PlayerController->bShowMouseCursor = true;
-		PlayerController->SetInputMode(FInputModeUIOnly());
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("GameMode BeginPlay started!"));
 	}
-	// Setup fixed camera
+	
 	SetupFixedCamera();
+	
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		FVector PortalLocation(1610.0f, -250.0f, 210.0f);
-		FRotator PortalRotation(0.0f, 0.0f, 0.0f);
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		AMegaPortal* Portal = World->SpawnActor<AMegaPortal>(AMegaPortal::StaticClass(), PortalLocation, PortalRotation, SpawnParams);
-		if (Portal)
+		AventuraManager = World->SpawnActor<AAventuraManager>(AAventuraManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		
+		if (AventuraManager)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("MegaPortal spawneado correctamente en (1610, -250, 160)"));
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager spawned successfully!"));
+			}
+		}
+		else
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("FAILED to spawn AventuraManager!"));
+			}
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("World is NULL in GameMode!"));
 		}
 	}
 }

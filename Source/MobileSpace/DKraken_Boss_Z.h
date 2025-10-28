@@ -15,7 +15,5 @@ class MOBILESPACE_API ADKraken_Boss_Z : public ABoss_Z
 	GENERATED_BODY()
 
 public:
-
 	ADKraken_Boss_Z();
-	
 };

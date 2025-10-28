@@ -27,6 +27,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class ACameraActor* FixedCamera;
 
+	// Adventure Manager for level control
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Management")
+	class AAventuraManager* AventuraManager;
+
 protected:
 	
 	// Function to setup fixed camera

@@ -15,7 +15,5 @@ class MOBILESPACE_API ADragonR_Boss_Z : public ABoss_Z
 	GENERATED_BODY()
 
 public:
-
 	ADragonR_Boss_Z();
-	
 };

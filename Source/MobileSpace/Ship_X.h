@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "MoveComponent.h"
 #include "Ship_X.generated.h"
 
 UCLASS()
@@ -20,7 +21,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* ShipMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* ShipCollision;
+	
+	// ¡COMPONENTE DE MOVIMIENTO CHISTOSO!
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UMoveComponent* MoveComp;
 	
 
 protected:

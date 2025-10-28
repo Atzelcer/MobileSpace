@@ -9,15 +9,13 @@
 UENUM(BlueprintType)
 enum class EMovementPattern : uint8
 {
-	Idle            UMETA(DisplayName = "Idle"),
-	Patrol          UMETA(DisplayName = "Horizontal Patrol"),
-	SineWave        UMETA(DisplayName = "Sine Wave"),
-	Figure8         UMETA(DisplayName = "Figure 8"),
-	Spiral          UMETA(DisplayName = "Spiral"),
-	Loop            UMETA(DisplayName = "Loop"),
-	ZigZag          UMETA(DisplayName = "Zig Zag"),
-	Parabola        UMETA(DisplayName = "Parabolic Dive")
+	Linear          UMETA(DisplayName = "Linear Movement"),     
+	SineWave        UMETA(DisplayName = "Sine Wave"),           
+	Circular        UMETA(DisplayName = "Circular Motion"),     
+	ZigZag          UMETA(DisplayName = "Zig Zag"),            
+	Elliptical      UMETA(DisplayName = "Elliptical Path")     
 };
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MOBILESPACE_API UMoveComponent : public UActorComponent
@@ -34,7 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void StopMovemento();
 
-	// Par�metros editables
+	// Parámetros editables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float Speed = 600.0f;
 
@@ -42,10 +40,26 @@ public:
 	float Amplitude = 200.0f; // Amplitud de ondas/espirales
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float Frequency = 2.0f; // Frecuencia de oscilaci�n
+	float Frequency = 2.0f; // Frecuencia de oscilación
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	FVector StartPosition = FVector::ZeroVector;
+
+	// LÍMITES DE PANTALLA PARA MÓVIL
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
+	float MinX = -1600.0f; // Límite izquierdo (donde está el jugador)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
+	float MaxX = 1600.0f; // Límite derecho (donde spawnan)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
+	float MinY = -800.0f; // Límite inferior
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
+	float MaxY = 800.0f; // Límite superior
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
+	bool bUseBounds = true; // Activar/desactivar límites
 
 
 protected:
@@ -59,14 +73,15 @@ private:
 	int32 PatrolDirection;
 
 
-	// Funciones de patrones
-	void UpdatePatrol(float DeltaTime);
+	// Funciones de patrones matemáticos simples (solo X, Y)
+	void UpdateLinear(float DeltaTime);
 	void UpdateSineWave(float DeltaTime);
-	void UpdateFigure8(float DeltaTime);
-	void UpdateSpiral(float DeltaTime);
-	void UpdateLoop(float DeltaTime);
+	void UpdateCircular(float DeltaTime);
 	void UpdateZigZag(float DeltaTime);
-	void UpdateParabola(float DeltaTime);
+	void UpdateElliptical(float DeltaTime);
+
+	// Función para aplicar límites de pantalla
+	FVector ApplyScreenBounds(const FVector& DesiredPosition);
 
 public:	
 	// Called every frame
