@@ -8,6 +8,7 @@ public class MobileSpace : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+        // === DEPENDENCIAS PÚBLICAS ===
         PublicDependencyModuleNames.AddRange(new string[]
         {
             "Core",
@@ -27,6 +28,7 @@ public class MobileSpace : ModuleRules
             "OnlineSubsystemUtils"
         });
 
+        // === DEPENDENCIAS PRIVADAS ===
         PrivateDependencyModuleNames.AddRange(new string[]
         {
             "UMG",
@@ -34,9 +36,27 @@ public class MobileSpace : ModuleRules
             "SlateCore"
         });
 
+        // === MÓDULOS CARGADOS DINÁMICAMENTE ===
         DynamicallyLoadedModuleNames.AddRange(new string[]
         {
-            "OnlineSubsystemNull"
+            "OnlineSubsystemNull"  // ? Solo aquí
         });
+
+        // === FORZAR COMPILACIÓN EN EDITOR (SIN REPETIR OnlineSubsystemNull) ===
+        if (Target.bBuildEditor)
+        {
+            PrivateDependencyModuleNames.AddRange(new string[]
+            {
+                "OnlineSubsystemUtils",
+                "OnlineSubsystem"
+                // ? ¡NO agregues OnlineSubsystemNull aquí!
+            });
+        }
+
+        // === PARA MÓVIL (opcional) ===
+        if (Target.Platform == UnrealTargetPlatform.Android || Target.Platform == UnrealTargetPlatform.IOS)
+        {
+            PrivateDependencyModuleNames.Add("Launch");
+        }
     }
 }

@@ -13,19 +13,5 @@
 				"UMG"
 			]
 		}
-	],
-	"Plugins": [
-		{
-			"Name": "OnlineSubsystem",
-			"Enabled": true
-		},
-		{
-			"Name": "OnlineSubsystemUtils",
-			"Enabled": true
-		},
-		{
-			"Name": "OnlineSubsystemNull",
-			"Enabled": true
-		}
 	]
 }
