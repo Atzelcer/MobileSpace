@@ -4,6 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Ship_X.h"
+#include "Boss_Z.h"
+#include "Ship_CazadorAlfa.h"
+#include "Ship_CazadorDelta.h"
+#include "Ship_CazadorVerde.h"
+#include "Ship_CazadorRojo.h"
+#include "Ship_CazadorAzul.h"
+#include "Ship_CazadorOmega.h"
+#include "DKraken_Boss_Z.h"
+#include "DragonR_Boss_Z.h"
+#include "DragonT_Boss_Z.h"
+#include "MoveComponent.h" // ¡LIBRERÍA PARA LOS PATRONES CHISTOSOS!
 #include "AventuraManager.generated.h"
 
 UCLASS()
@@ -48,16 +60,8 @@ public:
 	UFUNCTION()
 	void Nivel7();
 
-	int32 NivelEnCurso;
-
 	UFUNCTION()
-	void EstablecerMaterial(UMaterialInstance* NuevoMaterial);
-
-	UFUNCTION()
-	void EscogerMaterialAleatorio();
-
-	UFUNCTION()
-	void ReproducirMusicaNivel(int32 Nivel);
+	void CheckWaveComplete();
 
 	UFUNCTION()
 	void ControladorNiveles();
@@ -65,25 +69,24 @@ public:
 	UFUNCTION()
 	void SetNivelActual(int32 NuevoNivel);
 
-
 	void SiguienteNivel();
 
-	//Material Instance 
-
+protected:
+	UPROPERTY()
+	int32 NivelActual;
 
 	UPROPERTY()
-	class UMaterialInstance* MaterialGameMejor;
+	int32 CurrentWave;
 
-	bool Next_Oleada;
+	UPROPERTY()
+	TArray<AShip_X*> ActiveShips;
 
-	int32 Current_Level;
-	int32 Enemies_Oleadas;
+	UPROPERTY()
+	ABoss_Z* CurrentBoss;
 
+	UPROPERTY()
+	FTimerHandle WaveTimerHandle;
 
-	int32 TopeOleada;
-	int32 OleadaActual;
-
-
-private:
-	int32 NivelActual;
+	UPROPERTY()
+	FTimerHandle BossTimerHandle;
 };

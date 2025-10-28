@@ -18,21 +18,26 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
 	ProjectileMesh->SetupAttachment(RootComponent);
 	ProjectileMesh->SetVisibility(false);
-	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
+	
+	// Configuración de colisión mejorada
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	ProjectileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore); // No golpear al jugador
+	
+	// Vincular eventos de colisión
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);
-	// En MobileSpaceProjectile.cpp (constructor)
-	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);// set up a notification for when this component hits something
+	
 	RootComponent = ProjectileMesh;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 5000.f;
+	ProjectileMovement->MaxSpeed = 5000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
+	ProjectileMovement->bSweepCollision = true; // Importante: Habilitar detección de colisión por barrido
 
 
 	// Die after 3 seconds by default
@@ -41,11 +46,11 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
 	ParticleProjectile->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/TurretVFX/Sources/Particle/P_Pentagon.P_Pentagon'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/TurretVFX/Sources/Particle/P_EnergyBolt.P_EnergyBolt'"));
 	if (ParticleAsset.Succeeded())
 	{
 		ParticleProjectile->SetTemplate(ParticleAsset.Object);
-		ParticleProjectile->SetRelativeScale3D(FVector(5.0, 5.0, 5.0));
+		ParticleProjectile->SetRelativeScale3D(FVector(2.0, 2.0, 2.0));
 	}
 
 	ParticleHit = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleHit"));
@@ -61,13 +66,36 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 
 void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Solo agrega impulso y reproduce el efecto de hit si golpea f�sica
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
+	// Debug para ver qué está golpeando
+	if (GEngine && OtherActor)
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, 
+			FString::Printf(TEXT("Projectile hit: %s"), *OtherActor->GetName()));
 	}
 
-	
+	// No golpear al jugador que disparó
+	if (OtherActor && OtherActor != GetOwner() && OtherActor != this)
+	{
+		// Si golpea algo que simula física, agregar impulso
+		if (OtherComp && OtherComp->IsSimulatingPhysics())
+		{
+			OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
+		}
 
-	Destroy();
+		// ¡DESTRUIR AMBOS! 😂
+		// Destruir la cosa que golpeamos (nave enemiga, etc.)
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, 
+				FString::Printf(TEXT("Destroying target: %s"), *OtherActor->GetName()));
+		}
+		OtherActor->Destroy();
+
+		// Destruir el proyectil también
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Projectile destroyed on impact!"));
+		}
+		Destroy();
+	}
 }

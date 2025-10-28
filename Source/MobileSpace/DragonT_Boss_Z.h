@@ -15,9 +15,5 @@ class MOBILESPACE_API ADragonT_Boss_Z : public ABoss_Z
 	GENERATED_BODY()
 
 public:
-
 	ADragonT_Boss_Z();
-	
-	
-	
 };

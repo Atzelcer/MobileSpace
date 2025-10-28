@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Ship_X.h"
-#include "MoveComponent.h"
 #include "AtackComponent.h"
 #include "Ship_CazadorVerde.generated.h"
 /**
@@ -20,13 +19,10 @@ public:
 	AShip_CazadorVerde();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UMoveComponent* MoveComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UAtackComponent* AttackComp;
 
 
-	// Patrón de ataque que usará este enemigo
+	// Patrï¿½n de ataque que usarï¿½ este enemigo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	EAtackPattern AttackPattern = EAtackPattern::Single;
 

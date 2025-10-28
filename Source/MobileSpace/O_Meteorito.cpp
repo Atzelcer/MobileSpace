@@ -13,3 +13,5 @@ AO_Meteorito::AO_Meteorito()
 		MeshObstaculo->SetStaticMesh(MeshAsset.Object);
 	}
 }
+
+

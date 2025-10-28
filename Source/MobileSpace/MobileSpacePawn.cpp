@@ -50,7 +50,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 	if (ParticleAsset.Succeeded())
 	{
 		ParticleTrail->SetTemplate(ParticleAsset.Object);
-		ParticleTrail->SetRelativeLocation(FVector(-500.f, -500.f, 0.f));
+		ParticleTrail->SetRelativeLocation(FVector(-500.f, 0.f, 0.f));
 		ParticleTrail->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
 		
 	}
