@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MultiplayerManager.generated.h"
@@ -14,29 +13,29 @@ class MOBILESPACE_API AMultiplayerManager : public AActor
 public:
 	AMultiplayerManager();
 
-protected:
 	virtual void BeginPlay() override;
 
-public:
+	UFUNCTION(BlueprintCallable)
+	void CrearSala();
 
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable)
+	void ValidarCodigoYUnirse(const FString& CodigoIngresado);
 
-	// === Lógica de conexión LAN ===
-	UFUNCTION(BlueprintCallable, Category = "Multiplayer")
-	void CrearSala(const FString& CodigoGenerado); // Host crea sala
+	UFUNCTION()
+	void ConfirmarConexionCliente();
 
-	UFUNCTION(BlueprintCallable, Category = "Multiplayer")
-	void ValidarCodigoYUnirse(const FString& CodigoIngresado); // Cliente intenta unirse
+	UFUNCTION()
+	void IniciarPartida();
 
-	UFUNCTION(BlueprintCallable, Category = "Multiplayer")
-	void ConfirmarConexionCliente(); // Llamado cuando el cliente valida correctamente
+	void SpawnearJugadores();
 
-	UFUNCTION(BlueprintCallable, Category = "Multiplayer")
-	void SpawnearJugadores(); // Se ejecuta al pasar al juego
+	void MostrarPantallaCarga();
 
-private:
+	UPROPERTY(Replicated, VisibleAnywhere)
 	FString CodigoSala;
-	bool bEsHost;
+
+	UPROPERTY(Replicated, VisibleAnywhere)
+	FString IPHost;
 
 	UPROPERTY()
 	APlayerController* HostController;
@@ -44,6 +43,8 @@ private:
 	UPROPERTY()
 	APlayerController* ClienteController;
 
+	UPROPERTY()
 	FTimerHandle TimerIniciarPartida;
-	void IniciarPartida();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

@@ -7,16 +7,11 @@
 #include "Misc/OutputDeviceNull.h"
 #include "GameFramework/GameModeBase.h"
 
-
 void UWidgetSalaEspera::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	FString CodigoGenerado = GenerarCodigoSala();
-	ActualizarCodigo(CodigoGenerado);
-
-	if (Image_nave_Player1) Image_nave_Player1->SetVisibility(ESlateVisibility::Visible);
-	if (Image_nave_Player2) Image_nave_Player2->SetVisibility(ESlateVisibility::Hidden);
+	if (Image_nave_Player2)
+		Image_nave_Player2->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UWidgetSalaEspera::ActualizarCodigo(const FString& Codigo)
@@ -27,31 +22,11 @@ void UWidgetSalaEspera::ActualizarCodigo(const FString& Codigo)
 
 void UWidgetSalaEspera::JugadorConectado(int32 NumeroJugador)
 {
-	switch (NumeroJugador)
-	{
-	case 1:
-		if (Image_nave_Player1) Image_nave_Player1->SetVisibility(ESlateVisibility::Visible);
-		break;
-	case 2:
-		if (Image_nave_Player2) Image_nave_Player2->SetVisibility(ESlateVisibility::Visible);
-		break;
-	default:
-		break;
-	}
+	if (NumeroJugador == 2 && Image_nave_Player2)
+		Image_nave_Player2->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UWidgetSalaEspera::IrAPantallaCarga()
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
-
-	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (HUD)
-		HUD->MostrarPantallaCargaMulti();
-}
-
-FString UWidgetSalaEspera::GenerarCodigoSala()
-{
-	const int32 Codigo = FMath::RandRange(1000, 9999);
-	return FString::Printf(TEXT("%d"), Codigo);
+	RemoveFromParent();
 }

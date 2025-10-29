@@ -6,9 +6,7 @@
 #include "Boss_Z.h"
 #include "DKraken_Boss_Z.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class MOBILESPACE_API ADKraken_Boss_Z : public ABoss_Z
 {

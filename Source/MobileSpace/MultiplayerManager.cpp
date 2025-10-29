@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+
 #include "MultiplayerManager.h"
+#include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
-#include "Engine/World.h"
-#include "ShipMultijugador.h"
-#include "TimerManager.h"
-#include "GameFramework/PlayerController.h"
-#include "WidgetSalaEspera.h"
 #include "HUDmain.h"
+#include "WidgetSalaEspera.h"
+#include "ShipMultijugador.h"
+#include "Sockets.h"
+#include "SocketSubsystem.h"
 
 AMultiplayerManager::AMultiplayerManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	bEsHost = false;
 }
 
 void AMultiplayerManager::BeginPlay()
@@ -20,36 +20,38 @@ void AMultiplayerManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-
-void AMultiplayerManager::Tick(float DeltaTime)
+void AMultiplayerManager::CrearSala()
 {
-	Super::Tick(DeltaTime);
-}
+	CodigoSala = FString::FromInt(FMath::RandRange(1000, 9999));
+	bool bCanBind = false;
+	TSharedPtr<FInternetAddr> LocalAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBind);
+	IPHost = LocalAddr.IsValid() ? LocalAddr->ToString(false) : TEXT("0.0.0.0");
 
-void AMultiplayerManager::CrearSala(const FString& CodigoGenerado)
-{
+	//UE_LOG(LogTemp, Warning, TEXT("Sala creada. IP: %s | Código: %s"), *IPHost, *CodigoSala);
+
 	UWorld* World = GetWorld();
 	if (!World) return;
 
-	bEsHost = true;
-	CodigoSala = CodigoGenerado;
 	HostController = UGameplayStatics::GetPlayerController(World, 0);
-
-	UE_LOG(LogTemp, Warning, TEXT("Sala creada. Código: %s"), *CodigoSala);
+	if (HostController)
+	{
+		AHUDmain* HUD = Cast<AHUDmain>(HostController->GetHUD());
+		HUD->MostrarSalaEspera();
+		if (HUD && HUD->WidgetSalaEsperaInstance)
+			HUD->WidgetSalaEsperaInstance->ActualizarCodigo(CodigoSala);
+	}
 }
-
 
 void AMultiplayerManager::ValidarCodigoYUnirse(const FString& CodigoIngresado)
 {
 	if (CodigoIngresado == CodigoSala)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Código válido. Conectando cliente..."));
 		ConfirmarConexionCliente();
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Código inválido. No se puede unir."));
-	}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Código incorrecto."));
+	//}
 }
 
 void AMultiplayerManager::ConfirmarConexionCliente()
@@ -61,25 +63,39 @@ void AMultiplayerManager::ConfirmarConexionCliente()
 	if (!ClienteController) return;
 
 	AHUDmain* HUD = Cast<AHUDmain>(ClienteController->GetHUD());
-	if (!HUD) return;
-
-	HUD->MostrarSalaEspera();
-
-	if (HUD->WidgetSalaEsperaInstance)
+	if (HUD)
 	{
-		HUD->WidgetSalaEsperaInstance->JugadorConectado(2);
+		HUD->MostrarSalaEspera();
+		if (HUD->WidgetSalaEsperaInstance)
+			HUD->WidgetSalaEsperaInstance->JugadorConectado(2);
 	}
 
-	World->GetTimerManager().SetTimer(TimerIniciarPartida, this, &AMultiplayerManager::IniciarPartida, 3.0f, false);
+
+	World->GetTimerManager().SetTimer(TimerIniciarPartida, this, &AMultiplayerManager::MostrarPantallaCarga, 3.0f, false);
 }
 
+void AMultiplayerManager::MostrarPantallaCarga()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+	if (!PC) return;
+
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	HUD->MostrarPantallaCargaMulti();
+
+	World->GetTimerManager().SetTimer(TimerIniciarPartida, this, &AMultiplayerManager::IniciarPartida, 5.0f, false);
+
+}
 
 void AMultiplayerManager::IniciarPartida()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Iniciando partida..."));
+	//UE_LOG(LogTemp, Warning, TEXT("Iniciando partida..."));
 	SpawnearJugadores();
 }
-
 
 
 void AMultiplayerManager::SpawnearJugadores()
@@ -87,18 +103,51 @@ void AMultiplayerManager::SpawnearJugadores()
 	UWorld* World = GetWorld();
 	if (!World) return;
 
+	const FVector CentroMapa(0, 0, 200);
 	const FVector SpawnHost(0, -800, 200);
 	const FVector SpawnCliente(0, 800, 200);
 
-	if (HostController && HostController->GetPawn() == nullptr)
+	if (HostController && !HostController->GetPawn())
 	{
-		APawn* HostShip = World->SpawnActor<AShipMultijugador>(AShipMultijugador::StaticClass(), SpawnHost, FRotator(0, 0, 0));
+		FRotator RotacionHost = (CentroMapa - SpawnHost).Rotation();
+		AShipMultijugador* HostShip = World->SpawnActor<AShipMultijugador>(
+			AShipMultijugador::StaticClass(), SpawnHost, RotacionHost);
 		if (HostShip) HostController->Possess(HostShip);
 	}
 
-	if (ClienteController && ClienteController->GetPawn() == nullptr)
+	if (ClienteController && !ClienteController->GetPawn())
 	{
-		APawn* ClientShip = World->SpawnActor<AShipMultijugador>(AShipMultijugador::StaticClass(), SpawnCliente, FRotator(0, 180, 0));
+		FRotator RotacionCliente = (CentroMapa - SpawnCliente).Rotation();
+		AShipMultijugador* ClientShip = World->SpawnActor<AShipMultijugador>(
+			AShipMultijugador::StaticClass(), SpawnCliente, RotacionCliente);
 		if (ClientShip) ClienteController->Possess(ClientShip);
 	}
+
+	if (HostController)
+	{
+		AHUDmain* HUDHost = Cast<AHUDmain>(HostController->GetHUD());
+		if (HUDHost)
+		{
+			HUDHost->OcultarTodo();
+			HUDHost->MostrarOnGameMulti();
+		}
+	}
+
+	if (ClienteController)
+	{
+		AHUDmain* HUDClient = Cast<AHUDmain>(ClienteController->GetHUD());
+		if (HUDClient)
+		{
+			HUDClient->OcultarTodo();
+			HUDClient->MostrarOnGameMulti();
+		}
+	}
+}
+
+
+void AMultiplayerManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AMultiplayerManager, CodigoSala);
+	DOREPLIFETIME(AMultiplayerManager, IPHost);
 }

@@ -23,10 +23,10 @@ AAventuraManager::AAventuraManager()
 void AAventuraManager::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager BeginPlay!"));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager BeginPlay!"));
+	//}
 	ControladorNiveles();
 }
 
@@ -40,22 +40,22 @@ void AAventuraManager::Tick(float DeltaTime)
 
 void AAventuraManager::ControladorNiveles()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Blue, 
-			FString::Printf(TEXT("ControladorNiveles() called for Level %d"), NivelActual));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Blue, 
+	//		FString::Printf(TEXT("ControladorNiveles() called for Level %d"), NivelActual));
+	//}
 	
 	// Resetear estado del nivel
 	CurrentWave = 1;
 	CurrentBoss = nullptr;
 	ActiveShips.Empty();
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Yellow, FString::Printf(TEXT("Starting Level %d - Wave reset to 1"), NivelActual));
-	}
-	
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Yellow, FString::Printf(TEXT("Starting Level %d - Wave reset to 1"), NivelActual));
+	//}
+	//
 	switch (NivelActual)
 	{
 	case 1: Nivel1(); break;
@@ -77,19 +77,19 @@ void AAventuraManager::SetNivelActual(int32 NuevoNivel)
 
 void AAventuraManager::SiguienteNivel()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Green, 
-			FString::Printf(TEXT("SiguienteNivel() called! Current: %d -> Next: %d"), NivelActual, NivelActual + 1));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Green, 
+	//		FString::Printf(TEXT("SiguienteNivel() called! Current: %d -> Next: %d"), NivelActual, NivelActual + 1));
+	//}
 	
 	NivelActual++;
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Green, 
-			FString::Printf(TEXT("About to call ControladorNiveles() for level %d"), NivelActual));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Green, 
+	//		FString::Printf(TEXT("About to call ControladorNiveles() for level %d"), NivelActual));
+	//}
 	
 	ControladorNiveles();
 }
@@ -109,11 +109,11 @@ void AAventuraManager::CheckWaveComplete()
 	{
 		if (CurrentWave == 1)
 		{
-			// WAVE 1 TERMINADA → Pasar a WAVE 2
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("WAVE 1 COMPLETE! Starting Wave 2..."));
-			}
+			//// WAVE 1 TERMINADA → Pasar a WAVE 2
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("WAVE 1 COMPLETE! Starting Wave 2..."));
+			//}
 			CurrentWave = 2;
 			GetWorldTimerManager().SetTimer(WaveTimerHandle, [this]() {
 				switch (NivelActual)
@@ -127,20 +127,20 @@ void AAventuraManager::CheckWaveComplete()
 		}
 		else if (CurrentWave == 2)
 		{
-			// WAVE 2 TERMINADA → Pasar al siguiente nivel (SIN SPAWNEAR BOSS)
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, TEXT("WAVE 2 COMPLETE! Proceeding to next level..."));
-			}
-			
+			//// WAVE 2 TERMINADA → Pasar al siguiente nivel (SIN SPAWNEAR BOSS)
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, TEXT("WAVE 2 COMPLETE! Proceeding to next level..."));
+			//}
+			//
 			// Cambiar a wave 3 temporalmente para evitar loops
 			CurrentWave = 3;
 			
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Magenta, TEXT("Setting timer for SiguienteNivel()..."));
-			}
-			
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Magenta, TEXT("Setting timer for SiguienteNivel()..."));
+			//}
+			//
 			GetWorldTimerManager().SetTimer(WaveTimerHandle, this, &AAventuraManager::SiguienteNivel, 2.5f, false);
 		}
 	}
