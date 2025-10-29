@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "MobileSpaceProjectile.h"
 #include "MobileSpacePawn.generated.h"
 
 UCLASS(Blueprintable)
@@ -28,9 +29,9 @@ public:
 	AMobileSpacePawn();
 
 	/** Offset from the ships location to spawn projectiles */
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
 	FVector GunOffset;
-
+	
 	/* How fast the weapon will fire */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float FireRate;
@@ -42,6 +43,9 @@ public:
 	/** Sound to play each time we fire */
 	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)
 	class USoundBase* FireSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* MuzzleParticleAsset;
 
 	// Begin Actor Interface
 	virtual void Tick(float DeltaSeconds) override;
@@ -78,4 +82,8 @@ public:
 	// FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	UParticleSystemComponent* ParticleTrail;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
+	TSubclassOf<AMobileSpaceProjectile> ProjectileClass;
 };
+
