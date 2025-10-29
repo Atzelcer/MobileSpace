@@ -17,51 +17,51 @@ AMobileSpaceGameMode::AMobileSpaceGameMode()
 	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 	HUDClass = AHUDmain::StaticClass();
 	
-	// Initialize pointers
-	AventuraManager = nullptr;
+	//// Initialize pointers
+	//AventuraManager = nullptr;
 }
 
 void AMobileSpaceGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("GameMode BeginPlay started!"));
-	}
-	
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("GameMode BeginPlay started!"));
+	//}
+	//
 	SetupFixedCamera();
 	
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//UWorld* World = GetWorld();
+	//if (World)
+	//{
+	//	FActorSpawnParameters SpawnParams;
+	//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		AventuraManager = World->SpawnActor<AAventuraManager>(AAventuraManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-		
-		if (AventuraManager)
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager spawned successfully!"));
-			}
-		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("FAILED to spawn AventuraManager!"));
-			}
-		}
-	}
-	else
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("World is NULL in GameMode!"));
-		}
-	}
+	//	AventuraManager = World->SpawnActor<AAventuraManager>(AAventuraManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	//	
+	//	if (AventuraManager)
+	//	{
+	//		if (GEngine)
+	//		{
+	//			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager spawned successfully!"));
+	//		}
+	//	}
+	//	else
+	//	{
+	//		if (GEngine)
+	//		{
+	//			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("FAILED to spawn AventuraManager!"));
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	if (GEngine)
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("World is NULL in GameMode!"));
+	//	}
+	//}
 }
 
 void AMobileSpaceGameMode::Tick(float DeltaSeconds)
@@ -108,7 +108,7 @@ void AMobileSpaceGameMode::SetupFixedCamera()
 		if (PC)
 		{
 			PC->SetViewTarget(FixedCamera);
-			UE_LOG(LogTemp, Warning, TEXT("Fixed camera created and set as view target!"));
+			//UE_LOG(LogTemp, Warning, TEXT("Fixed camera created and set as view target!"));
 		}
 	}
 }

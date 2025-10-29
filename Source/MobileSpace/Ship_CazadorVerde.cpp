@@ -56,6 +56,5 @@ void AShip_CazadorVerde::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Cazador Verde Fired!"));
 	}
 }

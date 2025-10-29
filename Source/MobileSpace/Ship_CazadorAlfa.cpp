@@ -46,9 +46,9 @@ void AShip_CazadorAlfa::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Cazador Alfa Fired!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Cazador Alfa Fired!"));
+		//}
 	}
 }

@@ -5,6 +5,7 @@
 #include "HUDmain.h"
 #include "WidgetSalaEspera.h"
 #include "Engine/Engine.h"
+#include "MobileSpaceInstance.h"
 
 void UWidget_Modo_multijugador::NativeConstruct()
 {
@@ -43,15 +44,26 @@ void UWidget_Modo_multijugador::MostrarVentana(bool bMostrar)
 
 void UWidget_Modo_multijugador::OnCrearSalaClicked()
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	UWorld* World = GetWorld();
+	if (!World) return;
+	UE_LOG(LogTemp, Warning, TEXT("se entreo gagagogogogogogo AAAAAAAAAAAAAAAAAAA"));
+	UMobileSpaceInstance* Instance = Cast<UMobileSpaceInstance>(UGameplayStatics::GetGameInstance(World));
+	if (Instance)
+	{
+		Instance->HostSala(); // Crea sala, lanza mapa en modo listen
+		UE_LOG(LogTemp, Warning, TEXT("se entreo gagagogogogogogo "));
+	}
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
 	if (!PC) return;
 
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (!HUD) return;
-
-	HUD->MostrarSalaEspera();
-	HUD->OcultarModoMultijugador();
-	HUD->OcultarTodo();
+	if (HUD)
+	{
+		HUD->MostrarSalaEspera(); // Muestra widget de espera
+		HUD->OcultarModoMultijugador();
+		HUD->OcultarTodo();
+	}
 }
 
 void UWidget_Modo_multijugador::OnEntrarSalaClicked()
@@ -69,17 +81,26 @@ void UWidget_Modo_multijugador::OnEntrarSalaVentanaClicked()
 	if (!codigoSala_NEW) return;
 
 	const FString CodigoIngresado = codigoSala_NEW->GetText().ToString();
-	if (CodigoIngresado.Len() <= 0) return;
+	if (CodigoIngresado.IsEmpty()) return;
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
+	UWorld* World = GetWorld();
+	if (!World) return;
 
-	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (HUD)
+	UMobileSpaceInstance* Instance = Cast<UMobileSpaceInstance>(UGameplayStatics::GetGameInstance(World));
+	if (Instance)
 	{
-		HUD->MostrarSalaEspera();
-		HUD->OcultarModoMultijugador();
+		Instance->UnirseSala(CodigoIngresado); // valida código + conexión LAN
 	}
+
+	//APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+	//if (!PC) return;
+
+	//AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	//if (HUD)
+	//{
+	//	HUD->MostrarSalaEspera();
+	//	HUD->OcultarModoMultijugador();
+	//}
 }
 
 void UWidget_Modo_multijugador::OnVolverClicked()

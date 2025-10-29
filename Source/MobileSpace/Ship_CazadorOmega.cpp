@@ -58,9 +58,9 @@ void AShip_CazadorOmega::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Purple, TEXT("CAZADOR OMEGA FIRED SPREAD! [DANGER]"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Purple, TEXT("CAZADOR OMEGA FIRED SPREAD! [DANGER]"));
+		//}
 	}
 }

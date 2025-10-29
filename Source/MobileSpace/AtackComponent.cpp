@@ -91,15 +91,15 @@ void UAtackComponent::FireSingle()
     {
     case 0:
         World->SpawnActor<AProjectile_A>(AProjectile_A::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
-        UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_A"));
+        //UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_A"));
         break;
     case 1:
-        World->SpawnActor<AProjectile_B>(AProjectile_B::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
+        //World->SpawnActor<AProjectile_B>(AProjectile_B::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
         UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_B"));
         break;
     case 2:
         World->SpawnActor<AProjectile_C>(AProjectile_C::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
-        UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_C"));
+        //UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_C"));
         break;
     }
 
@@ -142,7 +142,7 @@ void UAtackComponent::FireSpread()
         UGameplayStatics::PlaySoundAtLocation(this, FireSound, Owner->GetActorLocation());
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Spread pattern fired!"));
+    //UE_LOG(LogTemp, Warning, TEXT("Spread pattern fired!"));
 }
 
 void UAtackComponent::FireBurst()
