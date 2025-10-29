@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "MobileSpaceProjectile.h"
 #include "MobileSpacePawn.generated.h"
 
 UCLASS(Blueprintable)
@@ -43,6 +44,9 @@ public:
 	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)
 	class USoundBase* FireSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* MuzzleParticleAsset;
+
 	// Begin Actor Interface
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -78,5 +82,8 @@ public:
 	// FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	UParticleSystemComponent* ParticleTrail;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
+	TSubclassOf<AMobileSpaceProjectile> ProjectileClass;
 };
 

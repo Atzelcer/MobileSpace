@@ -23,8 +23,13 @@ class AMobileSpaceProjectile : public AActor
 	UProjectileMovementComponent* ProjectileMovement;
 
 	UParticleSystemComponent* ParticleProjectile;
-	UParticleSystemComponent* ParticleHit;
+	// Instancia (spawn temporal) para el hit effect, no adjunta por defecto
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* HitParticleAsset;
 
+	// Instancia (spawn temporal) para el muzzle effect (se usará desde el pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* MuzzleParticleAsset;
 
 
 public:
@@ -33,6 +38,10 @@ public:
 	/** Function to handle the projectile hitting something */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// Agrega aquí la definición de la función para spawn de muzzle effect
+	void SpawnMuzzleEffect(const FVector& Location, const FRotator& Rotation);
+
 
 	/** Returns ProjectileMesh subobject **/
 	FORCEINLINE UStaticMeshComponent* GetProjectileMesh() const { return ProjectileMesh; }

@@ -10,7 +10,7 @@
 AShip_CazadorDelta::AShip_CazadorDelta()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMeshAsset(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow09.SM_StarSparrow09'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMeshAsset(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow19.SM_StarSparrow19'"));
 	if (ShipMeshAsset.Succeeded())
 	{
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
