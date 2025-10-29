@@ -92,10 +92,10 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 		OtherActor->Destroy();
 
 		// Destruir el proyectil también
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Projectile destroyed on impact!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Projectile destroyed on impact!"));
+		//}
 		Destroy();
 	}
 }

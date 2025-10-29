@@ -47,9 +47,9 @@ void AShip_CazadorRojo::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Cazador Rojo Fired Spread!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Cazador Rojo Fired Spread!"));
+		//}
 	}
 }

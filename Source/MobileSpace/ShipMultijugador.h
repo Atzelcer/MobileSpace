@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+// Copyright Epic Games, Inc.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,46 +16,47 @@ class MOBILESPACE_API AShipMultijugador : public APawn
 public:
 	AShipMultijugador();
 
-protected:
-	virtual void BeginPlay() override;
-
-public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	// === COMPONENTES ===
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Componentes")
 	class UStaticMeshComponent* ShipMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VFX")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Componentes")
 	class UParticleSystemComponent* ParticleTrail;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<class UWidgetOnGameMulti> WidgetMultiClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Audio")
+	class USoundBase* FireSound;
 
-	UPROPERTY()
-	class UWidgetOnGameMulti* WidgetMultiInstance;
-
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Stats")
+	// === VARIABLES ===
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Estado")
 	float VidaActual;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Estado")
 	float VidaMaxima;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Movimiento")
 	float VelocidadActual;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combate")
 	int32 CantidadMisiles;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combate")
 	int32 CantidadEscudos;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combate")
 	float LimiteDisparo;
 
-	void ActualizarHUD();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combate")
+	bool bCanFire;
+
+	// === FUNCIONES ===
+	virtual void BeginPlay() override;
+
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+
 	void FireShot();
 
 	void Server_FireShot_Implementation();
@@ -61,10 +64,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_FireShot();
 
-private:
-	bool bCanFire;
-	FTimerHandle FireTimerHandle;
 	void ResetFire();
+
+	void ActualizarHUD();
+
+protected:
+	FTimerHandle FireTimerHandle;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

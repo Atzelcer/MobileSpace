@@ -83,36 +83,36 @@ void ABoss_Z::StartIdlePhase()
 {
 	CurrentState = EBossState::Idle;
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Starting IDLE Phase"));
-	}
-	
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Starting IDLE Phase"));
+	//}
+	//
 	if (IdleAnimation)
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("IdleAnimation found! Playing..."));
-		}
-		
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("IdleAnimation found! Playing..."));
+		//}
+		//
 		// Try different methods to play animation
 		UAnimInstance* AnimInstance = BossMesh->GetAnimInstance();
 		if (AnimInstance)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("AnimInstance found! Trying PlayAnimation..."));
-			}
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("AnimInstance found! Trying PlayAnimation..."));
+			//}
 			
 			// Method 1: PlayAnimation (for meshes without AnimBP)
 			BossMesh->PlayAnimation(IdleAnimation, true);
 		}
 		else
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, TEXT("No AnimInstance - trying SetAnimation..."));
-			}
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, TEXT("No AnimInstance - trying SetAnimation..."));
+			//}
 			
 			// Method 2: SetAnimation (alternative method)
 			BossMesh->SetAnimation(IdleAnimation);
@@ -120,10 +120,10 @@ void ABoss_Z::StartIdlePhase()
 	}
 	else
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("No IdleAnimation found!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("No IdleAnimation found!"));
+		//}
 	}
 	
 	// Set timer to transition to attack phase after IDLE_DURATION seconds
@@ -134,18 +134,18 @@ void ABoss_Z::StartAttackPhase()
 {
 	CurrentState = EBossState::Attack;
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Starting ATTACK Phase"));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Starting ATTACK Phase"));
+	//}
 	
 	if (AttackAnimation)
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("AttackAnimation found! Playing..."));
-		}
-		
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("AttackAnimation found! Playing..."));
+		//}
+		//
 		UAnimInstance* AnimInstance = BossMesh->GetAnimInstance();
 		if (AnimInstance)
 		{
@@ -153,19 +153,19 @@ void ABoss_Z::StartAttackPhase()
 		}
 		else
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, TEXT("No AnimInstance for Attack - trying SetAnimation..."));
-			}
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, TEXT("No AnimInstance for Attack - trying SetAnimation..."));
+			//}
 			BossMesh->SetAnimation(AttackAnimation);
 		}
 	}
 	else
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("No AttackAnimation found!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("No AttackAnimation found!"));
+		//}
 	}
 }
 
@@ -173,10 +173,10 @@ void ABoss_Z::StartDeathPhase()
 {
 	CurrentState = EBossState::Death;
 	
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Magenta, TEXT("Starting DEATH Phase"));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Magenta, TEXT("Starting DEATH Phase"));
+	//}
 	
 	// Clear any existing timers
 	GetWorldTimerManager().ClearTimer(IdleTimerHandle);
@@ -186,11 +186,11 @@ void ABoss_Z::StartDeathPhase()
 	
 	if (DeathAnimation)
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("DeathAnimation found! Playing..."));
-		}
-		
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("DeathAnimation found! Playing..."));
+		//}
+		//
 		UAnimInstance* AnimInstance = BossMesh->GetAnimInstance();
 		if (AnimInstance)
 		{
@@ -203,18 +203,18 @@ void ABoss_Z::StartDeathPhase()
 		
 		// Get animation duration and set timer to destroy boss
 		float AnimDuration = DeathAnimation->GetPlayLength();
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("Death animation duration: %.2f seconds"), AnimDuration));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("Death animation duration: %.2f seconds"), AnimDuration));
+		//}
 		GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABoss_Z::DestroyBoss, AnimDuration, false);
 	}
 	else
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("No DeathAnimation found! Destroying immediately..."));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("No DeathAnimation found! Destroying immediately..."));
+		//}
 		// If no death animation, destroy immediately
 		DestroyBoss();
 	}
@@ -222,27 +222,27 @@ void ABoss_Z::StartDeathPhase()
 
 void ABoss_Z::DestroyBoss()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Destroying Boss!"));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Destroying Boss!"));
+	//}
 	
 	Destroy();
 }
 
 void ABoss_Z::OnBossHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TEXT("Boss collision detected!"));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TEXT("Boss collision detected!"));
+	//}
 
 	if (!OtherActor || OtherActor == this)
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Collision with self or null!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Collision with self or null!"));
+		//}
 		return;
 	}
 
@@ -250,7 +250,7 @@ void ABoss_Z::OnBossHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	{
 		FString ActorName = OtherActor->GetName();
 		FString ActorClass = OtherActor->GetClass()->GetName();
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, FString::Printf(TEXT("Collided with: %s (Class: %s)"), *ActorName, *ActorClass));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, FString::Printf(TEXT("Collided with: %s (Class: %s)"), *ActorName, *ActorClass));
 	}
 
 	// Only process hit if not already in death state
@@ -263,60 +263,60 @@ void ABoss_Z::OnBossHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		if (OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
 		{
 			bIsProjectile = true;
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Detected by IsA(AMobileSpaceProjectile)"));
-			}
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Detected by IsA(AMobileSpaceProjectile)"));
+			//}
 		}
 		
 		// Method 2: Name check (backup)
 		if (!bIsProjectile && OtherActor->GetName().Contains(TEXT("Projectile")))
 		{
 			bIsProjectile = true;
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Detected by name containing 'Projectile'"));
-			}
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Detected by name containing 'Projectile'"));
+			//}
 		}
 		
 		// Method 3: Class name check (backup)
 		if (!bIsProjectile && OtherActor->GetClass()->GetName().Contains(TEXT("MobileSpaceProjectile")))
 		{
 			bIsProjectile = true;
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, TEXT("Detected by class name containing 'MobileSpaceProjectile'"));
-			}
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, TEXT("Detected by class name containing 'MobileSpaceProjectile'"));
+			//}
 		}
 		
 		if (bIsProjectile)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("HIT BY PLAYER PROJECTILE! Starting death sequence..."));
-			}
-			
+			//if (GEngine)
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("HIT BY PLAYER PROJECTILE! Starting death sequence..."));
+			//}
+			//
 			// Destroy the projectile
 			OtherActor->Destroy();
 			
 			// Start death phase
 			StartDeathPhase();
 		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Not a recognized projectile"));
-			}
-		}
+		//else
+		//{
+		//	if (GEngine)
+		//	{
+		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Not a recognized projectile"));
+		//	}
+		//}
 	}
-	else
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, TEXT("Boss already in death state, ignoring collision"));
-		}
-	}
+	//else
+	//{
+	//	if (GEngine)
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, TEXT("Boss already in death state, ignoring collision"));
+	//	}
+	//}
 }
 
 

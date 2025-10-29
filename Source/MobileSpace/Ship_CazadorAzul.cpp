@@ -46,9 +46,9 @@ void AShip_CazadorAzul::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Cazador Azul Fired!"));
-		}
+		//if (GEngine)
+		//{
+		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Cazador Azul Fired!"));
+		//}
 	}
 }

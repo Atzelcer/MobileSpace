@@ -8,7 +8,6 @@
 void UWidgetPCMulti::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 		{
 			IrAlJuego();
@@ -23,6 +22,5 @@ void UWidgetPCMulti::IrAlJuego()
 			AHUDmain* HUD = Cast<AHUDmain>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
 			if (HUD)
 				HUD->MostrarOnGameMulti();
-
 		}, 3.0f, false);
 }

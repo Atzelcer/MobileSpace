@@ -2,69 +2,69 @@
 
 #include "ShipMultijugador.h"
 #include "ProjectileMultijugador.h"
+#include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "TimerManager.h"
+#include "Sound/SoundBase.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Net/UnrealNetwork.h"
-#include "WidgetOnGameMulti.h"
-#include "Blueprint/UserWidget.h"
 
 AShipMultijugador::AShipMultijugador()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMeshAsset(TEXT("/Game/StarSparrow/Meshes/Examples/SM_StarSparrow19.SM_StarSparrow19"));
-	ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
-	SetRootComponent(ShipMesh);
-	if (ShipMeshAsset.Succeeded())
-	{
-		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
-		ShipMesh->SetRelativeScale3D(FVector(0.3f));
-	}
-	ShipMesh->SetIsReplicated(true);
 	SetReplicateMovement(true);
 
-	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailFX"));
+	// === MALLA PRINCIPAL ===
+	ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
+	RootComponent = ShipMesh;
+	ShipMesh->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	ShipMesh->SetIsReplicated(true);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow19.SM_StarSparrow19'"));
+	if (MeshAsset.Succeeded())
+	{
+		ShipMesh->SetStaticMesh(MeshAsset.Object);
+		ShipMesh->SetRelativeScale3D(FVector(0.3f));
+	}
+
+	// === PARTÍCULAS DE COLA ===
+	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleTrail"));
 	ParticleTrail->SetupAttachment(ShipMesh);
 
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_ElectricBall01_Yellow.P_Projectile_ElectricBall01_Yellow'"));
+	if (ParticleAsset.Succeeded())
+	{
+		ParticleTrail->SetTemplate(ParticleAsset.Object);
+		ParticleTrail->SetRelativeLocation(FVector(-500.f, 0.f, 0.f));
+		ParticleTrail->SetRelativeScale3D(FVector(2.f));
+	}
+
+	// === SONIDO DE DISPARO ===
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Sci-Fi_Gun_1-1.Sci-Fi_Gun_1-1'"));
+	if (FireAudio.Succeeded())
+	{
+		FireSound = FireAudio.Object;
+	}
+
+	// === ESTADÍSTICAS ===
 	VidaMaxima = 100.f;
-	VidaActual = VidaMaxima;
-	VelocidadActual = 1200.f;
-	CantidadMisiles = 5;
-	CantidadEscudos = 3;
-	LimiteDisparo = 1.0f;
+	VidaActual = 100.f;
+	VelocidadActual = 600.f;
+	CantidadMisiles = 3;
+	CantidadEscudos = 2;
+	LimiteDisparo = 0.5f;
 	bCanFire = true;
 }
 
 void AShipMultijugador::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (IsLocallyControlled())
-	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		if (PC && WidgetMultiClass)
-		{
-			WidgetMultiInstance = CreateWidget<UWidgetOnGameMulti>(PC, WidgetMultiClass);
-			if (WidgetMultiInstance)
-			{
-				WidgetMultiInstance->AddToViewport(5);
-				ActualizarHUD();
-			}
-		}
-	}
 }
 
 void AShipMultijugador::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (IsLocallyControlled() && WidgetMultiInstance)
-	{
-		ActualizarHUD();
-	}
 }
 
 void AShipMultijugador::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -75,55 +75,37 @@ void AShipMultijugador::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShipMultijugador::FireShot);
 }
 
-void AShipMultijugador::ActualizarHUD()
-{
-	if (!WidgetMultiInstance) return;
-	WidgetMultiInstance->ActualizarVida(VidaActual, VidaMaxima);
-	WidgetMultiInstance->ActualizarLimiteDisparo(LimiteDisparo, 1.0f);
-	WidgetMultiInstance->ActualizarVelocidad(VelocidadActual);
-	WidgetMultiInstance->ActualizarMisiles(CantidadMisiles);
-	WidgetMultiInstance->ActualizarEscudo(CantidadEscudos);
-}
-
 void AShipMultijugador::MoveForward(float Value)
 {
-	if (Value != 0.0f)
-	{
-		AddActorWorldOffset(FVector(Value * VelocidadActual * GetWorld()->DeltaTimeSeconds, 0.f, 0.f), true);
-	}
+	AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AShipMultijugador::MoveRight(float Value)
 {
-	if (Value != 0.0f)
-	{
-		AddActorWorldOffset(FVector(0.f, Value * VelocidadActual * GetWorld()->DeltaTimeSeconds, 0.f), true);
-	}
+	AddMovementInput(GetActorRightVector(), Value);
 }
 
 void AShipMultijugador::FireShot()
 {
 	if (!bCanFire) return;
-	Server_FireShot();
 	bCanFire = false;
-	GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, this, &AShipMultijugador::ResetFire, 0.25f);
+	Server_FireShot();
+	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShipMultijugador::ResetFire, LimiteDisparo, false);
 }
 
 void AShipMultijugador::Server_FireShot_Implementation()
 {
-	FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 90.f;
-	FRotator SpawnRotation = GetActorRotation();
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		World->SpawnActor<AProjectileMultijugador>(AProjectileMultijugador::StaticClass(), SpawnLocation, SpawnRotation);
-	}
+	FVector SpawnLoc = GetActorLocation() + GetActorForwardVector() * 100.f;
+	FRotator SpawnRot = GetActorRotation();
+	GetWorld()->SpawnActor<AProjectileMultijugador>(AProjectileMultijugador::StaticClass(), SpawnLoc, SpawnRot);
 }
 
 void AShipMultijugador::ResetFire()
 {
 	bCanFire = true;
 }
+
+void AShipMultijugador::ActualizarHUD() {}
 
 void AShipMultijugador::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

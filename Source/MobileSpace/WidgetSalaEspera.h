@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 #include "WidgetSalaEspera.generated.h"
 
 UCLASS()
@@ -28,7 +27,4 @@ public:
 	void ActualizarCodigo(const FString& Codigo);
 	void JugadorConectado(int32 NumeroJugador);
 	void IrAPantallaCarga();
-
-private:
-	FString GenerarCodigoSala();
 };

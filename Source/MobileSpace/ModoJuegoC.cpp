@@ -32,6 +32,7 @@ void UModoJuegoC::OnAventuraClicked()
         if (HUD)
         {
 			HUD->MostrarPantallaCarga();
+			HUD->ModoAventura();
 			HUD->OcultarPanelPrincipal();
             HUD->OcultarModoJuego();
 			/*HUD->DetenerMusicaInicio();
@@ -51,6 +52,7 @@ void UModoJuegoC::OnMultijugadorClicked()
         if (HUD)
         {
             HUD->MostrarModoMultijugador();
+            HUD->ModoMultijugador();
             //HUD->OcultarPanelPrincipal();
             //HUD->OcultarModoJuego();
 
