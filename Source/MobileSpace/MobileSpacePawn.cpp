@@ -20,14 +20,14 @@ const FName AMobileSpacePawn::FireForwardBinding("FireForward");
 const FName AMobileSpacePawn::FireRightBinding("FireRight");
 
 AMobileSpacePawn::AMobileSpacePawn()
-{
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow19.SM_StarSparrow19'"));
+{	
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow09.SM_StarSparrow09'"));
 	// Create the mesh component
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	ShipMeshComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0));
+	ShipMeshComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
 
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Sci-Fi_Gun_1-1.Sci-Fi_Gun_1-1'"));
@@ -52,9 +52,10 @@ AMobileSpacePawn::AMobileSpacePawn()
 		ParticleTrail->SetTemplate(ParticleAsset.Object);
 		ParticleTrail->SetRelativeLocation(FVector(-500.f, 0.f, 0.f));
 		ParticleTrail->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
-
+		
 	}
 
+	ProjectileClass = AMobileSpaceProjectile::StaticClass();
 }
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -95,7 +96,7 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 		const FRotator NeutralRotation = FRotator(0.f, 0.f, 0.f);
 		SmoothRotation = FMath::RInterpTo(CurrentRotation, NeutralRotation, DeltaSeconds, 4.0f);
 	}
-
+	
 	// Apply the smooth rotation
 	SetActorRotation(SmoothRotation);
 
@@ -104,7 +105,7 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 	{
 		FHitResult Hit(1.f);
 		RootComponent->MoveComponent(Movement, SmoothRotation, true, &Hit);
-
+		
 		if (Hit.IsValidBlockingHit())
 		{
 			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
@@ -112,11 +113,11 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 			RootComponent->MoveComponent(Deflection, SmoothRotation, true);
 		}
 	}
-
+	
 	// Galaga-style shooting: Check for fire input (any fire input shoots upward)
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
-
+	
 	// If any fire input is detected, shoot forward (upward in Galaga style)
 	if (FMath::Abs(FireForwardValue) > 0.0f || FMath::Abs(FireRightValue) > 0.0f)
 	{
@@ -124,40 +125,49 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 		const FVector FireDirection = FVector(1.f, 0.f, 0.f);
 		FireShot(FireDirection);
 	}
-
+	
 
 }
 
 void AMobileSpacePawn::FireShot(FVector FireDirection)
 {
-	// If it's ok to fire again
-	if (bCanFire == true)
+	if (!bCanFire || !ProjectileClass)
+		return;
+
+	// Rotación y posición del disparo
+	const FRotator FireRotation = FireDirection.Rotation();
+	const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
+
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		// Always fire forward in Galaga style
-		const FRotator FireRotation = FVector(1.f, 0.f, 0.f).Rotation(); // Always forward
-
-		// Spawn projectile at an offset from this pawn
-		const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
-
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
+		// Spawn muzzle particle effect (solo si tienes asignado el asset en el pawn)
+		if (MuzzleParticleAsset)
 		{
-			// spawn the projectile
-			World->SpawnActor<AMobileSpaceProjectile>(SpawnLocation, FireRotation);
+			UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleParticleAsset, SpawnLocation, FireRotation);
 		}
 
-		bCanFire = false;
-		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMobileSpacePawn::ShotTimerExpired, FireRate);
+		// Spawn el proyectil usando la clase asignada
+		AMobileSpaceProjectile* Projectile = World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocation, FireRotation);
 
-		// try and play the sound if specified
-		if (FireSound != nullptr)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-		}
+		// (Opcional) Puedes llamar funciones extra en el proyectil si lo deseas:
+		// if (Projectile) { ... }
 	}
+
+	bCanFire = false;
+	// Timer para volver a habilitar disparar
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMobileSpacePawn::ShotTimerExpired, FireRate);
+
+	// Sonido de disparo
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+	
 }
 
 void AMobileSpacePawn::ShotTimerExpired()
 {
 	bCanFire = true;
 }
+
