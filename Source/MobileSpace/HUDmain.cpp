@@ -229,6 +229,7 @@ void AHUDmain::OcultarPantallaCarga()
 	if (PantallaCargaInstance && PantallaCargaInstance->IsInViewport())
 		PantallaCargaInstance->RemoveFromParent();
 
+	ModoAventura();
 	DetenerMusicaInicio();
 	RemoverInputController();
 	MostrarOnGame();
@@ -391,7 +392,7 @@ void AHUDmain::MostrarOnGameMulti()
 		{
 			UGameplayStatics::SetGamePaused(GetWorld(), false);
 			OcultarPantallaCargaMulti();
-			// Mostrar cursor pero mantener control del juego
+
 			PC->bShowMouseCursor = true;
 			FInputModeGameAndUI InputMode;
 			InputMode.SetWidgetToFocus(WidgetOnGameInstance->TakeWidget());
@@ -446,6 +447,10 @@ void AHUDmain::RemoverInputController()
 void AHUDmain::OcultarTodo()
 {
 	OcultarPanelPrincipal();
+	OcultarAjustes();
+	OcultarCreditos();
+	OcultarModoJuego();
+	OcultarPantallaCarga();
 	OcultarModoJuego();
 	OcultarAjustes();
 	OcultarCreditos();

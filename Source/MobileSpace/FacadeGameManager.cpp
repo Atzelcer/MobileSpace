@@ -6,22 +6,18 @@
 #include "MultiplayerManager.h"
 #include "Engine/World.h"
 
-// Sets default values
 AFacadeGameManager::AFacadeGameManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
 void AFacadeGameManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AFacadeGameManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -30,6 +26,8 @@ void AFacadeGameManager::Tick(float DeltaTime)
 
 void AFacadeGameManager::IniciarModoAventura()
 {
+	if (AventuraManagerRef) return;
+
 	UWorld* World = GetWorld();
 	if (World && !AventuraManagerRef)
 	{
@@ -41,6 +39,8 @@ void AFacadeGameManager::IniciarModoAventura()
 
 void AFacadeGameManager::IniciarModoMultijugador()
 {
+	if (MultiplayerManagerRef) return;
+
 	UWorld* World = GetWorld();
 	if (World && !MultiplayerManagerRef)
 	{

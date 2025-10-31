@@ -26,8 +26,5 @@ public:
 	UPROPERTY()
 	TArray<UTexture2D*> FondosCarga;
 
-	//FTimerHandle TimerHandle_Ocultar;
-
 	void MostrarFondoAleatorio();
-	void OcultarDespuesDeDelay();
 };

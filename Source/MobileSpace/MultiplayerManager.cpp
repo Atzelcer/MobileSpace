@@ -122,7 +122,7 @@ void AMultiplayerManager::SpawnearJugadores()
 		AHUDmain* HUDHost = Cast<AHUDmain>(HostController->GetHUD());
 		if (HUDHost)
 		{
-			HUDHost->OcultarTodo();
+			//HUDHost->OcultarTodo();
 			HUDHost->MostrarOnGameMulti();
 		}
 	}
@@ -132,7 +132,7 @@ void AMultiplayerManager::SpawnearJugadores()
 		AHUDmain* HUDClient = Cast<AHUDmain>(ClienteController->GetHUD());
 		if (HUDClient)
 		{
-			HUDClient->OcultarTodo();
+			//HUDClient->OcultarTodo();
 			HUDClient->MostrarOnGameMulti();
 		}
 	}

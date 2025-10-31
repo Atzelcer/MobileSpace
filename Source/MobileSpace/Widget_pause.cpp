@@ -47,7 +47,7 @@ void UWidget_pause::OnMenuPrincipalClicked()
 	{
 		HUD->OcultarOnGame();
 		HUD->OcultarPause();
-		HUD->OcultarTodo();
+		//HUD->OcultarTodo();
 		FName NivelActual = *UGameplayStatics::GetCurrentLevelName(GetWorld());
 		UGameplayStatics::OpenLevel(GetWorld(), NivelActual);
 		UGameplayStatics::SetGamePaused(GetWorld(), false);

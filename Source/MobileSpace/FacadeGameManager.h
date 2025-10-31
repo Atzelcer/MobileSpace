@@ -28,10 +28,8 @@ public:
 
 public:
 
-	UPROPERTY()
 	AAventuraManager* AventuraManagerRef;
 
-	UPROPERTY()
 	AMultiplayerManager* MultiplayerManagerRef;
 
 	UFUNCTION()

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -15,8 +13,9 @@
 #include "DKraken_Boss_Z.h"
 #include "DragonR_Boss_Z.h"
 #include "DragonT_Boss_Z.h"
-#include "MoveComponent.h" // ¡LIBRERÍA PARA LOS PATRONES CHISTOSOS!
+#include "MoveComponent.h"
 #include "AventuraManager.generated.h"
+
 
 UCLASS()
 class MOBILESPACE_API AAventuraManager : public AActor

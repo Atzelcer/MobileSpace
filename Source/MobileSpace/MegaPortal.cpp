@@ -25,9 +25,9 @@ void AMegaPortal::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AActor* FoundManager = UGameplayStatics::GetActorOfClass(GetWorld(), AAventuraManager::StaticClass());
-	if (FoundManager)
-		AventuraManagerRef = Cast<AAventuraManager>(FoundManager);
+	//AActor* FoundManager = UGameplayStatics::GetActorOfClass(GetWorld(), AAventuraManager::StaticClass());
+	//if (FoundManager)
+	//	AventuraManagerPor = Cast<AAventuraManager>(FoundManager);
 
 	CargarNiagaraSystems();
 	EscogerEfectoAleatorio();
@@ -40,13 +40,13 @@ void AMegaPortal::Tick(float DeltaTime)
 
 void AMegaPortal::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (OtherActor && OtherActor->IsA(AMobileSpacePawn::StaticClass()))
-	{
-		if (AventuraManagerRef)
-			AventuraManagerRef->SiguienteNivel();
+	//if (OtherActor && OtherActor->IsA(AMobileSpacePawn::StaticClass()))
+	//{
+	//	if (AventuraManagerPor)
+	//		AventuraManagerPor->SiguienteNivel();
 
-		Destroy();
-	}
+	//	Destroy();
+	//}
 }
 
 void AMegaPortal::CargarNiagaraSystems()

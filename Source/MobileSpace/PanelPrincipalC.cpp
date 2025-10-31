@@ -32,12 +32,9 @@ void UPanelPrincipalC::OnJugarClicked()
 		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
 		if (HUD)
 		{
-			//RemoveFromParent();
 			HUD->MostrarModoJuego();
 		}
 	}
-
-	//UGameplayStatics::OpenLevel(GetWorld(), FName("StarterMap"));
 }
 
 
@@ -49,8 +46,7 @@ void UPanelPrincipalC::OnAjustesClicked()
 		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
 		if (HUD)
 		{
-			//RemoveFromParent();
-			HUD->MostrarAjustes();	
+			HUD->MostrarAjustes();
 		}
 	}
 }
@@ -64,7 +60,6 @@ void UPanelPrincipalC::OnCreditosClicked()
 		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
 		if (HUD)
 		{
-			//RemoveFromParent();
 			HUD->MostrarCreditos();
 		}
 	}

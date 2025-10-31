@@ -25,43 +25,7 @@ void AMobileSpaceGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//if (GEngine)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("GameMode BeginPlay started!"));
-	//}
-	//
 	SetupFixedCamera();
-	
-	//UWorld* World = GetWorld();
-	//if (World)
-	//{
-	//	FActorSpawnParameters SpawnParams;
-	//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	//	AventuraManager = World->SpawnActor<AAventuraManager>(AAventuraManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	//	
-	//	if (AventuraManager)
-	//	{
-	//		if (GEngine)
-	//		{
-	//			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager spawned successfully!"));
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (GEngine)
-	//		{
-	//			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("FAILED to spawn AventuraManager!"));
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	if (GEngine)
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("World is NULL in GameMode!"));
-	//	}
-	//}
 }
 
 void AMobileSpaceGameMode::Tick(float DeltaSeconds)

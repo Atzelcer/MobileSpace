@@ -33,8 +33,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UNiagaraComponent* NiagaraPortalComponent;
 
-	UPROPERTY()
-	AAventuraManager* AventuraManagerRef;
+	AAventuraManager* AventuraManagerPor;
 
 	// Lista de posibles efectos Niagara
 	UPROPERTY()
