@@ -17,7 +17,6 @@ AShip_CazadorAzul::AShip_CazadorAzul()
 		ShipMesh->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f)); // Aumenté el tamaño
 	}
 
-	// Crear componente de ataque (MoveComp ya se hereda del padre)
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 }
 
@@ -25,14 +24,7 @@ void AShip_CazadorAzul::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Configurar rotación inicial
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-	
-	// Configurar movimiento - Azul usa movimiento sine wave
-	MoveComp->StartPosition = GetActorLocation();
-	MoveComp->StartPattern(EMovementPattern::SineWave);
-	
-	// Configurar disparo automático rápido
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorAzul::AutoFire, TimeBetweenShots, true, 1.2f);
 }
 
@@ -46,9 +38,6 @@ void AShip_CazadorAzul::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		//if (GEngine)
-		//{
-		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Cazador Azul Fired!"));
-		//}
+
 	}
 }

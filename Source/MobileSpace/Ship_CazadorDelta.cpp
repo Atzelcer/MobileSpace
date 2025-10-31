@@ -17,7 +17,6 @@ AShip_CazadorDelta::AShip_CazadorDelta()
 		ShipMesh->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
 	}
 
-	// Crear componente de ataque (MoveComp ya se hereda del padre)
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 }
 
@@ -25,14 +24,7 @@ void AShip_CazadorDelta::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Configurar rotación inicial
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-	
-	// Configurar movimiento - Delta usa movimiento zigzag
-	MoveComp->StartPosition = GetActorLocation();
-	MoveComp->StartPattern(EMovementPattern::ZigZag);
-	
-	// Configurar disparo automático con ráfagas
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorDelta::AutoFire, TimeBetweenShots, true, 1.5f);
 }
 
@@ -45,10 +37,6 @@ void AShip_CazadorDelta::AutoFire()
 {
 	if (AttackComp)
 	{
-		AttackComp->Fire(AttackPattern);
-		//if (GEngine)
-		//{
-		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Cazador Delta Fired Burst!"));
-		//}
+		AttackComp->Fire(AttackPattern);	
 	}
 }

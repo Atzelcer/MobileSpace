@@ -19,11 +19,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UAtackComponent* AttackComp;
 
-	// Patrón de ataque que usará este enemigo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	EAtackPattern AttackPattern = EAtackPattern::Single;
 
-	// Tiempo entre disparos
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float TimeBetweenShots = 1.8f;
 

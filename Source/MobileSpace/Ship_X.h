@@ -9,13 +9,13 @@
 #include "MoveComponent.h"
 #include "Ship_X.generated.h"
 
+
 UCLASS()
 class MOBILESPACE_API AShip_X : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AShip_X();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -23,20 +23,16 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* ShipCollision;
-	
-	// ¡COMPONENTE DE MOVIMIENTO CHISTOSO!
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere)
 	UMoveComponent* MoveComp;
 	
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()

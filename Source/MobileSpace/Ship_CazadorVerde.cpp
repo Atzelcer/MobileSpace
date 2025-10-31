@@ -17,31 +17,22 @@ AShip_CazadorVerde::AShip_CazadorVerde()
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
 		ShipMesh->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
 	}
-	// Crear componente de ataque (MoveComp ya se hereda del padre)
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 
-	
+	if (MoveComp)
+	{
+		MoveComp->Pattern = EArcadeMovement::Wave;
+		MoveComp->Speed = 700.f;
+		MoveComp->Amplitude = 120.f;
+	}
 }
 
 void AShip_CazadorVerde::BeginPlay()
 {
 	Super::BeginPlay();
+
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-	// Configurar posición inicial
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-
-	MoveComp->StartPosition = GetActorLocation();
-
-	// Probar diferentes patrones
-	MoveComp->StartPattern(EMovementPattern::SineWave); // Onda sinusoidal
-
-	// O cambiar cada 5 segundos
-	FTimerHandle PatternTimer;
-	GetWorld()->GetTimerManager().SetTimer(PatternTimer, [this]() {
-		MoveComp->StartPattern(EMovementPattern::Linear);
-		}, 5.0f, false);
-
-
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorVerde::AutoFire, TimeBetweenShots, true, 1.0f);
 }
 
