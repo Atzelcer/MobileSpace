@@ -22,8 +22,11 @@ AAventuraManager::AAventuraManager()
 void AAventuraManager::BeginPlay()
 {
 	Super::BeginPlay();
+	ShipFactory = NewObject<UShipFactoryGeneral>(this);
+
 	
 	ControladorNiveles();
+
 }
 
 void AAventuraManager::Tick(float DeltaTime)
@@ -111,13 +114,17 @@ void AAventuraManager::CheckWaveComplete()
 //patrones factory - patron prototype 
 void AAventuraManager::Nivel1()
 {
-	//solo spawnea una nave
 	UWorld* World = GetWorld();
-	if (!World) return;
+	if (!World || !ShipFactory) return;
+
 	FVector SpawnLocation = FVector(1000.0f, 0.0f, 300.0f);
 	FRotator SpawnRotation = FRotator::ZeroRotator;
-	
-	AShip_CazadorRojo* NewShip = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), SpawnLocation, SpawnRotation);
+
+	AShip_X* NewShip = ShipFactory->CrearNave(World, ENaveTipo::Roja, SpawnLocation, SpawnRotation);
+	if (NewShip)
+	{
+		ActiveShips.Add(NewShip); 
+	}
 	
 }
 
