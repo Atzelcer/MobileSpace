@@ -16,8 +16,6 @@ AShip_CazadorAlfa::AShip_CazadorAlfa()
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
 		ShipMesh->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
 	}
-
-	// Crear componente de ataque (MoveComp ya se hereda del padre)
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 }
 
@@ -25,14 +23,7 @@ void AShip_CazadorAlfa::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Configurar rotación inicial
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-	
-	// Configurar movimiento - Alfa usa movimiento recto simple
-	MoveComp->StartPosition = GetActorLocation();
-	MoveComp->StartPattern(EMovementPattern::ZigZag);
-	
-	// Configurar disparo automático
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorAlfa::AutoFire, TimeBetweenShots, true, 1.0f);
 }
 
@@ -46,9 +37,5 @@ void AShip_CazadorAlfa::AutoFire()
 	if (AttackComp)
 	{
 		AttackComp->Fire(AttackPattern);
-		//if (GEngine)
-		//{
-		//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Cazador Alfa Fired!"));
-		//}
 	}
 }

@@ -15,7 +15,6 @@
 #include "DKraken_Boss_Z.h"
 #include "DragonR_Boss_Z.h"
 #include "DragonT_Boss_Z.h"
-#include "MoveComponent.h" // ¡LIBRERÍA PARA LOS PATRONES CHISTOSOS!
 #include "AventuraManager.generated.h"
 
 UCLASS()

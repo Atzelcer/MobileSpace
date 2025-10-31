@@ -7,15 +7,15 @@
 #include "MoveComponent.generated.h"
 
 UENUM(BlueprintType)
-enum class EMovementPattern : uint8
+enum class EArcadeMovement : uint8
 {
-	Linear          UMETA(DisplayName = "Linear Movement"),     
-	SineWave        UMETA(DisplayName = "Sine Wave"),           
-	Circular        UMETA(DisplayName = "Circular Motion"),     
-	ZigZag          UMETA(DisplayName = "Zig Zag"),            
-	Elliptical      UMETA(DisplayName = "Elliptical Path")     
+	None,
+	Slide,
+	Wave,
+	Spiral,
+	RandomHop,
+	Reverse
 };
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MOBILESPACE_API UMoveComponent : public UActorComponent
@@ -25,41 +25,25 @@ class MOBILESPACE_API UMoveComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UMoveComponent();
-	// Control de patrones
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void StartPattern(EMovementPattern Pattern);
 
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void StopMovemento();
+	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
+	EArcadeMovement Pattern = EArcadeMovement::Slide;
 
-	// Parámetros editables
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float Speed = 600.0f;
+	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
+	float Speed = 520.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float Amplitude = 200.0f; // Amplitud de ondas/espirales
+	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
+	float Amplitude = 140.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float Frequency = 2.0f; // Frecuencia de oscilación
+	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
+	float Frequency = 2.1f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	FVector StartPosition = FVector::ZeroVector;
+	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
+	FVector2D MovementMin = FVector2D(-1300.f, -2000.f);
 
-	// LÍMITES DE PANTALLA PARA MÓVIL
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
-	float MinX = -1600.0f; // Límite izquierdo (donde está el jugador)
+	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
+	FVector2D MovementMax = FVector2D(1300.f, 2000.f);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
-	float MaxX = 1600.0f; // Límite derecho (donde spawnan)
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
-	float MinY = -800.0f; // Límite inferior
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
-	float MaxY = 800.0f; // Límite superior
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mobile Bounds")
-	bool bUseBounds = true; // Activar/desactivar límites
 
 
 protected:
@@ -68,20 +52,9 @@ protected:
 
 private:
 
-	EMovementPattern CurrentPattern;
-	float MovementTime;
-	int32 PatrolDirection;
+	FVector Origin;
+	float Elapsed;
 
-
-	// Funciones de patrones matemáticos simples (solo X, Y)
-	void UpdateLinear(float DeltaTime);
-	void UpdateSineWave(float DeltaTime);
-	void UpdateCircular(float DeltaTime);
-	void UpdateZigZag(float DeltaTime);
-	void UpdateElliptical(float DeltaTime);
-
-	// Función para aplicar límites de pantalla
-	FVector ApplyScreenBounds(const FVector& DesiredPosition);
 
 public:	
 	// Called every frame
