@@ -85,5 +85,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
 	TSubclassOf<AMobileSpaceProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Movement|Limits")
+	FVector2D MovementMin = FVector2D(-1400.f, -3000.f);
+
+	UPROPERTY(EditAnywhere, Category = "Movement|Limits")
+	FVector2D MovementMax = FVector2D(1400.f, 3000.f);
 };
 
