@@ -6,7 +6,6 @@
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Engine/World.h"
 #include "HUDmain.h"
 #include "MegaPortal.h"
 #include "AventuraManager.h"
@@ -17,15 +16,16 @@ AMobileSpaceGameMode::AMobileSpaceGameMode()
 	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 	HUDClass = AHUDmain::StaticClass();
 	
-	//// Initialize pointers
-	//AventuraManager = nullptr;
+	
 }
 
 void AMobileSpaceGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	SetupFixedCamera();
+	
+	
 }
 
 void AMobileSpaceGameMode::Tick(float DeltaSeconds)
