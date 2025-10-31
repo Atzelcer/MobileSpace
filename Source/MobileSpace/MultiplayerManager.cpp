@@ -27,8 +27,6 @@ void AMultiplayerManager::CrearSala()
 	TSharedPtr<FInternetAddr> LocalAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBind);
 	IPHost = LocalAddr.IsValid() ? LocalAddr->ToString(false) : TEXT("0.0.0.0");
 
-	//UE_LOG(LogTemp, Warning, TEXT("Sala creada. IP: %s | Código: %s"), *IPHost, *CodigoSala);
-
 	UWorld* World = GetWorld();
 	if (!World) return;
 
@@ -48,10 +46,6 @@ void AMultiplayerManager::ValidarCodigoYUnirse(const FString& CodigoIngresado)
 	{
 		ConfirmarConexionCliente();
 	}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Código incorrecto."));
-	//}
 }
 
 void AMultiplayerManager::ConfirmarConexionCliente()
