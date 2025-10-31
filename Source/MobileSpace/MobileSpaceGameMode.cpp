@@ -6,7 +6,6 @@
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Engine/World.h"
 #include "HUDmain.h"
 #include "MegaPortal.h"
 #include "AventuraManager.h"
@@ -17,51 +16,16 @@ AMobileSpaceGameMode::AMobileSpaceGameMode()
 	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 	HUDClass = AHUDmain::StaticClass();
 	
-	//// Initialize pointers
-	//AventuraManager = nullptr;
+	
 }
 
 void AMobileSpaceGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	//if (GEngine)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("GameMode BeginPlay started!"));
-	//}
-	//
+
 	SetupFixedCamera();
 	
-	//UWorld* World = GetWorld();
-	//if (World)
-	//{
-	//	FActorSpawnParameters SpawnParams;
-	//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	//	AventuraManager = World->SpawnActor<AAventuraManager>(AAventuraManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	//	
-	//	if (AventuraManager)
-	//	{
-	//		if (GEngine)
-	//		{
-	//			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AventuraManager spawned successfully!"));
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (GEngine)
-	//		{
-	//			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("FAILED to spawn AventuraManager!"));
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	if (GEngine)
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("World is NULL in GameMode!"));
-	//	}
-	//}
+	
 }
 
 void AMobileSpaceGameMode::Tick(float DeltaSeconds)

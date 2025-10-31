@@ -4,10 +4,8 @@
 #include "MobileSpaceProjectile.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Engine/CollisionProfile.h"
 #include "Engine/StaticMesh.h"
 #include "Kismet/GameplayStatics.h"
@@ -125,44 +123,56 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 		const FVector FireDirection = FVector(1.f, 0.f, 0.f);
 		FireShot(FireDirection);
 	}
+	FVector ActorLocation = GetActorLocation();
+	ActorLocation.X = FMath::Clamp(ActorLocation.X, MovementMin.X, MovementMax.X);
+	ActorLocation.Y = FMath::Clamp(ActorLocation.Y, MovementMin.Y, MovementMax.Y);
+	SetActorLocation(ActorLocation);
 	
 
 }
 
 void AMobileSpacePawn::FireShot(FVector FireDirection)
 {
-	if (!bCanFire || !ProjectileClass)
-		return;
-
-	// Rotación y posición del disparo
-	const FRotator FireRotation = FireDirection.Rotation();
-	const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
+	if (!bCanFire || !ProjectileClass) return;
 
 	UWorld* World = GetWorld();
-	if (World)
-	{
-		// Spawn muzzle particle effect (solo si tienes asignado el asset en el pawn)
-		if (MuzzleParticleAsset)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleParticleAsset, SpawnLocation, FireRotation);
-		}
+	if (!World) return;
 
-		// Spawn el proyectil usando la clase asignada
-		AMobileSpaceProjectile* Projectile = World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocation, FireRotation);
+	// Direcciones de disparo:
+	const FRotator FireRotationCenter = FireDirection.Rotation();
 
-		// (Opcional) Puedes llamar funciones extra en el proyectil si lo deseas:
-		// if (Projectile) { ... }
-	}
+	// Ángulo en grados para los lados
+	float SideAngle = 30.f;
+
+	// Rotaciones para los dos lados
+	FRotator FireRotationLeft = FireRotationCenter + FRotator(0.f, -SideAngle, 0.f);
+	FRotator FireRotationRight = FireRotationCenter + FRotator(0.f, SideAngle, 0.f);
+
+	// Offset para que salgan separadas
+	FVector OffsetLeft(0.f, -50.f, 0.f);   // Y negativo (izquierda)
+	FVector OffsetRight(0.f, 50.f, 0.f);   // Y positivo (derecha)
+
+	FVector SpawnLocation = GetActorLocation() + FireRotationCenter.RotateVector(GunOffset);
+
+	// --- Disparo Izquierda ---
+	FVector SpawnLocationLeft = SpawnLocation + OffsetLeft;
+	if (MuzzleParticleAsset)
+		UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleParticleAsset, SpawnLocationLeft, FireRotationLeft);
+
+	World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocationLeft, FireRotationLeft);
+
+	// --- Disparo Derecha ---
+	FVector SpawnLocationRight = SpawnLocation + OffsetRight;
+	if (MuzzleParticleAsset)
+		UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleParticleAsset, SpawnLocationRight, FireRotationRight);
+
+	World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocationRight, FireRotationRight);
 
 	bCanFire = false;
-	// Timer para volver a habilitar disparar
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMobileSpacePawn::ShotTimerExpired, FireRate);
+	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMobileSpacePawn::ShotTimerExpired, FireRate);
 
-	// Sonido de disparo
 	if (FireSound)
-	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
 	
 }
 
