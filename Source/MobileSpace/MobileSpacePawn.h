@@ -19,10 +19,10 @@ class AMobileSpacePawn : public APawn
 public:
 	AMobileSpacePawn();
 
+	virtual void BeginPlay() override;
+
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
 	FVector GunOffset;
-	
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float FireRate;
 
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
@@ -70,5 +70,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	int32 NumLifes = 3; // Vidas
+
+public:
+	void EstablecerCapsula(int32 TipoCapsula);
+
+private:
+	class AHUDmain* HUDRef;
+
 };
 

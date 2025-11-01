@@ -11,6 +11,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "HUDmain.h"
+#include "EngineUtils.h"
+#include "Widget_ON_GAME.h"
+
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
 const FName AMobileSpacePawn::MoveRightBinding("MoveRight");
@@ -55,6 +59,31 @@ AMobileSpacePawn::AMobileSpacePawn()
 
 	ProjectileClass = AMobileSpaceProjectile::StaticClass();
 }
+
+void AMobileSpacePawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	for (TActorIterator<AHUDmain> It(World); It; ++It)
+	{
+		HUDRef = *It;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HUD ya existe "));
+		break;
+	}
+
+	if (!HUDRef)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (PC)
+			HUDRef = Cast<AHUDmain>(PC->GetHUD());
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Asignando HUD desde PlayerController "));
+	}
+	EstablecerCapsula(2);
+}
+
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -181,3 +210,36 @@ void AMobileSpacePawn::ShotTimerExpired()
 	bCanFire = true;
 }
 
+
+void AMobileSpacePawn::EstablecerCapsula(int32 TipoCapsula)
+{
+	if (!HUDRef || !HUDRef->WidgetOnGameInstance)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No se pudo establecer la capsula: Referencia HUD o Widget nula"));
+		return;
+	}
+
+	switch (TipoCapsula)
+	{
+	case 1:
+		NumLifes += 1;
+		HUDRef->WidgetOnGameInstance->ActualizarVida(NumLifes);
+		break;
+
+	case 2:
+		MoveSpeed += 1;
+		HUDRef->WidgetOnGameInstance->ActualizarVelocidad(MoveSpeed);
+		break;
+
+	case 3:
+		HUDRef->WidgetOnGameInstance->ActualizarMisiles(10);
+		break;
+
+	case 4:
+		HUDRef->WidgetOnGameInstance->ActualizarEscudo(1);
+		break;
+
+	default:
+		break;
+	}
+}

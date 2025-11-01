@@ -22,6 +22,7 @@
 #include "EngineUtils.h"
 #include "AventuraManager.h"
 #include "MultiplayerManager.h"
+#include "MobileSpacePawn.h"
 
 AHUDmain::AHUDmain()
 {

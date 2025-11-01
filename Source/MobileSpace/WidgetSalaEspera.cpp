@@ -49,9 +49,9 @@ void UWidgetSalaEspera::CancelarEspera()
 		HUD->OcultarSalaEspera();
 		HUD->MostrarModoMultijugador();
 
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Se ha cancelado la espera de jugadores."));
+		//if (GEngine)
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Se ha cancelado la espera de jugadores."));
 
-		UE_LOG(LogTemp, Warning, TEXT("Llamando a LeaveLobby desde el cliente para salir de la lobby."));
+		//UE_LOG(LogTemp, Warning, TEXT("Llamando a LeaveLobby desde el cliente para salir de la lobby."));
 	}
 }

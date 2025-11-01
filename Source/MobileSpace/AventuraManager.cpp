@@ -10,6 +10,8 @@
 #include "DKraken_Boss_Z.h"
 #include "DragonR_Boss_Z.h"
 #include "DragonT_Boss_Z.h"
+#include "MobileSpacePawn.h"
+#include "Kismet/GameplayStatics.h"
 
 AAventuraManager::AAventuraManager()
 {
@@ -17,11 +19,31 @@ AAventuraManager::AAventuraManager()
 	NivelActual = 1;
 	CurrentWave = 1;
 	CurrentBoss = nullptr;
+
+
+	//DefaultPawnClass = AMobileSpacePawn::StaticClass();
 }
 
 void AAventuraManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//UWorld* World = GetWorld();
+	//if (World)
+	//{
+	//	FActorSpawnParameters Params;
+	//	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//	Params.Owner = this;
+
+	//	FVector SpawnLocation = FVector::ZeroVector;
+	//	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	//	AMobileSpacePawn* Pawn = World->SpawnActor<AMobileSpacePawn>(AMobileSpacePawn::StaticClass(), SpawnLocation, SpawnRotation, Params);
+
+	//	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+	//	if (PC && Pawn)
+	//		PC->Possess(Pawn);
+	//}
 	
 	ControladorNiveles();
 }

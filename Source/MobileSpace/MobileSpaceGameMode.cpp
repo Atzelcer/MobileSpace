@@ -12,11 +12,7 @@
 
 AMobileSpaceGameMode::AMobileSpaceGameMode()
 {
-	// set default pawn class to our character class
-	DefaultPawnClass = AMobileSpacePawn::StaticClass();
-	HUDClass = AHUDmain::StaticClass();
-	
-	
+	HUDClass = AHUDmain::StaticClass();	
 }
 
 void AMobileSpaceGameMode::BeginPlay()
@@ -24,8 +20,6 @@ void AMobileSpaceGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	SetupFixedCamera();
-	
-	
 }
 
 void AMobileSpaceGameMode::Tick(float DeltaSeconds)

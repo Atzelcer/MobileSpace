@@ -94,7 +94,7 @@ public:
 	TSubclassOf<class UWidgetPCMulti> WidgetPCMultiClass;
 
 	UPROPERTY(Transient)
-	UWidgetPCMulti* WidgetPCMultiInstance;
+	class UWidgetPCMulti* WidgetPCMultiInstance;
 
 	UPROPERTY(EditAnywhere, Category = "Widgets")
 	class TSubclassOf<class UWidgetOnGameMulti> WidgetOnGameMultiClass;
