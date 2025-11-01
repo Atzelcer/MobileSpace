@@ -58,30 +58,24 @@ AMobileSpacePawn::AMobileSpacePawn()
 	}
 
 	ProjectileClass = AMobileSpaceProjectile::StaticClass();
+
+	CantEscudo = 1;
+	CantMissil = 1;
+	CantVelocidad = 1;
+	CantVida = 5;
+
 }
 
 void AMobileSpacePawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWorld* World = GetWorld();
-	if (!World) return;
-
-	for (TActorIterator<AHUDmain> It(World); It; ++It)
-	{
-		HUDRef = *It;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HUD ya existe "));
-		break;
-	}
-
-	if (!HUDRef)
-	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		if (PC)
-			HUDRef = Cast<AHUDmain>(PC->GetHUD());
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Asignando HUD desde PlayerController "));
-	}
-	EstablecerCapsula(2);
+	//APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	//if (PC)
+	//{
+	//	HUDRef = Cast<AHUDmain>(PC->GetHUD());
+	//	InicializarPowerUpsHUD();
+	//}
 }
 
 
@@ -167,19 +161,16 @@ void AMobileSpacePawn::FireShot(FVector FireDirection)
 	UWorld* World = GetWorld();
 	if (!World) return;
 
-	// Direcciones de disparo:
 	const FRotator FireRotationCenter = FireDirection.Rotation();
 
-	// Ángulo en grados para los lados
 	float SideAngle = 30.f;
 
-	// Rotaciones para los dos lados
 	FRotator FireRotationLeft = FireRotationCenter + FRotator(0.f, -SideAngle, 0.f);
 	FRotator FireRotationRight = FireRotationCenter + FRotator(0.f, SideAngle, 0.f);
 
 	// Offset para que salgan separadas
-	FVector OffsetLeft(0.f, -50.f, 0.f);   // Y negativo (izquierda)
-	FVector OffsetRight(0.f, 50.f, 0.f);   // Y positivo (derecha)
+	FVector OffsetLeft(0.f, -50.f, 0.f); 
+	FVector OffsetRight(0.f, 50.f, 0.f);  
 
 	FVector SpawnLocation = GetActorLocation() + FireRotationCenter.RotateVector(GunOffset);
 
@@ -211,35 +202,70 @@ void AMobileSpacePawn::ShotTimerExpired()
 }
 
 
+void AMobileSpacePawn::InicializarPowerUpsHUD()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	UWidget_ON_GAME* Widget = HUD->WidgetOnGameInstance;
+	if (!Widget || !Widget->IsInViewport())
+		return;
+
+	Widget->ActualizarVida(CantVida);
+	Widget->ActualizarVelocidad(CantVelocidad);
+	Widget->ActualizarMisiles(CantMissil);
+	Widget->ActualizarEscudo(CantEscudo);
+}
+
+
 void AMobileSpacePawn::EstablecerCapsula(int32 TipoCapsula)
 {
-	if (!HUDRef || !HUDRef->WidgetOnGameInstance)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No se pudo establecer la capsula: Referencia HUD o Widget nula"));
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	UWidget_ON_GAME* Widget = HUD->WidgetOnGameInstance;
+	if (!Widget || !Widget->IsInViewport())
 		return;
-	}
 
 	switch (TipoCapsula)
 	{
 	case 1:
-		NumLifes += 1;
-		HUDRef->WidgetOnGameInstance->ActualizarVida(NumLifes);
+		CantVida += 1;
+		Widget->ActualizarVida(CantVida);
 		break;
 
 	case 2:
-		MoveSpeed += 1;
-		HUDRef->WidgetOnGameInstance->ActualizarVelocidad(MoveSpeed);
+		CantVelocidad += 1;
+		Widget->ActualizarVelocidad(CantVelocidad);
 		break;
 
 	case 3:
-		HUDRef->WidgetOnGameInstance->ActualizarMisiles(10);
+		CantMissil += 1;
+		Widget->ActualizarMisiles(CantMissil);
 		break;
 
 	case 4:
-		HUDRef->WidgetOnGameInstance->ActualizarEscudo(1);
+		CantEscudo += 1;
+		Widget->ActualizarEscudo(CantEscudo);
 		break;
 
 	default:
 		break;
 	}
+}
+
+
+void AMobileSpacePawn::HacerDanio()
+{
+	//CantVida -= 1;
+	//if (CantVida <= 0)
+	//{
+	//	this->Destroy();
+	//}
 }

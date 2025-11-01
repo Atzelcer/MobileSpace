@@ -254,11 +254,23 @@ void AHUDmain::MostrarOnGame()
 			UGameplayStatics::SetGamePaused(GetWorld(), false);
 
 			// Mostrar cursor pero mantener control del juego
+
+
 			PC->bShowMouseCursor = true;
 			FInputModeGameAndUI InputMode;
 			InputMode.SetWidgetToFocus(WidgetOnGameInstance->TakeWidget());
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			PC->SetInputMode(InputMode);
+		}
+
+		APawn* Pawn = PC->GetPawn();
+		if (Pawn)
+		{
+			AMobileSpacePawn* Nave = Cast<AMobileSpacePawn>(Pawn);
+			if (Nave)
+			{
+				Nave->InicializarPowerUpsHUD();
+			}
 		}
 	}
 }

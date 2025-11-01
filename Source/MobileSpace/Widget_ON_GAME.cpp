@@ -37,10 +37,13 @@ void UWidget_ON_GAME::ActualizarEscudo(int32 Cantidad)
 		TextBlock_cantidad_escudo->SetText(FText::FromString(FString::Printf(TEXT("%d"), Cantidad)));
 }
 
-void UWidget_ON_GAME::ActualizarSobrecarga(float Progreso)
+void UWidget_ON_GAME::ActualizarSobrecarga(float Valor, float MaxValor)
 {
 	if (ProgressBar_Sobrecarga_Disparo)
-		ProgressBar_Sobrecarga_Disparo->SetPercent(FMath::Clamp(Progreso, 0.f, 1.f));
+	{
+		float Progreso = FMath::Clamp(Valor / MaxValor, 0.f, 1.f);
+		ProgressBar_Sobrecarga_Disparo->SetPercent(Progreso);
+	}
 }
 
 void UWidget_ON_GAME::CambiarArma(UTexture2D* NuevaArma)

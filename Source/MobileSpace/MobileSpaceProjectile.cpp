@@ -7,6 +7,7 @@
 #include "Engine/StaticMesh.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "MegaObstaculo.h"
 
 AMobileSpaceProjectile::AMobileSpaceProjectile() 
 {
@@ -78,6 +79,14 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 		OtherActor->Destroy();
 		Destroy();
 	}
+
+	AMegaObstaculo* Obstaculo = Cast<AMegaObstaculo>(OtherActor);
+	if (Obstaculo)
+	{
+		Obstaculo->DestruirObstaculo();
+		Destroy();
+	}
+
 }
 
 void AMobileSpaceProjectile::SpawnMuzzleEffect(const FVector& Location, const FRotator& Rotation)

@@ -44,10 +44,21 @@ public:
 	UFUNCTION()
 	void OnMenuClicked();
 
+	UFUNCTION(BlueprintCallable)
 	void ActualizarVida(int32 Valor);
+
+	UFUNCTION(BlueprintCallable)
 	void ActualizarVelocidad(float Velocidad);
+
+	UFUNCTION(BlueprintCallable)
 	void ActualizarMisiles(int32 Cantidad);
+
+	UFUNCTION(BlueprintCallable)
 	void ActualizarEscudo(int32 Cantidad);
-	void ActualizarSobrecarga(float Progreso);
+
+	UFUNCTION(BlueprintCallable)
+	void ActualizarSobrecarga(float Valor, float MaxValor);
+
+	UFUNCTION(BlueprintCallable)
 	void CambiarArma(UTexture2D* NuevaArma);
 };

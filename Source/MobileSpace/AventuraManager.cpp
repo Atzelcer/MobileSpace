@@ -12,6 +12,8 @@
 #include "DragonT_Boss_Z.h"
 #include "MobileSpacePawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "MegaCapsula.h"
+#include "MegaObstaculo.h"
 
 AAventuraManager::AAventuraManager()
 {
@@ -141,6 +143,30 @@ void AAventuraManager::Nivel1()
 	
 	AShip_CazadorRojo* NewShip = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), SpawnLocation, SpawnRotation);
 	
+
+	const float PosZ = 282.000183f;
+
+	// Rango Y de aparición
+	const float MinY = -1680.0f;
+	const float MaxY = 1750.0f;
+
+	// Cuántos spawnear
+	const int32 NumCapsulas = 4;
+	const int32 NumObstaculos = 6;
+
+	for (int32 i = 0; i < NumCapsulas; ++i)
+	{
+		float RandY = FMath::FRandRange(MinY, MaxY);
+		FVector SpawnPos(6000.f + i * 800.f, RandY, PosZ);
+		World->SpawnActor<AMegaCapsula>(AMegaCapsula::StaticClass(), SpawnPos, FRotator::ZeroRotator);
+	}
+
+	for (int32 i = 0; i < NumObstaculos; ++i)
+	{
+		float RandY = FMath::FRandRange(MinY, MaxY);
+		FVector SpawnPos(6000.f + i * 700.f, RandY, PosZ);
+		World->SpawnActor<AMegaObstaculo>(AMegaObstaculo::StaticClass(), SpawnPos, FRotator::ZeroRotator);
+	}
 }
 
 void AAventuraManager::Nivel2()

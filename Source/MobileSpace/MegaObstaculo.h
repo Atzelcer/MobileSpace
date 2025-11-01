@@ -4,23 +4,45 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
+#include "Sound/SoundWave.h"
 #include "MegaObstaculo.generated.h"
 
 UCLASS()
 class MOBILESPACE_API AMegaObstaculo : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
 	AMegaObstaculo();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
-public:	
-	// Called every frame
+public:
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* CollisionComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 TipoObstaculo;
+
+	UPROPERTY()
+	USoundWave* SonidoDestruccion;
+
+	void AsignarMallaAleatoria();
+	void DestruirObstaculo();
+
+	UPROPERTY(EditAnywhere, Category = "Movimiento")
+	float Velocidad = 500.f;
+
+	void MoverObstaculo(float DeltaTime);
+	void VerificarDestruccion();
 
 };

@@ -38,4 +38,11 @@ public:
 
 	void AsignarParticulaAleatoria();
 	void DestruirCapsula();
+
+	UPROPERTY(EditAnywhere, Category = "Movimiento")
+	float Velocidad = 600.f;
+
+	void MoverCapsula(float DeltaTime);
+	void VerificarDestruccion();
+
 };

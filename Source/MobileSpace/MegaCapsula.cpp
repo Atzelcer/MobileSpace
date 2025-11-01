@@ -4,6 +4,7 @@
 #include "MegaCapsula.h"
 #include "Kismet/GameplayStatics.h"
 #include "MobileSpacePawn.h"
+#include "MegaObstaculo.h"
 
 AMegaCapsula::AMegaCapsula()
 {
@@ -31,6 +32,8 @@ void AMegaCapsula::BeginPlay()
 void AMegaCapsula::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	MoverCapsula(DeltaTime);
+	VerificarDestruccion();
 }
 
 void AMegaCapsula::AsignarParticulaAleatoria()
@@ -75,4 +78,18 @@ void AMegaCapsula::DestruirCapsula()
 		UGameplayStatics::PlaySoundAtLocation(this, SonidoRecoleccion, GetActorLocation());
 
 	Destroy();
+}
+
+
+void AMegaCapsula::MoverCapsula(float DeltaTime)
+{
+	FVector NuevaPos = GetActorLocation();
+	NuevaPos.X -= Velocidad * DeltaTime;
+	SetActorLocation(NuevaPos);
+}
+
+void AMegaCapsula::VerificarDestruccion()
+{
+	if (GetActorLocation().X <= 200.000244f)
+		Destroy();
 }

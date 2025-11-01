@@ -52,7 +52,9 @@ private:
 
 	FTimerHandle TimerHandle_ShotTimerExpired;
 
+
 public:
+	void InicializarPowerUpsHUD();
 
 	FORCEINLINE class UStaticMeshComponent* GetShipMeshComponent() const { return ShipMeshComponent; }
 	
@@ -69,10 +71,24 @@ public:
 	FVector2D MovementMax = FVector2D(1400.f, 3000.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
-	int32 NumLifes = 3; // Vidas
+	int32 NumLifes = 3; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+	int32 CantVida;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+	int32 CantVelocidad;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+	int32 CantMissil;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+	int32 CantEscudo;
 
 public:
 	void EstablecerCapsula(int32 TipoCapsula);
+
+	void HacerDanio();
 
 private:
 	class AHUDmain* HUDRef;

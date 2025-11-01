@@ -13,6 +13,8 @@
 AMobileSpaceGameMode::AMobileSpaceGameMode()
 {
 	HUDClass = AHUDmain::StaticClass();	
+	
+	DefaultPawnClass = AMobileSpacePawn::StaticClass();
 }
 
 void AMobileSpaceGameMode::BeginPlay()
