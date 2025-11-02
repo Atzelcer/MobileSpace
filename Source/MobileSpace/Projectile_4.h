@@ -13,5 +13,8 @@ UCLASS()
 class MOBILESPACE_API AProjectile_4 : public AMobileSpaceProjectile
 {
 	GENERATED_BODY()
+
+public:
+	AProjectile_4();
 	
 };

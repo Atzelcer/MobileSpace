@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "MobileSpaceProjectile.h"
+#include "MobileSpaceProjectile.h"  
 #include "MobileSpacePawn.generated.h"
 
 UCLASS(Blueprintable)
@@ -28,11 +28,9 @@ public:
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float MoveSpeed;
 
-	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)
-	class USoundBase* FireSound;
 
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	UParticleSystem* MuzzleParticleAsset;
+
+	
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -40,6 +38,7 @@ public:
 	void FireShot(FVector FireDirection);
 
 	void ShotTimerExpired();
+
 
 	static const FName MoveForwardBinding;
 	static const FName MoveRightBinding;

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundBase.h"
 #include "MobileSpaceProjectile.generated.h"
 
 class UProjectileMovementComponent;
@@ -14,37 +16,31 @@ class AMobileSpaceProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	/** Sphere collision component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* ProjectileMesh;
+protected:
+    UPROPERTY(VisibleAnywhere, Category = Projectile)
+    UStaticMeshComponent* ProjectileMesh;
 
-	/** Projectile movement component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
+    UPROPERTY(VisibleAnywhere, Category = Movement)
+    UProjectileMovementComponent* ProjectileMovement;
 
-	UParticleSystemComponent* ParticleProjectile;
-	// Instancia (spawn temporal) para el hit effect, no adjunta por defecto
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	UParticleSystem* HitParticleAsset;
+    UPROPERTY(VisibleAnywhere, Category = Effects)
+    UParticleSystemComponent* ParticleProjectile;
 
-	// Instancia (spawn temporal) para el muzzle effect (se usará desde el pawn)
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	UParticleSystem* MuzzleParticleAsset;
-
+	UPROPERTY(EditAnywhere, Category = Sound)
+	USoundBase* FireSound;
 
 public:
-	AMobileSpaceProjectile();
+    AMobileSpaceProjectile();
 
-	/** Function to handle the projectile hitting something */
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+        UPrimitiveComponent* OtherComp, FVector NormalImpulse,
+        const FHitResult& Hit);
 
-	// Agrega aquí la definición de la función para spawn de muzzle effect
-	void SpawnMuzzleEffect(const FVector& Location, const FRotator& Rotation);
+    void PlayFireSound();
 
-
-	/** Returns ProjectileMesh subobject **/
-	FORCEINLINE UStaticMeshComponent* GetProjectileMesh() const { return ProjectileMesh; }
-	/** Returns ProjectileMovement subobject **/
-	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+public:
+    FORCEINLINE UStaticMeshComponent* GetProjectileMesh() const { return ProjectileMesh; }
+    FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 };
+	
