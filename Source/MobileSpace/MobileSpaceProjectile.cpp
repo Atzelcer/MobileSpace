@@ -7,7 +7,6 @@
 #include "Engine/StaticMesh.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "MegaObstaculo.h"
 #include "Ship_X.h"
 
 AMobileSpaceProjectile::AMobileSpaceProjectile() 
@@ -21,28 +20,24 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	ProjectileMesh->SetupAttachment(RootComponent);
 	ProjectileMesh->SetVisibility(false);
 	
-	// Configuración de colisión mejorada
 	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	ProjectileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore); // No golpear al jugador
+	ProjectileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore); 
 	
-	// Vincular eventos de colisión
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);
 	
 	RootComponent = ProjectileMesh;
 
-	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
 	ProjectileMovement->InitialSpeed = 5000.f;
 	ProjectileMovement->MaxSpeed = 5000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
-	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
-	ProjectileMovement->bSweepCollision = true; // Importante: Habilitar detección de colisión por barrido
+	ProjectileMovement->ProjectileGravityScale = 0.f; 
+	ProjectileMovement->bSweepCollision = true; 
 
 
-	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 
 	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
@@ -54,7 +49,6 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 		ParticleProjectile->SetTemplate(ParticleAsset.Object);
 	}
 
-	// Particle asset for hit effect (no instancia, solo referencia)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleHitAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Trail05_Red.P_Hit_Trail05_Red'"));
 	if (ParticleHitAsset.Succeeded()) {
 		HitParticleAsset = ParticleHitAsset.Object;
@@ -66,38 +60,25 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	}
 }
 
-
-void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitParticleAsset)
-	{
+	if (HitParticleAsset) {
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleAsset, Hit.Location, Hit.Normal.Rotation());
 	}
 
-	if (!OtherActor || OtherActor == GetOwner() || OtherActor == this)
-		return;
+	if (OtherActor && OtherActor != GetOwner() && OtherActor != this) {
+		if (OtherComp && OtherComp->IsSimulatingPhysics())
+			OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
 
-	if (AMegaObstaculo* Obstaculo = Cast<AMegaObstaculo>(OtherActor))
-	{
-		Obstaculo->DestruirObstaculo();
+		if (OtherActor->IsA(AShip_X::StaticClass())) {
+			Cast<AShip_X>(OtherActor)->HandleDestruction(); // Debes implementar esto
+		}
+		else {
+			OtherActor->Destroy(); 
+		}
 		Destroy();
-		return;
 	}
-
-	if (AShip_X* Nave = Cast<AShip_X>(OtherActor))
-	{
-		Nave->DestruirNave();
-		Destroy(); 
-		return;
-	}
-	if (OtherComp && OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
-	}
-	Destroy();
 }
-
 
 void AMobileSpaceProjectile::SpawnMuzzleEffect(const FVector& Location, const FRotator& Rotation)
 {

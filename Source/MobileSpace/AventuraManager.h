@@ -6,15 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Ship_X.h"
 #include "Boss_Z.h"
-#include "Ship_CazadorAlfa.h"
-#include "Ship_CazadorDelta.h"
-#include "Ship_CazadorVerde.h"
-#include "Ship_CazadorRojo.h"
-#include "Ship_CazadorAzul.h"
-#include "Ship_CazadorOmega.h"
-#include "DKraken_Boss_Z.h"
-#include "DragonR_Boss_Z.h"
-#include "DragonT_Boss_Z.h"
+#include "ShipFactoryGeneral.h"
 #include "AventuraManager.generated.h"
 
 UCLASS()
@@ -88,4 +80,9 @@ protected:
 
 	UPROPERTY()
 	FTimerHandle BossTimerHandle;
+
+public:
+
+	UPROPERTY()
+	UShipFactoryGeneral* ShipFactory;
 };

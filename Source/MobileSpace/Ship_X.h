@@ -6,7 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "MoveComponent.h"
+#include "Sound/SoundBase.h"
 #include "Ship_X.generated.h"
 
 
@@ -23,8 +26,19 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* ShipCollision;
+
 	UPROPERTY(VisibleAnywhere)
 	UMoveComponent* MoveComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	USoundBase* DestructionSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	UParticleSystem* DestructionEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector DestructionEffectScale = FVector(1.0f, 1.0f, 1.0f);
+	
 	
 
 protected:
@@ -36,14 +50,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void OnShipHit(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult
-	);
+	void OnShipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	void HandleDestruction();
 
 
 protected:

@@ -10,10 +10,7 @@
 #include "DKraken_Boss_Z.h"
 #include "DragonR_Boss_Z.h"
 #include "DragonT_Boss_Z.h"
-#include "MobileSpacePawn.h"
-#include "Kismet/GameplayStatics.h"
-#include "MegaCapsula.h"
-#include "MegaObstaculo.h"
+
 
 AAventuraManager::AAventuraManager()
 {
@@ -21,31 +18,13 @@ AAventuraManager::AAventuraManager()
 	NivelActual = 1;
 	CurrentWave = 1;
 	CurrentBoss = nullptr;
-
-
-	//DefaultPawnClass = AMobileSpacePawn::StaticClass();
 }
 
 void AAventuraManager::BeginPlay()
 {
 	Super::BeginPlay();
+	ShipFactory = NewObject<UShipFactoryGeneral>(this);
 
-	//UWorld* World = GetWorld();
-	//if (World)
-	//{
-	//	FActorSpawnParameters Params;
-	//	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//	Params.Owner = this;
-
-	//	FVector SpawnLocation = FVector::ZeroVector;
-	//	FRotator SpawnRotation = FRotator::ZeroRotator;
-
-	//	AMobileSpacePawn* Pawn = World->SpawnActor<AMobileSpacePawn>(AMobileSpacePawn::StaticClass(), SpawnLocation, SpawnRotation, Params);
-
-	//	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
-	//	if (PC && Pawn)
-	//		PC->Possess(Pawn);
-	//}
 	
 	ControladorNiveles();
 }
@@ -135,41 +114,9 @@ void AAventuraManager::CheckWaveComplete()
 //patrones factory - patron prototype 
 void AAventuraManager::Nivel1()
 {
-	//solo spawnea una nave
-	UWorld* World = GetWorld();
-	if (!World) return;
-	FVector SpawnLocation = FVector(1000.0f, 0.0f, 300.0f);
-	FRotator SpawnRotation = FRotator::ZeroRotator;
 	
-	AShip_CazadorRojo* NewShip = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), SpawnLocation, SpawnRotation);
-	
-	AShip_CazadorAzul* NewShip1 = World->SpawnActor<AShip_CazadorAzul>(AShip_CazadorAzul::StaticClass(), SpawnLocation, SpawnRotation);
-	AShip_CazadorAlfa* NewShip2 = World->SpawnActor<AShip_CazadorAlfa>(AShip_CazadorAlfa::StaticClass(), SpawnLocation, SpawnRotation);
+	ShipFactory->CrearNave(GetWorld(), ENaveTipo::Verde);
 
-
-	//const float PosZ = 282.000183f;
-
-	//// Rango Y de aparición
-	//const float MinY = -1680.0f;
-	//const float MaxY = 1750.0f;
-
-	//// Cuántos spawnear
-	//const int32 NumCapsulas = 4;
-	//const int32 NumObstaculos = 6;
-
-	//for (int32 i = 0; i < NumCapsulas; ++i)
-	//{
-	//	float RandY = FMath::FRandRange(MinY, MaxY);
-	//	FVector SpawnPos(6000.f + i * 800.f, RandY, PosZ);
-	//	World->SpawnActor<AMegaCapsula>(AMegaCapsula::StaticClass(), SpawnPos, FRotator::ZeroRotator);
-	//}
-
-	//for (int32 i = 0; i < NumObstaculos; ++i)
-	//{
-	//	float RandY = FMath::FRandRange(MinY, MaxY);
-	//	FVector SpawnPos(6000.f + i * 700.f, RandY, PosZ);
-	//	World->SpawnActor<AMegaObstaculo>(AMegaObstaculo::StaticClass(), SpawnPos, FRotator::ZeroRotator);
-	//}
 }
 
 void AAventuraManager::Nivel2()
