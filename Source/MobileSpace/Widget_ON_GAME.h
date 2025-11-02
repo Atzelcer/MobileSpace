@@ -19,46 +19,41 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	UPROPERTY(meta = (BindWidget)) UProgressBar* ProgressBar_Sobrecarga_Disparo;
+	UPROPERTY(meta = (BindWidget)) UTextBlock* TextBlock_cantidad_vida;
+	UPROPERTY(meta = (BindWidget)) UTextBlock* TextBlock_cantidad_velocidad;
+	UPROPERTY(meta = (BindWidget)) UImage* image_arma_cambio;
+	UPROPERTY(meta = (BindWidget)) UTextBlock* TextBlock_cantidad_misil;
+	UPROPERTY(meta = (BindWidget)) UTextBlock* TextBlock_cantidad_escudo;
+	UPROPERTY(meta = (BindWidget)) UButton* Button_menu;
 
-	UPROPERTY(meta = (BindWidget))
-	UProgressBar* ProgressBar_Sobrecarga_Disparo;
+	UPROPERTY(meta = (BindWidget)) UButton* Button_escudo;
+	UPROPERTY(meta = (BindWidget)) UButton* Button_velocidad;
+	UPROPERTY(meta = (BindWidget)) UButton* Button_missil;
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextBlock_cantidad_vida;
+	UPROPERTY(meta = (BindWidget)) UImage* Image_ESCUDO;
+	UPROPERTY(meta = (BindWidget)) UImage* Image_VELOCIDAD;
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextBlock_cantidad_velocidad;
+	bool bEscudoActivo;
+	bool bVelocidadActiva;
 
-	UPROPERTY(meta = (BindWidget))
-	UImage* image_arma_cambio;
+	UPROPERTY() UTexture2D* TexEscudo_ON;
+	UPROPERTY() UTexture2D* TexEscudo_OFF;
+	UPROPERTY() UTexture2D* TexVelocidad_ON;
+	UPROPERTY() UTexture2D* TexVelocidad_OFF;
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextBlock_cantidad_misil;
+	UFUNCTION() void OnMenuClicked();
+	UFUNCTION(BlueprintCallable) void ActualizarVida(int32 Valor);
+	UFUNCTION(BlueprintCallable) void ActualizarVelocidad(float Velocidad);
+	UFUNCTION(BlueprintCallable) void ActualizarMisiles(int32 Cantidad);
+	UFUNCTION(BlueprintCallable) void ActualizarEscudo(int32 Cantidad);
+	UFUNCTION(BlueprintCallable) void ActualizarSobrecarga(float Valor, float MaxValor);
+	UFUNCTION(BlueprintCallable) void CambiarArma(UTexture2D* NuevaArma);
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextBlock_cantidad_escudo;
 
-	UPROPERTY(meta = (BindWidget))
-	UButton* Button_menu;
+	UFUNCTION() void OnEscudoClicked();
+	UFUNCTION() void OnVelocidadClicked();
+	UFUNCTION() void OnMissilClicked();
 
-	UFUNCTION()
-	void OnMenuClicked();
-
-	UFUNCTION(BlueprintCallable)
-	void ActualizarVida(int32 Valor);
-
-	UFUNCTION(BlueprintCallable)
-	void ActualizarVelocidad(float Velocidad);
-
-	UFUNCTION(BlueprintCallable)
-	void ActualizarMisiles(int32 Cantidad);
-
-	UFUNCTION(BlueprintCallable)
-	void ActualizarEscudo(int32 Cantidad);
-
-	UFUNCTION(BlueprintCallable)
-	void ActualizarSobrecarga(float Valor, float MaxValor);
-
-	UFUNCTION(BlueprintCallable)
-	void CambiarArma(UTexture2D* NuevaArma);
+	void ActualizarEstadoBotones();
 };

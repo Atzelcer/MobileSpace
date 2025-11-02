@@ -41,3 +41,8 @@ void AShip_CazadorAzul::AutoFire()
 
 	}
 }
+
+void AShip_CazadorAzul::DestruirNave()
+{
+	Super::DestruirNave();
+}

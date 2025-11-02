@@ -39,3 +39,8 @@ void AShip_CazadorOmega::AutoFire()
 		AttackComp->Fire(AttackPattern);
 	}
 }
+
+void AShip_CazadorOmega::DestruirNave()
+{
+	Super::DestruirNave();
+}

@@ -40,3 +40,8 @@ void AShip_CazadorDelta::AutoFire()
 		AttackComp->Fire(AttackPattern);	
 	}
 }
+
+void AShip_CazadorDelta::DestruirNave()
+{
+	Super::DestruirNave();
+}

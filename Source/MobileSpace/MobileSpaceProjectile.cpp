@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "MegaObstaculo.h"
+#include "Ship_X.h"
 
 AMobileSpaceProjectile::AMobileSpaceProjectile() 
 {
@@ -65,29 +66,38 @@ AMobileSpaceProjectile::AMobileSpaceProjectile()
 	}
 }
 
-void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+
+void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitParticleAsset) {
+	if (HitParticleAsset)
+	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleAsset, Hit.Location, Hit.Normal.Rotation());
 	}
 
-	// Física y destrucción igual que antes
-	if (OtherActor && OtherActor != GetOwner() && OtherActor != this) {
-		if (OtherComp && OtherComp->IsSimulatingPhysics())
-			OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
+	if (!OtherActor || OtherActor == GetOwner() || OtherActor == this)
+		return;
 
-		OtherActor->Destroy();
-		Destroy();
-	}
-
-	AMegaObstaculo* Obstaculo = Cast<AMegaObstaculo>(OtherActor);
-	if (Obstaculo)
+	if (AMegaObstaculo* Obstaculo = Cast<AMegaObstaculo>(OtherActor))
 	{
 		Obstaculo->DestruirObstaculo();
 		Destroy();
+		return;
 	}
 
+	if (AShip_X* Nave = Cast<AShip_X>(OtherActor))
+	{
+		Nave->DestruirNave();
+		Destroy(); 
+		return;
+	}
+	if (OtherComp && OtherComp->IsSimulatingPhysics())
+	{
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
+	}
+	Destroy();
 }
+
 
 void AMobileSpaceProjectile::SpawnMuzzleEffect(const FVector& Location, const FRotator& Rotation)
 {

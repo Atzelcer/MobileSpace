@@ -37,4 +37,7 @@ protected:
 private:
 	FTimerHandle FireTimerHandle;
 	void AutoFire();
+
+public:
+	virtual void DestruirNave() override;
 };

@@ -143,30 +143,33 @@ void AAventuraManager::Nivel1()
 	
 	AShip_CazadorRojo* NewShip = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), SpawnLocation, SpawnRotation);
 	
+	AShip_CazadorAzul* NewShip1 = World->SpawnActor<AShip_CazadorAzul>(AShip_CazadorAzul::StaticClass(), SpawnLocation, SpawnRotation);
+	AShip_CazadorAlfa* NewShip2 = World->SpawnActor<AShip_CazadorAlfa>(AShip_CazadorAlfa::StaticClass(), SpawnLocation, SpawnRotation);
 
-	const float PosZ = 282.000183f;
 
-	// Rango Y de aparición
-	const float MinY = -1680.0f;
-	const float MaxY = 1750.0f;
+	//const float PosZ = 282.000183f;
 
-	// Cuántos spawnear
-	const int32 NumCapsulas = 4;
-	const int32 NumObstaculos = 6;
+	//// Rango Y de aparición
+	//const float MinY = -1680.0f;
+	//const float MaxY = 1750.0f;
 
-	for (int32 i = 0; i < NumCapsulas; ++i)
-	{
-		float RandY = FMath::FRandRange(MinY, MaxY);
-		FVector SpawnPos(6000.f + i * 800.f, RandY, PosZ);
-		World->SpawnActor<AMegaCapsula>(AMegaCapsula::StaticClass(), SpawnPos, FRotator::ZeroRotator);
-	}
+	//// Cuántos spawnear
+	//const int32 NumCapsulas = 4;
+	//const int32 NumObstaculos = 6;
 
-	for (int32 i = 0; i < NumObstaculos; ++i)
-	{
-		float RandY = FMath::FRandRange(MinY, MaxY);
-		FVector SpawnPos(6000.f + i * 700.f, RandY, PosZ);
-		World->SpawnActor<AMegaObstaculo>(AMegaObstaculo::StaticClass(), SpawnPos, FRotator::ZeroRotator);
-	}
+	//for (int32 i = 0; i < NumCapsulas; ++i)
+	//{
+	//	float RandY = FMath::FRandRange(MinY, MaxY);
+	//	FVector SpawnPos(6000.f + i * 800.f, RandY, PosZ);
+	//	World->SpawnActor<AMegaCapsula>(AMegaCapsula::StaticClass(), SpawnPos, FRotator::ZeroRotator);
+	//}
+
+	//for (int32 i = 0; i < NumObstaculos; ++i)
+	//{
+	//	float RandY = FMath::FRandRange(MinY, MaxY);
+	//	FVector SpawnPos(6000.f + i * 700.f, RandY, PosZ);
+	//	World->SpawnActor<AMegaObstaculo>(AMegaObstaculo::StaticClass(), SpawnPos, FRotator::ZeroRotator);
+	//}
 }
 
 void AAventuraManager::Nivel2()

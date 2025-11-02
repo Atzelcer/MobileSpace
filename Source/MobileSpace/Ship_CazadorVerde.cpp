@@ -49,3 +49,8 @@ void AShip_CazadorVerde::AutoFire()
 		AttackComp->Fire(AttackPattern);
 	}
 }
+
+void AShip_CazadorVerde::DestruirNave()
+{
+	Super::DestruirNave();
+}

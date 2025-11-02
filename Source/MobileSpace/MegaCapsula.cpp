@@ -90,6 +90,6 @@ void AMegaCapsula::MoverCapsula(float DeltaTime)
 
 void AMegaCapsula::VerificarDestruccion()
 {
-	if (GetActorLocation().X <= 200.000244f)
+	if (GetActorLocation().X <= -1100.000244f)
 		Destroy();
 }

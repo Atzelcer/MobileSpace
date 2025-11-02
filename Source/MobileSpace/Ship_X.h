@@ -45,6 +45,19 @@ public:
 		const FHitResult& SweepResult
 	);
 
-	
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "PowerUps")
+	int32 ProbabilidadSpawnCapsula;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundBase* SonidoExplosion;
+
+	void IntentarSpawnCapsula();
+
+public:
+	// Función virtual para que las clases hijas la sobreescriban
+	virtual void DestruirNave();
+
 
 };
