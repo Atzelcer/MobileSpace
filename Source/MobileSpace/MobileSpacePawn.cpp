@@ -1,7 +1,8 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MobileSpacePawn.h"
-#include "MobileSpaceProjectile.h"
+#include "MobileSpaceProjectile.h" 
+#include "Projectile_1.h"           
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
@@ -9,7 +10,6 @@
 #include "Engine/CollisionProfile.h"
 #include "Engine/StaticMesh.h"
 #include "Kismet/GameplayStatics.h"
-#include "Sound/SoundBase.h"
 #include "Particles/ParticleSystemComponent.h"
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
@@ -27,17 +27,11 @@ AMobileSpacePawn::AMobileSpacePawn()
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
 	ShipMeshComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
 
-	// Cache our sound effect
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Sci-Fi_Gun_1-1.Sci-Fi_Gun_1-1'"));
-	FireSound = FireAudio.Object;
-
-	// No camera setup - using fixed camera from GameMode
-
 	// Movement
 	MoveSpeed = 1800.0f;
 	// Weapon
-	GunOffset = FVector(90.f, 0.f, 0.f);
-	FireRate = 0.1f;
+	GunOffset = FVector(200.f, 0.f, 0.f);
+	FireRate = 0.2f;
 	bCanFire = true;
 
 	//partycle
@@ -53,7 +47,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 		
 	}
 
-	ProjectileClass = AMobileSpaceProjectile::StaticClass();
+	ProjectileClass = AProjectile_1::StaticClass();
 }
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -138,46 +132,23 @@ void AMobileSpacePawn::FireShot(FVector FireDirection)
 	UWorld* World = GetWorld();
 	if (!World) return;
 
-	// Direcciones de disparo:
-	const FRotator FireRotationCenter = FireDirection.Rotation();
+	const FRotator FireRotation = FireDirection.Rotation();
+	FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
 
-	// Ángulo en grados para los lados
-	float SideAngle = 30.f;
+	AMobileSpaceProjectile* Proj = World->SpawnActor<AMobileSpaceProjectile>(
+		ProjectileClass, SpawnLocation, FireRotation);
 
-	// Rotaciones para los dos lados
-	FRotator FireRotationLeft = FireRotationCenter + FRotator(0.f, -SideAngle, 0.f);
-	FRotator FireRotationRight = FireRotationCenter + FRotator(0.f, SideAngle, 0.f);
-
-	// Offset para que salgan separadas
-	FVector OffsetLeft(0.f, -50.f, 0.f);   // Y negativo (izquierda)
-	FVector OffsetRight(0.f, 50.f, 0.f);   // Y positivo (derecha)
-
-	FVector SpawnLocation = GetActorLocation() + FireRotationCenter.RotateVector(GunOffset);
-
-	// --- Disparo Izquierda ---
-	FVector SpawnLocationLeft = SpawnLocation + OffsetLeft;
-	if (MuzzleParticleAsset)
-		UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleParticleAsset, SpawnLocationLeft, FireRotationLeft);
-
-	World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocationLeft, FireRotationLeft);
-
-	// --- Disparo Derecha ---
-	FVector SpawnLocationRight = SpawnLocation + OffsetRight;
-	if (MuzzleParticleAsset)
-		UGameplayStatics::SpawnEmitterAtLocation(World, MuzzleParticleAsset, SpawnLocationRight, FireRotationRight);
-
-	World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocationRight, FireRotationRight);
-
+	if (Proj) {
+		Proj->PlayFireSound();
+	}
+	
 	bCanFire = false;
 	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMobileSpacePawn::ShotTimerExpired, FireRate);
-
-	if (FireSound)
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	
 }
 
 void AMobileSpacePawn::ShotTimerExpired()
 {
 	bCanFire = true;
 }
+
 
