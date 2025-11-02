@@ -19,13 +19,20 @@ AShip_X::AShip_X()
 	ShipCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShipCollision"));
 	ShipCollision->SetupAttachment(ShipMesh);
 	ShipCollision->SetBoxExtent(FVector(100.f, 100.f, 100.f));
-	ShipCollision->OnComponentBeginOverlap.AddDynamic(this, &AShip_X::OnShipHit);
-	
-	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	ShipCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+
+	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	ShipCollision->SetCollisionResponseToAllChannels(ECR_Block);
+	ShipCollision->SetCollisionObjectType(ECC_Pawn); 
+
+	ShipCollision->OnComponentHit.AddDynamic(this, &AShip_X::OnShipHit);
 
 	MoveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("MoveComp"));
-	
+
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset(TEXT("SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
+	if (SoundAsset.Succeeded()) {
+		DestructionSound = SoundAsset.Object;
+	}
 }
 
 void AShip_X::BeginPlay()
@@ -39,12 +46,26 @@ void AShip_X::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AShip_X::OnShipHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AShip_X::OnShipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (OtherActor && OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
+	{
+		Destroy();
+	}
+}
 
-    if (OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
-    {
-        Destroy();
-    }
+void AShip_X::HandleDestruction()
+{
+	if (DestructionEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestructionEffect, GetActorLocation(), GetActorRotation(), FVector(3.f, 3.f, 3.f));
+	}
+
+	if (DestructionSound) {
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DestructionSound, GetActorLocation());
+	}
+
+	
+	Destroy();
 }
 
