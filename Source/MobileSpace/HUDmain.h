@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Widget_Indicar_level.h"
 #include "HUDmain.generated.h"
 
 UCLASS()
@@ -91,7 +92,7 @@ public:
 	class UWidgetSalaEspera* WidgetSalaEsperaInstance;
 
 	UPROPERTY(EditAnywhere, Category = "Widgets")
-	TSubclassOf<class UWidgetPCMulti> WidgetPCMultiClass;
+	class TSubclassOf<class UWidgetPCMulti> WidgetPCMultiClass;
 
 	UPROPERTY(Transient)
 	class UWidgetPCMulti* WidgetPCMultiInstance;
@@ -102,6 +103,12 @@ public:
 	UPROPERTY(Transient)
 	class UWidgetOnGameMulti* WidgetOnGameMultiInstance;
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	class TSubclassOf<class UWidget_Indicar_level> WidgetLevelClass;
+
+	UPROPERTY(Transient)
+	class UWidget_Indicar_level* WidgetLevelInstance;
 
 	UPROPERTY(Transient)
 	class UAudioComponent* MusicaComponent;
@@ -185,9 +192,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OcultarOnGameMulti();
 
+	UFUNCTION(BlueprintCallable)
+	void MostrarNivel(const FString& Mensaje);
+
+	UFUNCTION(BlueprintCallable)
+	void OcultarNivel();
+
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarTodo();
 
+	FTimerHandle TimerHandle_OcultarNivel;
 	FTimerHandle TimerHandle_OcultarPantallaCarga;
 	FTimerHandle TimerHandle_ConteoPantallaCarga;
 	int32 TiempoRestantePantallaCarga;

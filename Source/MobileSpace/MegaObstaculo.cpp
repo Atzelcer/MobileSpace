@@ -20,6 +20,8 @@ AMegaObstaculo::AMegaObstaculo()
 	static ConstructorHelpers::FObjectFinder<USoundWave> Sonido(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Whoosh_4-1.Whoosh_4-1'"));
 	if (Sonido.Succeeded())
 		SonidoDestruccion = Sonido.Object;
+
+	VelocidadMovimiento = 600.f;
 }
 
 void AMegaObstaculo::BeginPlay()
@@ -69,6 +71,14 @@ void AMegaObstaculo::NotifyActorBeginOverlap(AActor* OtherActor)
 		Nave->HacerDanio();
 		DestruirObstaculo();
 	}
+
+	AMobileSpaceProjectile* Proyectil = Cast<AMobileSpaceProjectile>(OtherActor);
+	if (Proyectil)
+	{
+		DestruirObstaculo();
+		Proyectil->Destroy();
+		return;
+	}
 }
 
 void AMegaObstaculo::DestruirObstaculo()
@@ -82,12 +92,17 @@ void AMegaObstaculo::DestruirObstaculo()
 void AMegaObstaculo::MoverObstaculo(float DeltaTime)
 {
 	FVector NuevaPos = GetActorLocation();
-	NuevaPos.X -= Velocidad * DeltaTime;
+	NuevaPos.X -= VelocidadMovimiento * DeltaTime;
 	SetActorLocation(NuevaPos);
 }
 
 void AMegaObstaculo::VerificarDestruccion()
 {
-	if (GetActorLocation().X <= 200.000244f)
+	if (GetActorLocation().X <= -1100.000244f)
 		Destroy();
+}
+
+void AMegaObstaculo::SetVelocidadMovimiento(float NuevaVelocidad)
+{
+	VelocidadMovimiento = NuevaVelocidad;
 }

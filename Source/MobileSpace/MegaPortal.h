@@ -6,11 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "MegaPortal.generated.h"
 
-class UCapsuleComponent;
-class UNiagaraSystem;
-class UNiagaraComponent;
-class AAventuraManager;
-
 UCLASS()
 class MOBILESPACE_API AMegaPortal : public AActor
 {
@@ -21,24 +16,27 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
-	UCapsuleComponent* CollisionComponent;
+	class UCapsuleComponent* CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	UNiagaraComponent* NiagaraPortalComponent;
+	class UParticleSystemComponent* ParticlePortalComponent;
 
-	AAventuraManager* AventuraManagerPor;
-
-	// Lista de posibles efectos Niagara
 	UPROPERTY()
-	TArray<UNiagaraSystem*> NiagaraSystems;
+	TArray<UParticleSystem*> ParticleSystems;
 
-	void CargarNiagaraSystems();
+	UPROPERTY()
+	class AAventuraManager* AventuraManagerPor;
+
+	void CargarParticleSystems();
 	void EscogerEfectoAleatorio();
+
+	void IrAlSiguienteNivelConTransicion();
+
+	FTimerHandle TimerHandle_SiguienteNivel;
+
 };

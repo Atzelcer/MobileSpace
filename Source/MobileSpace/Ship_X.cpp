@@ -22,6 +22,8 @@ AShip_X::AShip_X()
 	ShipCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShipCollision"));
 	ShipCollision->SetupAttachment(ShipMesh);
 	ShipCollision->SetBoxExtent(FVector(100.f, 100.f, 100.f));
+
+	// Configure collision properly
 	ShipCollision->OnComponentBeginOverlap.AddDynamic(this, &AShip_X::OnShipHit);
 	
 	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -66,10 +68,6 @@ void AShip_X::IntentarSpawnCapsula()
 
 	if (NumeroAleatorio <= ProbabilidadSpawnCapsula)
 	{
-		//ver valor del numero aleatorio con GEngine
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Numero Aleatorio: %d"), NumeroAleatorio));
-
-
 		const FVector SpawnLocation = GetActorLocation();
 		const FRotator SpawnRotation = GetActorRotation();
 
@@ -85,5 +83,20 @@ void AShip_X::DestruirNave()
 	}
 
 	IntentarSpawnCapsula();
+	Destroy();
+}
+
+void AShip_X::HandleDestruction()
+{
+	if (DestructionEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestructionEffect, GetActorLocation(), GetActorRotation(), FVector(3.f, 3.f, 3.f));
+	}
+
+	if (DestructionSound) {
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DestructionSound, GetActorLocation());
+	}
+
+
 	Destroy();
 }

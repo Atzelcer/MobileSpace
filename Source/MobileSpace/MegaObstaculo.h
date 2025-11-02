@@ -40,9 +40,11 @@ public:
 	void DestruirObstaculo();
 
 	UPROPERTY(EditAnywhere, Category = "Movimiento")
-	float Velocidad = 500.f;
+	float VelocidadMovimiento = 600.f;
 
 	void MoverObstaculo(float DeltaTime);
 	void VerificarDestruccion();
+
+	void SetVelocidadMovimiento(float NuevaVelocidad);
 
 };

@@ -9,6 +9,8 @@
 #include "ShipFactoryGeneral.h"
 #include "AventuraManager.generated.h"
 
+class AMobileSpacePawn;
+
 UCLASS()
 class MOBILESPACE_API AAventuraManager : public AActor
 {
@@ -26,7 +28,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	TSubclassOf<AMobileSpacePawn> PawnClass;
 
 public:
 
@@ -50,10 +53,6 @@ public:
 
 	UFUNCTION()
 	void Nivel7();
-
-	UFUNCTION()
-	void CheckWaveComplete();
-
 	UFUNCTION()
 	void ControladorNiveles();
 
@@ -61,6 +60,12 @@ public:
 	void SetNivelActual(int32 NuevoNivel);
 
 	void SiguienteNivel();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class ACameraActor* FixedCamera;
+
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+	void SetupFixedCamera();
 
 protected:
 	UPROPERTY()
@@ -85,4 +90,27 @@ public:
 
 	UPROPERTY()
 	UShipFactoryGeneral* ShipFactory;
+
+
+	FTimerHandle TimerHandle_IniciarNivel;
+
+private:
+	int32 OleadasTotales;
+	int32 CantidadPorOleada;
+	int32 OleadaActual;
+	TArray<ENaveTipo> TiposActuales;
+
+	void GenerarOleada();
+	void ComprobarOleadaGeneral();
+	void SpawnPortalFinal();
+
+	void GenerarOleadaObstaculos();
+	void ComprobarOleadaObstaculos();
+
+private:
+	int32 OleadaActualObstaculos = 0;
+	int32 OleadasTotalesObstaculos = 3;
+	int32 CantidadPorOleadaObstaculos = 6;
+
+	FTimerHandle TimerHandle_ComprobarObstaculos;
 };

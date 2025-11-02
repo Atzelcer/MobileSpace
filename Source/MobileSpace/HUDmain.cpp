@@ -23,6 +23,7 @@
 #include "AventuraManager.h"
 #include "MultiplayerManager.h"
 #include "MobileSpacePawn.h"
+#include "Widget_Indicar_level.h"
 
 AHUDmain::AHUDmain()
 {
@@ -75,6 +76,10 @@ AHUDmain::AHUDmain()
 	static ConstructorHelpers::FClassFinder<UWidgetOnGameMulti> OnGameMultiBP(TEXT("/Game/WIDGETS/EnGame_multijugador.EnGame_multijugador_C"));
 	if (OnGameMultiBP.Succeeded())
 		WidgetOnGameMultiClass = OnGameMultiBP.Class;
+
+	static ConstructorHelpers::FClassFinder<UWidget_Indicar_level> LevelWidgetBP(TEXT("/Game/WIDGETS/IndicadorLevel.IndicadorLevel_C"));
+	if (LevelWidgetBP.Succeeded())
+		WidgetLevelClass = LevelWidgetBP.Class;
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
 	if (MusicaAsset.Succeeded())
@@ -422,6 +427,36 @@ void AHUDmain::OcultarOnGameMulti()
 		WidgetOnGameMultiInstance->RemoveFromParent();
 	}
 }
+
+void AHUDmain::MostrarNivel(const FString& Mensaje)
+{
+	if (!WidgetLevelInstance && WidgetLevelClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		WidgetLevelInstance = CreateWidget<UWidget_Indicar_level>(PC, WidgetLevelClass);
+	}
+
+	if (WidgetLevelInstance)
+	{
+		if (!WidgetLevelInstance->IsInViewport())
+			WidgetLevelInstance->AddToViewport();
+
+		WidgetLevelInstance->SetVisibility(ESlateVisibility::Visible);
+		WidgetLevelInstance->MostrarMensaje(Mensaje);
+
+	
+	}
+}
+
+void AHUDmain::OcultarNivel()
+{
+	
+	if (WidgetLevelInstance && WidgetLevelInstance->IsInViewport())
+	{
+		WidgetLevelInstance->RemoveFromParent();
+	}
+}
+
 
 void AHUDmain::ReproducirMusicaInicio()
 {
