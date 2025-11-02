@@ -11,6 +11,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "HUDmain.h"
+#include "EngineUtils.h"
+#include "Widget_ON_GAME.h"
+
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
 const FName AMobileSpacePawn::MoveRightBinding("MoveRight");
@@ -54,7 +58,26 @@ AMobileSpacePawn::AMobileSpacePawn()
 	}
 
 	ProjectileClass = AMobileSpaceProjectile::StaticClass();
+
+	CantEscudo = 1;
+	CantMissil = 1;
+	CantVelocidad = 1;
+	CantVida = 5;
+
 }
+
+void AMobileSpacePawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	//if (PC)
+	//{
+	//	HUDRef = Cast<AHUDmain>(PC->GetHUD());
+	//	InicializarPowerUpsHUD();
+	//}
+}
+
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -138,19 +161,16 @@ void AMobileSpacePawn::FireShot(FVector FireDirection)
 	UWorld* World = GetWorld();
 	if (!World) return;
 
-	// Direcciones de disparo:
 	const FRotator FireRotationCenter = FireDirection.Rotation();
 
-	// Ángulo en grados para los lados
 	float SideAngle = 30.f;
 
-	// Rotaciones para los dos lados
 	FRotator FireRotationLeft = FireRotationCenter + FRotator(0.f, -SideAngle, 0.f);
 	FRotator FireRotationRight = FireRotationCenter + FRotator(0.f, SideAngle, 0.f);
 
 	// Offset para que salgan separadas
-	FVector OffsetLeft(0.f, -50.f, 0.f);   // Y negativo (izquierda)
-	FVector OffsetRight(0.f, 50.f, 0.f);   // Y positivo (derecha)
+	FVector OffsetLeft(0.f, -50.f, 0.f); 
+	FVector OffsetRight(0.f, 50.f, 0.f);  
 
 	FVector SpawnLocation = GetActorLocation() + FireRotationCenter.RotateVector(GunOffset);
 
@@ -181,3 +201,71 @@ void AMobileSpacePawn::ShotTimerExpired()
 	bCanFire = true;
 }
 
+
+void AMobileSpacePawn::InicializarPowerUpsHUD()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	UWidget_ON_GAME* Widget = HUD->WidgetOnGameInstance;
+	if (!Widget || !Widget->IsInViewport())
+		return;
+
+	Widget->ActualizarVida(CantVida);
+	Widget->ActualizarVelocidad(CantVelocidad);
+	Widget->ActualizarMisiles(CantMissil);
+	Widget->ActualizarEscudo(CantEscudo);
+}
+
+
+void AMobileSpacePawn::EstablecerCapsula(int32 TipoCapsula)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	UWidget_ON_GAME* Widget = HUD->WidgetOnGameInstance;
+	if (!Widget || !Widget->IsInViewport())
+		return;
+
+	switch (TipoCapsula)
+	{
+	case 1:
+		CantVida += 1;
+		Widget->ActualizarVida(CantVida);
+		break;
+
+	case 2:
+		CantVelocidad += 1;
+		Widget->ActualizarVelocidad(CantVelocidad);
+		break;
+
+	case 3:
+		CantMissil += 1;
+		Widget->ActualizarMisiles(CantMissil);
+		break;
+
+	case 4:
+		CantEscudo += 1;
+		Widget->ActualizarEscudo(CantEscudo);
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+void AMobileSpacePawn::HacerDanio()
+{
+	//CantVida -= 1;
+	//if (CantVida <= 0)
+	//{
+	//	this->Destroy();
+	//}
+}

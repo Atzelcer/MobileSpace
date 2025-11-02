@@ -32,14 +32,10 @@ void UModoJuegoC::OnAventuraClicked()
         if (HUD)
         {
 			HUD->MostrarPantallaCarga();
-			HUD->ModoAventura();
-			HUD->OcultarPanelPrincipal();
             HUD->OcultarModoJuego();
-			/*HUD->DetenerMusicaInicio();
-            HUD->RemoverInputController();*/
+			HUD->OcultarPanelPrincipal();
         }
     }
-    //UGameplayStatics::OpenLevel(GetWorld(), FName("MapaAventura"));
 }
 
 
@@ -53,9 +49,6 @@ void UModoJuegoC::OnMultijugadorClicked()
         {
             HUD->MostrarModoMultijugador();
             HUD->ModoMultijugador();
-            //HUD->OcultarPanelPrincipal();
-            //HUD->OcultarModoJuego();
-
         }
     }
 }

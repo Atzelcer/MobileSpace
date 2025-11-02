@@ -5,9 +5,6 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "ShipFactoryGeneral.generated.h"
-/**
- * 
- */
 
 UENUM(BlueprintType)
 enum class ENaveTipo : uint8

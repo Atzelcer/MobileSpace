@@ -26,7 +26,6 @@ void UWidget_Modo_multijugador::NativeConstruct()
 	if (Button_entrar_sala_ventana)
 		Button_entrar_sala_ventana->OnClicked.AddDynamic(this, &UWidget_Modo_multijugador::OnEntrarSalaVentanaClicked);
 
-	// Ocultar ventana secundaria al iniciar
 	MostrarVentana(false);
 }
 
@@ -46,12 +45,12 @@ void UWidget_Modo_multijugador::OnCrearSalaClicked()
 {
 	UWorld* World = GetWorld();
 	if (!World) return;
-	UE_LOG(LogTemp, Warning, TEXT("se entreo gagagogogogogogo AAAAAAAAAAAAAAAAAAA"));
+
 	UMobileSpaceInstance* Instance = Cast<UMobileSpaceInstance>(UGameplayStatics::GetGameInstance(World));
 	if (Instance)
 	{
-		Instance->HostSala(); // Crea sala, lanza mapa en modo listen
-		UE_LOG(LogTemp, Warning, TEXT("se entreo gagagogogogogogo "));
+		Instance->HostSala();
+		//UE_LOG(LogTemp, Warning, TEXT("se entreo gagagogogogogogo "));
 	}
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
@@ -60,9 +59,7 @@ void UWidget_Modo_multijugador::OnCrearSalaClicked()
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 	if (HUD)
 	{
-		HUD->MostrarSalaEspera(); // Muestra widget de espera
-		HUD->OcultarModoMultijugador();
-		HUD->OcultarTodo();
+		HUD->MostrarSalaEspera();
 	}
 }
 
@@ -89,18 +86,8 @@ void UWidget_Modo_multijugador::OnEntrarSalaVentanaClicked()
 	UMobileSpaceInstance* Instance = Cast<UMobileSpaceInstance>(UGameplayStatics::GetGameInstance(World));
 	if (Instance)
 	{
-		Instance->UnirseSala(CodigoIngresado); // valida código + conexión LAN
+		Instance->UnirseSala(CodigoIngresado);
 	}
-
-	//APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
-	//if (!PC) return;
-
-	//AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	//if (HUD)
-	//{
-	//	HUD->MostrarSalaEspera();
-	//	HUD->OcultarModoMultijugador();
-	//}
 }
 
 void UWidget_Modo_multijugador::OnVolverClicked()

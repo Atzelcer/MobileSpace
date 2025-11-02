@@ -8,6 +8,9 @@
 #include "Components/BoxComponent.h"
 #include "MobileSpaceProjectile.h"
 #include "MoveComponent.h"
+#include "MegaCapsula.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 AShip_X::AShip_X()
 {
@@ -20,19 +23,20 @@ AShip_X::AShip_X()
 	ShipCollision->SetupAttachment(ShipMesh);
 	ShipCollision->SetBoxExtent(FVector(100.f, 100.f, 100.f));
 
-	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	ShipCollision->SetCollisionResponseToAllChannels(ECR_Block);
-	ShipCollision->SetCollisionObjectType(ECC_Pawn); 
-
-	ShipCollision->OnComponentHit.AddDynamic(this, &AShip_X::OnShipHit);
+	// Configure collision properly
+	ShipCollision->OnComponentBeginOverlap.AddDynamic(this, &AShip_X::OnShipHit);
+	
+	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ShipCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
 	MoveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("MoveComp"));
 
+	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSound(TEXT("SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
+	if (ExplosionSound.Succeeded())
+		SonidoExplosion = ExplosionSound.Object;
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset(TEXT("SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
-	if (SoundAsset.Succeeded()) {
-		DestructionSound = SoundAsset.Object;
-	}
+
+	ProbabilidadSpawnCapsula = 23;
 }
 
 void AShip_X::BeginPlay()
@@ -46,12 +50,40 @@ void AShip_X::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AShip_X::OnShipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AShip_X::OnShipHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
+
+    if (OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
+    {
+		DestruirNave();
+    }
+}
+
+void AShip_X::IntentarSpawnCapsula()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	int32 NumeroAleatorio = FMath::RandRange(1, 100);
+
+	if (NumeroAleatorio <= ProbabilidadSpawnCapsula)
 	{
-		Destroy();
+		const FVector SpawnLocation = GetActorLocation();
+		const FRotator SpawnRotation = GetActorRotation();
+
+		World->SpawnActor<AMegaCapsula>(AMegaCapsula::StaticClass(), SpawnLocation, SpawnRotation);
 	}
+}
+
+void AShip_X::DestruirNave()
+{
+	if (SonidoExplosion)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, SonidoExplosion, GetActorLocation());
+	}
+
+	IntentarSpawnCapsula();
+	Destroy();
 }
 
 void AShip_X::HandleDestruction()
@@ -65,7 +97,6 @@ void AShip_X::HandleDestruction()
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DestructionSound, GetActorLocation());
 	}
 
-	
+
 	Destroy();
 }
-

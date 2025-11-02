@@ -2,11 +2,11 @@
 
 #include "MegaPortal.h"
 #include "Components/CapsuleComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
 #include "AventuraManager.h"
 #include "MobileSpacePawn.h"
+#include "HUDmain.h"
 
 AMegaPortal::AMegaPortal()
 {
@@ -17,8 +17,10 @@ AMegaPortal::AMegaPortal()
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	RootComponent = CollisionComponent;
 
-	NiagaraPortalComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraPortalComponent"));
-	NiagaraPortalComponent->SetupAttachment(RootComponent);
+	ParticlePortalComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticlePortalComponent"));
+	ParticlePortalComponent->SetupAttachment(RootComponent);
+	ParticlePortalComponent->bAutoActivate = false;
+	ParticlePortalComponent->SetRelativeScale3D(FVector(3.f, 3.f, 3.f));
 }
 
 void AMegaPortal::BeginPlay()
@@ -27,9 +29,9 @@ void AMegaPortal::BeginPlay()
 
 	AActor* FoundManager = UGameplayStatics::GetActorOfClass(GetWorld(), AAventuraManager::StaticClass());
 	if (FoundManager)
-		AventuraManagerRef = Cast<AAventuraManager>(FoundManager);
+		AventuraManagerPor = Cast<AAventuraManager>(FoundManager);
 
-	CargarNiagaraSystems();
+	CargarParticleSystems();
 	EscogerEfectoAleatorio();
 }
 
@@ -42,44 +44,61 @@ void AMegaPortal::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor && OtherActor->IsA(AMobileSpacePawn::StaticClass()))
 	{
-		if (AventuraManagerRef)
-			AventuraManagerRef->SiguienteNivel();
-
+		IrAlSiguienteNivelConTransicion();
 		Destroy();
 	}
 }
 
-void AMegaPortal::CargarNiagaraSystems()
+void AMegaPortal::CargarParticleSystems()
 {
-	auto Cargar = [](const TCHAR* Path) -> UNiagaraSystem*
+	auto Cargar = [](const TCHAR* Path) -> UParticleSystem*
 		{
-			return LoadObject<UNiagaraSystem>(nullptr, Path);
+			return LoadObject<UParticleSystem>(nullptr, Path);
 		};
 
-	NiagaraSystems = {
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Fire_EllipsePortal.P_Fire_EllipsePortal")),
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Fog_CapturePortal.P_Fog_CapturePortal")),
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Futuristic_CapturePortal.P_Futuristic_CapturePortal")),
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Level_LowPolyPortal_Blue.P_Level_LowPolyPortal_Blue")),
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_Level_LowPolyPortal_Yellow.P_Level_LowPolyPortal_Yellow")),
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_LowPoly_CapturePortal_01.P_LowPoly_CapturePortal_01")),
-		Cargar(TEXT("/Game/Portals_VFXPack/Particles/P_LowPoly_CapturePortal_02.P_LowPoly_CapturePortal_02"))
+	ParticleSystems = {
+		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_06_Y1.PS_06_Y1'")),
+		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_06_R1.PS_06_R1'")),
+		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_06_B.PS_06_B'")),
+		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_27_R.PS_27_R'"))
 	};
 }
 
 void AMegaPortal::EscogerEfectoAleatorio()
 {
-	if (NiagaraSystems.Num() == 0) return;
+	if (ParticleSystems.Num() == 0) return;
 
-	int32 Index = FMath::RandRange(0, NiagaraSystems.Num() - 1);
-	UNiagaraSystem* EfectoSeleccionado = NiagaraSystems[Index];
+	int32 Index = FMath::RandRange(0, ParticleSystems.Num() - 1);
+	UParticleSystem* EfectoSeleccionado = ParticleSystems[Index];
 
-	if (EfectoSeleccionado && NiagaraPortalComponent)
+	if (EfectoSeleccionado && ParticlePortalComponent)
 	{
-		NiagaraPortalComponent->SetAsset(EfectoSeleccionado);
-		NiagaraPortalComponent->Activate(true);
-		UE_LOG(LogTemp, Warning, TEXT("Efecto Niagara seleccionado: %d"), Index);
+		ParticlePortalComponent->SetTemplate(EfectoSeleccionado);
+		ParticlePortalComponent->SetVisibility(true);
+		ParticlePortalComponent->SetHiddenInGame(false);
+		ParticlePortalComponent->Activate(true);
 	}
 }
 
+void AMegaPortal::IrAlSiguienteNivelConTransicion()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
 
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (HUD)
+	{
+		HUD->MostrarPantallaCarga();
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_SiguienteNivel,
+		[this]()
+		{
+			if (AventuraManagerPor)
+			{
+				AventuraManagerPor->SiguienteNivel();
+			}
+		},
+		5.0f, false);
+}

@@ -22,6 +22,8 @@
 #include "EngineUtils.h"
 #include "AventuraManager.h"
 #include "MultiplayerManager.h"
+#include "MobileSpacePawn.h"
+#include "Widget_Indicar_level.h"
 
 AHUDmain::AHUDmain()
 {
@@ -74,6 +76,10 @@ AHUDmain::AHUDmain()
 	static ConstructorHelpers::FClassFinder<UWidgetOnGameMulti> OnGameMultiBP(TEXT("/Game/WIDGETS/EnGame_multijugador.EnGame_multijugador_C"));
 	if (OnGameMultiBP.Succeeded())
 		WidgetOnGameMultiClass = OnGameMultiBP.Class;
+
+	static ConstructorHelpers::FClassFinder<UWidget_Indicar_level> LevelWidgetBP(TEXT("/Game/WIDGETS/IndicadorLevel.IndicadorLevel_C"));
+	if (LevelWidgetBP.Succeeded())
+		WidgetLevelClass = LevelWidgetBP.Class;
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
 	if (MusicaAsset.Succeeded())
@@ -229,6 +235,7 @@ void AHUDmain::OcultarPantallaCarga()
 	if (PantallaCargaInstance && PantallaCargaInstance->IsInViewport())
 		PantallaCargaInstance->RemoveFromParent();
 
+	ModoAventura();
 	DetenerMusicaInicio();
 	RemoverInputController();
 	MostrarOnGame();
@@ -252,11 +259,23 @@ void AHUDmain::MostrarOnGame()
 			UGameplayStatics::SetGamePaused(GetWorld(), false);
 
 			// Mostrar cursor pero mantener control del juego
+
+
 			PC->bShowMouseCursor = true;
 			FInputModeGameAndUI InputMode;
 			InputMode.SetWidgetToFocus(WidgetOnGameInstance->TakeWidget());
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			PC->SetInputMode(InputMode);
+		}
+
+		APawn* Pawn = PC->GetPawn();
+		if (Pawn)
+		{
+			AMobileSpacePawn* Nave = Cast<AMobileSpacePawn>(Pawn);
+			if (Nave)
+			{
+				Nave->InicializarPowerUpsHUD();
+			}
 		}
 	}
 }
@@ -391,7 +410,7 @@ void AHUDmain::MostrarOnGameMulti()
 		{
 			UGameplayStatics::SetGamePaused(GetWorld(), false);
 			OcultarPantallaCargaMulti();
-			// Mostrar cursor pero mantener control del juego
+
 			PC->bShowMouseCursor = true;
 			FInputModeGameAndUI InputMode;
 			InputMode.SetWidgetToFocus(WidgetOnGameInstance->TakeWidget());
@@ -408,6 +427,36 @@ void AHUDmain::OcultarOnGameMulti()
 		WidgetOnGameMultiInstance->RemoveFromParent();
 	}
 }
+
+void AHUDmain::MostrarNivel(const FString& Mensaje)
+{
+	if (!WidgetLevelInstance && WidgetLevelClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		WidgetLevelInstance = CreateWidget<UWidget_Indicar_level>(PC, WidgetLevelClass);
+	}
+
+	if (WidgetLevelInstance)
+	{
+		if (!WidgetLevelInstance->IsInViewport())
+			WidgetLevelInstance->AddToViewport();
+
+		WidgetLevelInstance->SetVisibility(ESlateVisibility::Visible);
+		WidgetLevelInstance->MostrarMensaje(Mensaje);
+
+	
+	}
+}
+
+void AHUDmain::OcultarNivel()
+{
+	
+	if (WidgetLevelInstance && WidgetLevelInstance->IsInViewport())
+	{
+		WidgetLevelInstance->RemoveFromParent();
+	}
+}
+
 
 void AHUDmain::ReproducirMusicaInicio()
 {
@@ -446,6 +495,10 @@ void AHUDmain::RemoverInputController()
 void AHUDmain::OcultarTodo()
 {
 	OcultarPanelPrincipal();
+	OcultarAjustes();
+	OcultarCreditos();
+	OcultarModoJuego();
+	OcultarPantallaCarga();
 	OcultarModoJuego();
 	OcultarAjustes();
 	OcultarCreditos();

@@ -6,9 +6,7 @@
 #include "Obstaculos.h"
 #include "O_Comodin.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class MOBILESPACE_API AO_Comodin : public AObstaculos
 {

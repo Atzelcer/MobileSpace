@@ -50,11 +50,30 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void OnShipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnShipHit(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
 
 	UFUNCTION()
 	void HandleDestruction();
 
-	
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "PowerUps")
+	int32 ProbabilidadSpawnCapsula;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundBase* SonidoExplosion;
+
+	void IntentarSpawnCapsula();
+
+public:
+	// Función virtual para que las clases hijas la sobreescriban
+	virtual void DestruirNave();
+
 
 };

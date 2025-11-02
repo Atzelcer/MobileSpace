@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/Button.h"
 #include "WidgetSalaEspera.generated.h"
 
 UCLASS()
@@ -16,15 +17,18 @@ public:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* TextBlock_codigoSala;
-
-	UPROPERTY(meta = (BindWidget))
-	UImage* Image_nave_Player1;
+	UButton* Button_cancelar;
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* Image_nave_Player2;
 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TextBlock_codigoSala;
+
 	void ActualizarCodigo(const FString& Codigo);
 	void JugadorConectado(int32 NumeroJugador);
 	void IrAPantallaCarga();
+
+	UFUNCTION()
+	void CancelarEspera();
 };

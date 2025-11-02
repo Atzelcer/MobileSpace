@@ -41,7 +41,8 @@ private:
 	void AutoFire();
 	
 
-
+public:
+	virtual void DestruirNave() override;
 
 
 	

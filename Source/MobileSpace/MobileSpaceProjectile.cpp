@@ -71,7 +71,7 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
 
 		if (OtherActor->IsA(AShip_X::StaticClass())) {
-			Cast<AShip_X>(OtherActor)->HandleDestruction(); // Debes implementar esto
+			Cast<AShip_X>(OtherActor)->DestruirNave();
 		}
 		else {
 			OtherActor->Destroy(); 
