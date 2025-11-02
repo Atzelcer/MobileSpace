@@ -11,6 +11,7 @@
 #include "DragonR_Boss_Z.h"
 #include "DragonT_Boss_Z.h"
 
+
 AAventuraManager::AAventuraManager()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -22,6 +23,8 @@ AAventuraManager::AAventuraManager()
 void AAventuraManager::BeginPlay()
 {
 	Super::BeginPlay();
+	ShipFactory = NewObject<UShipFactoryGeneral>(this);
+
 	
 	ControladorNiveles();
 }
@@ -111,14 +114,9 @@ void AAventuraManager::CheckWaveComplete()
 //patrones factory - patron prototype 
 void AAventuraManager::Nivel1()
 {
-	//solo spawnea una nave
-	UWorld* World = GetWorld();
-	if (!World) return;
-	FVector SpawnLocation = FVector(1000.0f, 0.0f, 300.0f);
-	FRotator SpawnRotation = FRotator::ZeroRotator;
 	
-	AShip_CazadorRojo* NewShip = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), SpawnLocation, SpawnRotation);
-	
+	ShipFactory->CrearNave(GetWorld(), ENaveTipo::Verde);
+
 }
 
 void AAventuraManager::Nivel2()

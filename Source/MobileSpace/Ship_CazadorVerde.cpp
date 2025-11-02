@@ -8,6 +8,7 @@
 #include "Engine/Engine.h"
 #include "TimerManager.h"
 
+
 AShip_CazadorVerde::AShip_CazadorVerde()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,6 +18,7 @@ AShip_CazadorVerde::AShip_CazadorVerde()
 		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
 		ShipMesh->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
 	}
+
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 
 	if (MoveComp)
@@ -24,6 +26,12 @@ AShip_CazadorVerde::AShip_CazadorVerde()
 		MoveComp->Pattern = EArcadeMovement::Wave;
 		MoveComp->Speed = 700.f;
 		MoveComp->Amplitude = 120.f;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_explosion.P_ky_explosion'"));
+	if (ParticleAsset.Succeeded())
+	{
+		DestructionEffect = ParticleAsset.Object;
 	}
 }
 
