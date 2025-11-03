@@ -63,7 +63,7 @@ void UMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	case EArcadeMovement::RandomHop:
 		// Movimiento recto + saltos random en Y
 		X -= Speed * Elapsed;
-		Y += Amplitude * FMath::Sin(Frequency * Elapsed + FMath::RandHelper(PI));
+		Y += Amplitude * FMath::Sin(Frequency * Elapsed + FMath::FRandRange(0.f, PI));
 		break;
 	case EArcadeMovement::Reverse:
 		// Avanza en X y revierte dirección cada 2 segundos

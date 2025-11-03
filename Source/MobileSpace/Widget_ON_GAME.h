@@ -16,7 +16,6 @@ class MOBILESPACE_API UWidget_ON_GAME : public UUserWidget
 	GENERATED_BODY()
 
 public:
-
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget)) UProgressBar* ProgressBar_Sobrecarga_Disparo;
@@ -30,9 +29,12 @@ public:
 	UPROPERTY(meta = (BindWidget)) UButton* Button_escudo;
 	UPROPERTY(meta = (BindWidget)) UButton* Button_velocidad;
 	UPROPERTY(meta = (BindWidget)) UButton* Button_missil;
-
 	UPROPERTY(meta = (BindWidget)) UImage* Image_ESCUDO;
 	UPROPERTY(meta = (BindWidget)) UImage* Image_VELOCIDAD;
+
+	UPROPERTY(meta = (BindWidget)) UImage* Image_panel01;
+	UPROPERTY(meta = (BindWidget)) UImage* Image_panel02;
+	UPROPERTY(meta = (BindWidget)) UImage* Image_panel03;
 
 	bool bEscudoActivo;
 	bool bVelocidadActiva;
@@ -42,6 +44,9 @@ public:
 	UPROPERTY() UTexture2D* TexVelocidad_ON;
 	UPROPERTY() UTexture2D* TexVelocidad_OFF;
 
+	UPROPERTY() TArray<UTexture2D*> PanelGameTextures;
+	UPROPERTY() TArray<UTexture2D*> IconHamburTextures;
+
 	UFUNCTION() void OnMenuClicked();
 	UFUNCTION(BlueprintCallable) void ActualizarVida(int32 Valor);
 	UFUNCTION(BlueprintCallable) void ActualizarVelocidad(float Velocidad);
@@ -49,11 +54,11 @@ public:
 	UFUNCTION(BlueprintCallable) void ActualizarEscudo(int32 Cantidad);
 	UFUNCTION(BlueprintCallable) void ActualizarSobrecarga(float Valor, float MaxValor);
 	UFUNCTION(BlueprintCallable) void CambiarArma(UTexture2D* NuevaArma);
-
-
 	UFUNCTION() void OnEscudoClicked();
 	UFUNCTION() void OnVelocidadClicked();
 	UFUNCTION() void OnMissilClicked();
 
 	void ActualizarEstadoBotones();
+	void CargarTexturasPanels();
+	void CambiarPanelsAleatorios();
 };
