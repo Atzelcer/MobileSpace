@@ -219,6 +219,7 @@ void AHUDmain::MostrarPantallaCarga()
 		PantallaCargaInstance->AddToViewport(5);
 		PantallaCargaInstance->MostrarFondoAleatorio();
 		UGameplayStatics::SetGamePaused(GetWorld(), false);
+		ConfigurarInputController();
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle_OcultarPantallaCarga,
 			this,
@@ -239,6 +240,38 @@ void AHUDmain::OcultarPantallaCarga()
 	DetenerMusicaInicio();
 	RemoverInputController();
 	MostrarOnGame();
+}
+
+void AHUDmain::MostrarPantallaCarga2()
+{
+	if (!PantallaCargaInstance && PantallaCargaClass)
+	{
+		PantallaCargaInstance = CreateWidget<UWidgetPantallaCarga>(GetWorld(), PantallaCargaClass);
+	}
+
+	if (PantallaCargaInstance && !PantallaCargaInstance->IsInViewport())
+	{
+		PantallaCargaInstance->AddToViewport(5);
+		PantallaCargaInstance->MostrarFondoAleatorio();
+		//UGameplayStatics::SetGamePaused(GetWorld(), false);
+		/*	ConfigurarInputController();*/
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_OcultarPantallaCarga,
+			this,
+			&AHUDmain::OcultarPantallaCarga2,
+			4.9f,
+			false
+		);
+	}
+}
+
+void AHUDmain::OcultarPantallaCarga2()
+{
+	if (PantallaCargaInstance && PantallaCargaInstance->IsInViewport())
+	{
+		PantallaCargaInstance->RemoveFromParent();
+		//RemoverInputController();
+	}
 }
 
 void AHUDmain::MostrarOnGame()
@@ -475,7 +508,7 @@ void AHUDmain::ConfigurarInputController()
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (PlayerController)
 	{
-		UGameplayStatics::SetGamePaused(GetWorld(), true);
+		//UGameplayStatics::SetGamePaused(GetWorld(), true);
 		PlayerController->bShowMouseCursor = true;
 		PlayerController->SetInputMode(FInputModeUIOnly());
 	}

@@ -28,10 +28,6 @@ public:
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float MoveSpeed;
 
-
-
-	
-
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
@@ -70,7 +66,7 @@ public:
 	FVector2D MovementMax = FVector2D(1400.f, 3000.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
-	int32 NumLifes = 3; 
+	int32 NumLifes; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	int32 CantVida;

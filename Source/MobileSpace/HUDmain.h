@@ -156,6 +156,12 @@ public:
 	void OcultarPantallaCarga();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
+	void MostrarPantallaCarga2();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarPantallaCarga2();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
 	void MostrarOnGame();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")

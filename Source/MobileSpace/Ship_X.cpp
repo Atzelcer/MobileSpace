@@ -55,7 +55,7 @@ void AShip_X::OnShipHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 
     if (OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
     {
-		DestruirNave();
+		HandleDestruction();
     }
 }
 
@@ -97,6 +97,6 @@ void AShip_X::HandleDestruction()
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DestructionSound, GetActorLocation());
 	}
 
-
+	IntentarSpawnCapsula();
 	Destroy();
 }
