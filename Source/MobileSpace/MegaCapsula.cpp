@@ -57,6 +57,8 @@ void AMegaCapsula::AsignarParticulaAleatoria()
 	UParticleSystem* Particula = LoadObject<UParticleSystem>(nullptr, *Path);
 	if (Particula)
 		ParticleComp->SetTemplate(Particula);
+		ParticleComp->SetRelativeScale3D(FVector(3.f, 3.f, 3.f));
+
 }
 
 void AMegaCapsula::NotifyActorBeginOverlap(AActor* OtherActor)

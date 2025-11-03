@@ -10,7 +10,7 @@ AMegaObstaculo::AMegaObstaculo()
 
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
 	RootComponent = CollisionComp;
-	CollisionComp->SetBoxExtent(FVector(550.f, 550.f, 550.f));
+	CollisionComp->SetBoxExtent(FVector(250.f, 250.f, 1150.f));
 	CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));

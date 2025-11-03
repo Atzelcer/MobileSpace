@@ -94,6 +94,20 @@ public:
 
 	FTimerHandle TimerHandle_IniciarNivel;
 
+
+
+	UPROPERTY()
+	UAudioComponent* AudioComp_SonidoCarga;
+
+	UPROPERTY()
+	USoundWave* SonidoCarga;
+
+	UFUNCTION()
+	void ActivarEfectoSonidoPantallaCarga(bool bActivarSonido);
+
+	UPROPERTY()
+	FTimerHandle TimerHandle_DetenerSonido;
+
 private:
 	int32 OleadasTotales;
 	int32 CantidadPorOleada;
@@ -113,4 +127,16 @@ private:
 	int32 CantidadPorOleadaObstaculos = 6;
 
 	FTimerHandle TimerHandle_ComprobarObstaculos;
+
+	UFUNCTION()
+	void TeletransportarJugador();
+
+	UFUNCTION()
+	void MoverJugador(float DeltaTime);
+
+	FTimerHandle TimerHandle_Teletransporte;
+
+	bool bJugadorMoviendose = false;
+	float VelocidadTeletransporte = 550.f;
+
 };
