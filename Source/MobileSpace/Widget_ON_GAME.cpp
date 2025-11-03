@@ -3,6 +3,7 @@
 #include "Widget_ON_GAME.h"
 #include "Kismet/GameplayStatics.h"
 #include "HUDmain.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UWidget_ON_GAME::NativeConstruct()
 {
@@ -21,32 +22,79 @@ void UWidget_ON_GAME::NativeConstruct()
 	if (Button_missil) Button_missil->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnMissilClicked);
 	if (Button_menu) Button_menu->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnMenuClicked);
 
+	CargarTexturasPanels();
+	CambiarPanelsAleatorios();
 	ActualizarEstadoBotones();
+}
+
+void UWidget_ON_GAME::CargarTexturasPanels()
+{
+	PanelGameTextures.Empty();
+	IconHamburTextures.Empty();
+
+	const FString RutasGameOn[4] = {
+		TEXT("Texture2D'/Game/Imagenes/gameOn/version01.version01'"),
+		TEXT("Texture2D'/Game/Imagenes/gameOn/version02.version02'"),
+		TEXT("Texture2D'/Game/Imagenes/gameOn/version03.version03'"),
+		TEXT("Texture2D'/Game/Imagenes/gameOn/version04.version04'")
+	};
+
+	const FString RutasHambur[4] = {
+		TEXT("Texture2D'/Game/Imagenes/iconos/hambur1.hambur1'"),
+		TEXT("Texture2D'/Game/Imagenes/iconos/hambur2.hambur2'"),
+		TEXT("Texture2D'/Game/Imagenes/iconos/hambur3.hambur3'"),
+		TEXT("Texture2D'/Game/Imagenes/iconos/hambur4.hambur4'")
+	};
+
+	for (int32 i = 0; i < 4; i++)
+	{
+		if (UTexture2D* TexPanel = LoadObject<UTexture2D>(nullptr, *RutasGameOn[i]))
+			PanelGameTextures.Add(TexPanel);
+
+		if (UTexture2D* TexHambur = LoadObject<UTexture2D>(nullptr, *RutasHambur[i]))
+			IconHamburTextures.Add(TexHambur);
+	}
+}
+
+void UWidget_ON_GAME::CambiarPanelsAleatorios()
+{
+	if (PanelGameTextures.Num() == 0 || IconHamburTextures.Num() == 0)
+		return;
+
+	int32 Index = FMath::RandRange(0, PanelGameTextures.Num() - 1);
+
+	if (Image_panel01)
+		Image_panel01->SetBrushFromTexture(PanelGameTextures[Index]);
+
+	if (Image_panel02)
+		Image_panel02->SetBrushFromTexture(PanelGameTextures[Index]);
+
+	if (Image_panel03)
+		Image_panel03->SetBrushFromTexture(IconHamburTextures[Index]);
 }
 
 void UWidget_ON_GAME::ActualizarVida(int32 Valor)
 {
 	if (TextBlock_cantidad_vida)
-		TextBlock_cantidad_vida->SetText(FText::FromString(FString::Printf(TEXT("%d"), Valor)));
+		TextBlock_cantidad_vida->SetText(FText::AsNumber(Valor));
 }
-
 
 void UWidget_ON_GAME::ActualizarVelocidad(float Velocidad)
 {
 	if (TextBlock_cantidad_velocidad)
-		TextBlock_cantidad_velocidad->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Velocidad)));
+		TextBlock_cantidad_velocidad->SetText(FText::AsNumber((int32)Velocidad));
 }
 
 void UWidget_ON_GAME::ActualizarMisiles(int32 Cantidad)
 {
 	if (TextBlock_cantidad_misil)
-		TextBlock_cantidad_misil->SetText(FText::FromString(FString::Printf(TEXT("%d"), Cantidad)));
+		TextBlock_cantidad_misil->SetText(FText::AsNumber(Cantidad));
 }
 
 void UWidget_ON_GAME::ActualizarEscudo(int32 Cantidad)
 {
 	if (TextBlock_cantidad_escudo)
-		TextBlock_cantidad_escudo->SetText(FText::FromString(FString::Printf(TEXT("%d"), Cantidad)));
+		TextBlock_cantidad_escudo->SetText(FText::AsNumber(Cantidad));
 }
 
 void UWidget_ON_GAME::ActualizarSobrecarga(float Valor, float MaxValor)
@@ -68,7 +116,6 @@ void UWidget_ON_GAME::ActualizarEstadoBotones()
 {
 	if (Image_ESCUDO)
 		Image_ESCUDO->SetBrushFromTexture(bEscudoActivo ? TexEscudo_ON : TexEscudo_OFF);
-
 	if (Image_VELOCIDAD)
 		Image_VELOCIDAD->SetBrushFromTexture(bVelocidadActiva ? TexVelocidad_ON : TexVelocidad_OFF);
 }
@@ -76,12 +123,10 @@ void UWidget_ON_GAME::ActualizarEstadoBotones()
 void UWidget_ON_GAME::OnEscudoClicked()
 {
 	if (!bEscudoActivo) return;
-
-	int32 CantidadActual = FCString::Atoi(*TextBlock_cantidad_escudo->GetText().ToString());
-	if (CantidadActual > 0)
+	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_escudo->GetText().ToString());
+	if (Cantidad > 0)
 	{
-		CantidadActual--;
-		TextBlock_cantidad_escudo->SetText(FText::AsNumber(CantidadActual));
+		TextBlock_cantidad_escudo->SetText(FText::AsNumber(Cantidad - 1));
 		bEscudoActivo = false;
 		ActualizarEstadoBotones();
 	}
@@ -90,12 +135,10 @@ void UWidget_ON_GAME::OnEscudoClicked()
 void UWidget_ON_GAME::OnVelocidadClicked()
 {
 	if (!bVelocidadActiva) return;
-
-	int32 CantidadActual = FCString::Atoi(*TextBlock_cantidad_velocidad->GetText().ToString());
-	if (CantidadActual > 0)
+	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_velocidad->GetText().ToString());
+	if (Cantidad > 0)
 	{
-		CantidadActual--;
-		TextBlock_cantidad_velocidad->SetText(FText::AsNumber(CantidadActual));
+		TextBlock_cantidad_velocidad->SetText(FText::AsNumber(Cantidad - 1));
 		bVelocidadActiva = false;
 		ActualizarEstadoBotones();
 	}
@@ -103,12 +146,9 @@ void UWidget_ON_GAME::OnVelocidadClicked()
 
 void UWidget_ON_GAME::OnMissilClicked()
 {
-	int32 CantidadActual = FCString::Atoi(*TextBlock_cantidad_misil->GetText().ToString());
-	if (CantidadActual > 0)
-	{
-		CantidadActual--;
-		TextBlock_cantidad_misil->SetText(FText::AsNumber(CantidadActual));
-	}
+	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_misil->GetText().ToString());
+	if (Cantidad > 0)
+		TextBlock_cantidad_misil->SetText(FText::AsNumber(Cantidad - 1));
 }
 
 void UWidget_ON_GAME::OnMenuClicked()
@@ -119,9 +159,7 @@ void UWidget_ON_GAME::OnMenuClicked()
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 	if (HUD)
 	{
-
 		UGameplayStatics::SetGamePaused(GetWorld(), true);
 		HUD->MostrarPause();
-
 	}
 }
