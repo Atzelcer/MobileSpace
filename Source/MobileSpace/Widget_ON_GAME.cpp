@@ -3,7 +3,7 @@
 #include "Widget_ON_GAME.h"
 #include "Kismet/GameplayStatics.h"
 #include "HUDmain.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "MobileSpacePawn.h"
 
 void UWidget_ON_GAME::NativeConstruct()
 {
@@ -16,6 +16,8 @@ void UWidget_ON_GAME::NativeConstruct()
 	TexEscudo_OFF = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/escudo_off.escudo_off'"));
 	TexVelocidad_ON = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/ONvelocidad.ONvelocidad'"));
 	TexVelocidad_OFF = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/ONvelocidad_off.ONvelocidad_off'"));
+	ONmissil = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/ONmissil.ONmissil'"));
+	ONmissil_off = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/ONmissil_off.ONmissil_off'"));
 
 	if (Button_escudo) Button_escudo->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnEscudoClicked);
 	if (Button_velocidad) Button_velocidad->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnVelocidadClicked);
@@ -63,14 +65,9 @@ void UWidget_ON_GAME::CambiarPanelsAleatorios()
 
 	int32 Index = FMath::RandRange(0, PanelGameTextures.Num() - 1);
 
-	if (Image_panel01)
-		Image_panel01->SetBrushFromTexture(PanelGameTextures[Index]);
-
-	if (Image_panel02)
-		Image_panel02->SetBrushFromTexture(PanelGameTextures[Index]);
-
-	if (Image_panel03)
-		Image_panel03->SetBrushFromTexture(IconHamburTextures[Index]);
+	if (Image_panel01) Image_panel01->SetBrushFromTexture(PanelGameTextures[Index]);
+	if (Image_panel02) Image_panel02->SetBrushFromTexture(PanelGameTextures[Index]);
+	if (Image_panel03) Image_panel03->SetBrushFromTexture(IconHamburTextures[Index]);
 }
 
 void UWidget_ON_GAME::ActualizarVida(int32 Valor)
@@ -83,18 +80,21 @@ void UWidget_ON_GAME::ActualizarVelocidad(float Velocidad)
 {
 	if (TextBlock_cantidad_velocidad)
 		TextBlock_cantidad_velocidad->SetText(FText::AsNumber((int32)Velocidad));
+	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::ActualizarMisiles(int32 Cantidad)
 {
 	if (TextBlock_cantidad_misil)
 		TextBlock_cantidad_misil->SetText(FText::AsNumber(Cantidad));
+	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::ActualizarEscudo(int32 Cantidad)
 {
 	if (TextBlock_cantidad_escudo)
 		TextBlock_cantidad_escudo->SetText(FText::AsNumber(Cantidad));
+	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::ActualizarSobrecarga(float Valor, float MaxValor)
@@ -114,42 +114,100 @@ void UWidget_ON_GAME::CambiarArma(UTexture2D* NuevaArma)
 
 void UWidget_ON_GAME::ActualizarEstadoBotones()
 {
+	int32 Escudos = FCString::Atoi(*TextBlock_cantidad_escudo->GetText().ToString());
+	int32 Velocidad = FCString::Atoi(*TextBlock_cantidad_velocidad->GetText().ToString());
+	int32 Misiles = FCString::Atoi(*TextBlock_cantidad_misil->GetText().ToString());
+
 	if (Image_ESCUDO)
-		Image_ESCUDO->SetBrushFromTexture(bEscudoActivo ? TexEscudo_ON : TexEscudo_OFF);
+		Image_ESCUDO->SetBrushFromTexture((Escudos > 0 && bEscudoActivo) ? TexEscudo_ON : TexEscudo_OFF);
+
 	if (Image_VELOCIDAD)
-		Image_VELOCIDAD->SetBrushFromTexture(bVelocidadActiva ? TexVelocidad_ON : TexVelocidad_OFF);
+		Image_VELOCIDAD->SetBrushFromTexture((Velocidad > 0 && bVelocidadActiva) ? TexVelocidad_ON : TexVelocidad_OFF);
+
+	if (Image_Missil)
+		Image_Missil->SetBrushFromTexture((Misiles > 0) ? ONmissil : ONmissil_off);
 }
 
 void UWidget_ON_GAME::OnEscudoClicked()
 {
 	if (!bEscudoActivo) return;
+
 	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_escudo->GetText().ToString());
-	if (Cantidad > 0)
+	if (Cantidad <= 0)
+	{
+		bEscudoActivo = false;
+	}
+	else
 	{
 		TextBlock_cantidad_escudo->SetText(FText::AsNumber(Cantidad - 1));
 		bEscudoActivo = false;
-		ActualizarEstadoBotones();
 	}
+	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::OnVelocidadClicked()
 {
 	if (!bVelocidadActiva) return;
+
 	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_velocidad->GetText().ToString());
-	if (Cantidad > 0)
+	if (Cantidad <= 0)
+	{
+		bVelocidadActiva = false;
+	}
+	else
 	{
 		TextBlock_cantidad_velocidad->SetText(FText::AsNumber(Cantidad - 1));
-		bVelocidadActiva = false;
-		ActualizarEstadoBotones();
+		bVelocidadActiva = false; 
 	}
+	ActualizarEstadoBotones();
+}
+
+void UWidget_ON_GAME::ReactivarEscudo()
+{
+	bEscudoActivo = true;
+	ActualizarEstadoBotones();
+}
+
+void UWidget_ON_GAME::ReactivarVelocidad()
+{
+	bVelocidadActiva = true;
+	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::OnMissilClicked()
 {
 	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_misil->GetText().ToString());
-	if (Cantidad > 0)
-		TextBlock_cantidad_misil->SetText(FText::AsNumber(Cantidad - 1));
+
+	if (Cantidad <= 0)
+	{
+		ActualizarEstadoBotones();
+		return;
+	}
+
+	TextBlock_cantidad_misil->SetText(FText::AsNumber(Cantidad - 1));
+	ActualizarEstadoBotones();
+
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC)
+	{
+		return;
+	}
+
+	APawn* Pawn = PC->GetPawn();
+	if (!Pawn)
+	{
+		return;
+	}
+
+	AMobileSpacePawn* Nave = Cast<AMobileSpacePawn>(Pawn);
+	if (Nave)
+	{
+		Nave->DispararMisil();
+	}
+
 }
+
 
 void UWidget_ON_GAME::OnMenuClicked()
 {

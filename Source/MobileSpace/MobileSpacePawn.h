@@ -65,6 +65,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement|Limits")
 	FVector2D MovementMax = FVector2D(1400.f, 3000.f);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armas|Misil")
+	FVector MisilOffset = FVector(85.471046f, 0.0f, 300.0f);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	int32 NumLifes; 
 
@@ -84,6 +87,8 @@ public:
 	void EstablecerCapsula(int32 TipoCapsula);
 
 	void HacerDanio();
+
+	void DispararMisil();
 
 private:
 	class AHUDmain* HUDRef;

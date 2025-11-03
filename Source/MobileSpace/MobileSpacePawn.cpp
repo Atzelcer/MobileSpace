@@ -14,6 +14,7 @@
 #include "HUDmain.h"
 #include "EngineUtils.h"
 #include "Widget_ON_GAME.h"
+#include "MegaMIssil.h"
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
 const FName AMobileSpacePawn::MoveRightBinding("MoveRight");
@@ -54,7 +55,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 
 
 	CantEscudo = 1;
-	CantMissil = 1;
+	CantMissil = 10;
 	CantVelocidad = 1;
 	CantVida = 5;
 
@@ -63,13 +64,6 @@ AMobileSpacePawn::AMobileSpacePawn()
 void AMobileSpacePawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	//if (PC)
-	//{
-	//	HUDRef = Cast<AHUDmain>(PC->GetHUD());
-	//	InicializarPowerUpsHUD();
-	//}
 }
 
 
@@ -241,4 +235,23 @@ void AMobileSpacePawn::HacerDanio()
 	//{
 	//	this->Destroy();
 	//}
+}
+
+void AMobileSpacePawn::DispararMisil()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	FVector SpawnLocation = GetActorLocation() + FVector(85.471046f, 0.0f, 300.0f);
+	FRotator SpawnRotation = (FVector(85.471046f, 0.0f, 300.0f) - SpawnLocation).Rotation();
+
+	FActorSpawnParameters Params;
+	Params.Owner = this;
+	Params.Instigator = GetInstigator();
+
+	AMegaMIssil* Misil = World->SpawnActor<AMegaMIssil>(AMegaMIssil::StaticClass(), SpawnLocation, SpawnRotation, Params);
+
 }
