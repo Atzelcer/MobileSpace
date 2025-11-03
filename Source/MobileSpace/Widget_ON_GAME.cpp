@@ -19,6 +19,7 @@ void UWidget_ON_GAME::NativeConstruct()
 	if (Button_escudo) Button_escudo->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnEscudoClicked);
 	if (Button_velocidad) Button_velocidad->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnVelocidadClicked);
 	if (Button_missil) Button_missil->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnMissilClicked);
+	if (Button_menu) Button_menu->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnMenuClicked);
 
 	ActualizarEstadoBotones();
 }
@@ -118,7 +119,9 @@ void UWidget_ON_GAME::OnMenuClicked()
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 	if (HUD)
 	{
+
 		UGameplayStatics::SetGamePaused(GetWorld(), true);
 		HUD->MostrarPause();
+
 	}
 }

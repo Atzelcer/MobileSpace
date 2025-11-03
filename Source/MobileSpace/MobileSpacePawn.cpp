@@ -11,6 +11,9 @@
 #include "Engine/StaticMesh.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "HUDmain.h"
+#include "EngineUtils.h"
+#include "Widget_ON_GAME.h"
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
 const FName AMobileSpacePawn::MoveRightBinding("MoveRight");
@@ -48,7 +51,28 @@ AMobileSpacePawn::AMobileSpacePawn()
 	}
 
 	ProjectileClass = AProjectile_1::StaticClass();
+
+
+	CantEscudo = 1;
+	CantMissil = 1;
+	CantVelocidad = 1;
+	CantVida = 5;
+
 }
+
+void AMobileSpacePawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	//if (PC)
+	//{
+	//	HUDRef = Cast<AHUDmain>(PC->GetHUD());
+	//	InicializarPowerUpsHUD();
+	//}
+}
+
+
 
 void AMobileSpacePawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -151,4 +175,70 @@ void AMobileSpacePawn::ShotTimerExpired()
 	bCanFire = true;
 }
 
+void AMobileSpacePawn::InicializarPowerUpsHUD()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
 
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	UWidget_ON_GAME* Widget = HUD->WidgetOnGameInstance;
+	if (!Widget || !Widget->IsInViewport())
+		return;
+
+	Widget->ActualizarVida(CantVida);
+	Widget->ActualizarVelocidad(CantVelocidad);
+	Widget->ActualizarMisiles(CantMissil);
+	Widget->ActualizarEscudo(CantEscudo);
+}
+
+
+void AMobileSpacePawn::EstablecerCapsula(int32 TipoCapsula)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+	if (!HUD) return;
+
+	UWidget_ON_GAME* Widget = HUD->WidgetOnGameInstance;
+	if (!Widget || !Widget->IsInViewport())
+		return;
+
+	switch (TipoCapsula)
+	{
+	case 1:
+		CantVida += 1;
+		Widget->ActualizarVida(CantVida);
+		break;
+
+	case 2:
+		CantVelocidad += 1;
+		Widget->ActualizarVelocidad(CantVelocidad);
+		break;
+
+	case 3:
+		CantMissil += 1;
+		Widget->ActualizarMisiles(CantMissil);
+		break;
+
+	case 4:
+		CantEscudo += 1;
+		Widget->ActualizarEscudo(CantEscudo);
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+void AMobileSpacePawn::HacerDanio()
+{
+	//CantVida -= 1;
+	//if (CantVida <= 0)
+	//{
+	//	this->Destroy();
+	//}
+}

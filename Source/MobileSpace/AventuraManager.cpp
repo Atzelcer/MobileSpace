@@ -17,6 +17,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "HUDmain.h"
 #include "MegaPortal.h"
+#include "Components/AudioComponent.h"
 #include "MegaObstaculo.h"
 
 
@@ -26,6 +27,13 @@ AAventuraManager::AAventuraManager()
 	NivelActual = 1;
 	CurrentWave = 1;
 	CurrentBoss = nullptr;
+
+	AudioComp_SonidoCarga = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp_SonidoCarga"));
+	AudioComp_SonidoCarga->SetupAttachment(RootComponent);
+	AudioComp_SonidoCarga->bAutoActivate = false;
+
+	SonidoCarga = LoadObject<USoundWave>(nullptr, TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Interstellar_Drift.Interstellar_Drift'"));
+
 }
 
 void AAventuraManager::BeginPlay()
@@ -81,7 +89,7 @@ void AAventuraManager::SetupFixedCamera()
 			// CameraComponent->SetOrthoWidth(3000.0f);
 
 			// For perspective but wide field of view
-			CameraComponent->SetFieldOfView(120.0f); // Wide angle for better view
+			CameraComponent->SetFieldOfView(120.0f);
 		}
 
 		// Set this camera as the view target for all players
@@ -99,6 +107,7 @@ void AAventuraManager::SetupFixedCamera()
 void AAventuraManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	MoverJugador(DeltaTime);
 }
 
 
@@ -117,22 +126,33 @@ void AAventuraManager::SiguienteNivel()
 void AAventuraManager::ControladorNiveles()
 {
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
+	if (!PC)
+	{
+		PC = GetWorld()->SpawnActor<APlayerController>(APlayerController::StaticClass());
+		if (!PC) return;
+	}
 
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (!HUD) return;
+	if (!HUD)
+	{
+		HUD = GetWorld()->SpawnActor<AHUDmain>(AHUDmain::StaticClass());
+		if (HUD)
+			PC->MyHUD = HUD;
+		else
+			return;
+	}
 
 	FString NombreNivel;
 
 	switch (NivelActual)
 	{
-	case 1: NombreNivel = TEXT("NIVEL 1: Solar Rift"); break;
-	case 2: NombreNivel = TEXT("NIVEL 2: Ion Core"); break;
-	case 3: NombreNivel = TEXT("NIVEL 3: Dark Nova"); break;
-	case 4: NombreNivel = TEXT("NIVEL 4: Quantum Halo"); break;
-	case 5: NombreNivel = TEXT("NIVEL 5: Infernum Core"); break;
-	case 6: NombreNivel = TEXT("NIVEL 6: Asteroid Dominion"); break;
-	case 7: NombreNivel = TEXT("NIVEL 7: Final Radiance"); break;
+	case 1: NombreNivel = TEXT("NIVEL 1: Solar Rift"); TeletransportarJugador(); break;
+	case 2: NombreNivel = TEXT("NIVEL 2: Ion Core"); TeletransportarJugador(); break;
+	case 3: NombreNivel = TEXT("NIVEL 3: Dark Nova"); TeletransportarJugador(); break;
+	case 4: NombreNivel = TEXT("NIVEL 4: Quantum Halo"); TeletransportarJugador(); break;
+	case 5: NombreNivel = TEXT("NIVEL 5: Infernum Core"); TeletransportarJugador(); break;
+	case 6: NombreNivel = TEXT("NIVEL 6: Asteroid Dominion"); TeletransportarJugador(); break;
+	case 7: NombreNivel = TEXT("NIVEL 7: Final Radiance"); TeletransportarJugador(); break;
 	default: NombreNivel = TEXT("Sector Unknown"); break;
 	}
 
@@ -160,13 +180,44 @@ void AAventuraManager::ControladorNiveles()
 		3.0f, false);
 }
 
+void AAventuraManager::ActivarEfectoSonidoPantallaCarga(bool bActivarSonido)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC || !AudioComp_SonidoCarga || !SonidoCarga)
+		return;
+
+	if (bActivarSonido)
+	{
+		if (!AudioComp_SonidoCarga->IsPlaying())
+		{
+			AudioComp_SonidoCarga->SetSound(SonidoCarga);
+			AudioComp_SonidoCarga->Play();
+		}
+
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_DetenerSonido,
+			[this]()
+			{
+				ActivarEfectoSonidoPantallaCarga(false);
+			},
+			4.5f, false);
+	}
+	else
+	{
+		if (AudioComp_SonidoCarga->IsPlaying())
+		{
+			AudioComp_SonidoCarga->Stop();
+		}
+	}
+}
+
+
+
 
 void AAventuraManager::GenerarOleada()
 {
 	if (OleadaActual > OleadasTotales)
 	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, TEXT("Todas las oleadas completadas. Spawneando portal final."));
 		SpawnPortalFinal();
 		return;
 	}
@@ -202,7 +253,7 @@ void AAventuraManager::ComprobarOleadaGeneral()
 
 void AAventuraManager::SpawnPortalFinal()
 {
-	FVector SpawnLocation(1000.f, 0.f, 300.f);
+	FVector SpawnLocation(850.f, 0.f, 300.f);
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
 	FActorSpawnParameters Params;
@@ -264,10 +315,57 @@ void AAventuraManager::ComprobarOleadaObstaculos()
 	}
 }
 
+void AAventuraManager::TeletransportarJugador()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC)
+		return;
+
+	AMobileSpacePawn* PawnJugador = Cast<AMobileSpacePawn>(PC->GetPawn());
+	if (!PawnJugador)
+		return;
+
+	// Desactivar control del jugador
+	PC->SetIgnoreMoveInput(true);
+	PC->SetIgnoreLookInput(true);
+
+	// Colocar fuera de la vista
+	FVector NuevaPosicion(-2800.f, 0.f, 300.f);
+	PawnJugador->SetActorLocation(NuevaPosicion);
+
+	// Iniciar movimiento automático hacia +X
+	bJugadorMoviendose = true;
+	SetActorTickEnabled(true);
+}
+
+void AAventuraManager::MoverJugador(float DeltaTime)
+{
+	if (!bJugadorMoviendose)
+		return;
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC)
+		return;
+
+	AMobileSpacePawn* PawnJugador = Cast<AMobileSpacePawn>(PC->GetPawn());
+	if (!PawnJugador)
+		return;
+
+	FVector Pos = PawnJugador->GetActorLocation();
+	Pos.X += VelocidadTeletransporte * DeltaTime;
+	PawnJugador->SetActorLocation(Pos);
+
+	if (Pos.X >= -1100.f)
+	{
+		// Llegó a la posición final
+		bJugadorMoviendose = false;
+	}
+}
+
 void AAventuraManager::Nivel1()
 {
-	OleadasTotales = 5;
-	CantidadPorOleada = 12;
+	OleadasTotales = 3;
+	CantidadPorOleada = 3;
 	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
 	OleadaActual = 0;
 	GenerarOleada();
@@ -275,8 +373,8 @@ void AAventuraManager::Nivel1()
 
 void AAventuraManager::Nivel2()
 {
-	OleadaActualObstaculos = 0;
-	OleadasTotalesObstaculos = 10;
+	OleadaActualObstaculos = 2;
+	OleadasTotalesObstaculos = 7;
 	CantidadPorOleadaObstaculos = 3;
 	GenerarOleadaObstaculos();
 }

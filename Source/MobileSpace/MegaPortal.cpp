@@ -75,6 +75,7 @@ void AMegaPortal::EscogerEfectoAleatorio()
 	{
 		ParticlePortalComponent->SetTemplate(EfectoSeleccionado);
 		ParticlePortalComponent->SetVisibility(true);
+		ParticlePortalComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
 		ParticlePortalComponent->SetHiddenInGame(false);
 		ParticlePortalComponent->Activate(true);
 	}
@@ -88,7 +89,8 @@ void AMegaPortal::IrAlSiguienteNivelConTransicion()
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 	if (HUD)
 	{
-		HUD->MostrarPantallaCarga();
+		HUD->MostrarPantallaCarga2();
+		AventuraManagerPor->ActivarEfectoSonidoPantallaCarga(true);
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(

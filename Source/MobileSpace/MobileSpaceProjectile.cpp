@@ -48,10 +48,10 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
         {
             Cast<AShip_X>(OtherActor)->HandleDestruction();
         }
-        else
-        {
-            OtherActor->Destroy();
-        }
+        //else
+        //{
+        //    OtherActor->Destroy();
+        //}
 
         Destroy();
 		
@@ -63,7 +63,6 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 
 void AMobileSpaceProjectile::PlayFireSound()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("PLAY SOUND"));
     if (FireSound)
     { 
 
