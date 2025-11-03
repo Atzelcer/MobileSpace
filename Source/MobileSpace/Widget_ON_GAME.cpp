@@ -119,10 +119,10 @@ void UWidget_ON_GAME::ActualizarEstadoBotones()
 	int32 Misiles = FCString::Atoi(*TextBlock_cantidad_misil->GetText().ToString());
 
 	if (Image_ESCUDO)
-		Image_ESCUDO->SetBrushFromTexture((Escudos > 0 && bEscudoActivo) ? TexEscudo_ON : TexEscudo_OFF);
+		Image_ESCUDO->SetBrushFromTexture((Escudos > 0 && bEscudoActivo == true ) ? TexEscudo_ON : TexEscudo_OFF);
 
 	if (Image_VELOCIDAD)
-		Image_VELOCIDAD->SetBrushFromTexture((Velocidad > 0 && bVelocidadActiva) ? TexVelocidad_ON : TexVelocidad_OFF);
+		Image_VELOCIDAD->SetBrushFromTexture((Velocidad > 0 && bVelocidadActiva == true) ? TexVelocidad_ON : TexVelocidad_OFF);
 
 	if (Image_Missil)
 		Image_Missil->SetBrushFromTexture((Misiles > 0) ? ONmissil : ONmissil_off);
@@ -133,6 +133,7 @@ void UWidget_ON_GAME::OnEscudoClicked()
 	if (!bEscudoActivo) return;
 
 	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_escudo->GetText().ToString());
+
 	if (Cantidad <= 0)
 	{
 		bEscudoActivo = false;
@@ -141,15 +142,26 @@ void UWidget_ON_GAME::OnEscudoClicked()
 	{
 		TextBlock_cantidad_escudo->SetText(FText::AsNumber(Cantidad - 1));
 		bEscudoActivo = false;
+
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PC)
+		{
+			AMobileSpacePawn* Nave = Cast<AMobileSpacePawn>(PC->GetPawn());
+			if (Nave)
+				Nave->ActivarEscudo(); 
+		}
 	}
+
 	ActualizarEstadoBotones();
 }
+
 
 void UWidget_ON_GAME::OnVelocidadClicked()
 {
 	if (!bVelocidadActiva) return;
 
 	int32 Cantidad = FCString::Atoi(*TextBlock_cantidad_velocidad->GetText().ToString());
+
 	if (Cantidad <= 0)
 	{
 		bVelocidadActiva = false;
@@ -157,20 +169,31 @@ void UWidget_ON_GAME::OnVelocidadClicked()
 	else
 	{
 		TextBlock_cantidad_velocidad->SetText(FText::AsNumber(Cantidad - 1));
-		bVelocidadActiva = false; 
+		bVelocidadActiva = false;
+
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PC)
+		{
+			AMobileSpacePawn* Nave = Cast<AMobileSpacePawn>(PC->GetPawn());
+			if (Nave)
+				Nave->ActivarVelocidad(); 
+		}
 	}
+
 	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::ReactivarEscudo()
 {
 	bEscudoActivo = true;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Escudo Reactivado desde el HUD"));
 	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::ReactivarVelocidad()
 {
 	bVelocidadActiva = true;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Velocidad Reactivada desde el HUD"));
 	ActualizarEstadoBotones();
 }
 

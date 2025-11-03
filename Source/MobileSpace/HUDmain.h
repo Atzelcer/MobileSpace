@@ -103,6 +103,11 @@ public:
 	UPROPERTY(Transient)
 	class UWidgetOnGameMulti* WidgetOnGameMultiInstance;
 
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	class TSubclassOf<class UWidgetGameOver> WidgetGameOverClass;
+
+	UPROPERTY(Transient)
+	class UWidgetGameOver* WidgetGameOverInstance;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	class TSubclassOf<class UWidget_Indicar_level> WidgetLevelClass;
@@ -197,6 +202,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OcultarOnGameMulti();
+
+	UFUNCTION(BlueprintCallable)
+	void MostrarGameOver();
+
+	UFUNCTION(BlueprintCallable)
+	void OcultarGameOver();
 
 	UFUNCTION(BlueprintCallable)
 	void MostrarNivel(const FString& Mensaje);

@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ship_X.h"
+#include "MegaObstaculo.h"
 
 AMobileSpaceProjectile::AMobileSpaceProjectile() 
 {
@@ -48,6 +49,12 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
         {
             Cast<AShip_X>(OtherActor)->HandleDestruction();
         }
+
+
+        if (OtherActor->IsA(AMegaObstaculo::StaticClass()))
+        {
+            Cast<AMegaObstaculo>(OtherActor)->DestruirObstaculo();
+		}
         //else
         //{
         //    OtherActor->Destroy();
@@ -64,8 +71,7 @@ void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 void AMobileSpaceProjectile::PlayFireSound()
 {
     if (FireSound)
-    { 
-
+    {   
         UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
     }
 }

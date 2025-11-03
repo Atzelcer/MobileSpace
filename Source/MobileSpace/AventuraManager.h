@@ -121,7 +121,7 @@ private:
 	void GenerarOleadaObstaculos();
 	void ComprobarOleadaObstaculos();
 
-private:
+public:
 	int32 OleadaActualObstaculos = 0;
 	int32 OleadasTotalesObstaculos = 3;
 	int32 CantidadPorOleadaObstaculos = 6;

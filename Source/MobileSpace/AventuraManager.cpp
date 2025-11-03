@@ -325,15 +325,12 @@ void AAventuraManager::TeletransportarJugador()
 	if (!PawnJugador)
 		return;
 
-	// Desactivar control del jugador
 	PC->SetIgnoreMoveInput(true);
 	PC->SetIgnoreLookInput(true);
 
-	// Colocar fuera de la vista
 	FVector NuevaPosicion(-2800.f, 0.f, 300.f);
 	PawnJugador->SetActorLocation(NuevaPosicion);
 
-	// Iniciar movimiento automático hacia +X
 	bJugadorMoviendose = true;
 	SetActorTickEnabled(true);
 }
@@ -357,7 +354,6 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 
 	if (Pos.X >= -1100.f)
 	{
-		// Llegó a la posición final
 		bJugadorMoviendose = false;
 	}
 }

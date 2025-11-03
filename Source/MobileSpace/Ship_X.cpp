@@ -21,7 +21,7 @@ AShip_X::AShip_X()
 
 	ShipCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShipCollision"));
 	ShipCollision->SetupAttachment(ShipMesh);
-	ShipCollision->SetBoxExtent(FVector(100.f, 100.f, 100.f));
+	ShipCollision->SetBoxExtent(FVector(350.f, 365.f, 200.f));
 
 	// Configure collision properly
 	ShipCollision->OnComponentBeginOverlap.AddDynamic(this, &AShip_X::OnShipHit);
