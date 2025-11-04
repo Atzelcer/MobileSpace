@@ -10,11 +10,13 @@ UENUM(BlueprintType)
 enum class EArcadeMovement : uint8
 {
 	None,
-	Slide,
 	Wave,
-	Spiral,
-	RandomHop,
-	Reverse
+	SEntry,
+	RadialBurst,
+	WavyWave,
+	ExpandingCircle,
+	SuperSequence
+	
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -27,7 +29,7 @@ public:
 	UMoveComponent();
 
 	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	EArcadeMovement Pattern = EArcadeMovement::Slide;
+	EArcadeMovement Pattern = EArcadeMovement::WavyWave;
 
 	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
 	float Speed = 520.0f;
@@ -39,10 +41,10 @@ public:
 	float Frequency = 2.1f;
 
 	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	FVector2D MovementMin = FVector2D(-1300.f, -2000.f);
+	FVector2D MovementMin = FVector2D(-1450.f, -2900.f);
 
 	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	FVector2D MovementMax = FVector2D(1300.f, 2000.f);
+	FVector2D MovementMax = FVector2D(1450.f, 2900.f);
 	
 
 

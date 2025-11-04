@@ -22,8 +22,8 @@ AShip_CazadorRojo::AShip_CazadorRojo()
 
 	if (MoveComp)
 	{
-		MoveComp->Pattern = EArcadeMovement::Spiral;
-		MoveComp->Speed = 380.f;
+		MoveComp->Pattern = EArcadeMovement::WavyWave;
+		MoveComp->Speed = 400.f;
 		MoveComp->Frequency = 1.7f;
 		MoveComp->Amplitude = 210.f;
 	}
@@ -35,7 +35,6 @@ void AShip_CazadorRojo::BeginPlay()
 	
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
 	
-	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorRojo::AutoFire, TimeBetweenShots, true, 2.0f);
 }
 
 void AShip_CazadorRojo::Tick(float DeltaTime)

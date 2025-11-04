@@ -75,5 +75,8 @@ public:
 	// Función virtual para que las clases hijas la sobreescriban
 	virtual void DestruirNave();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VFX")
+	UParticleSystemComponent* TrailEffect;
+
 
 };

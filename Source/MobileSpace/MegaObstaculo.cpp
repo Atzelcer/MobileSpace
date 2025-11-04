@@ -21,7 +21,7 @@ AMegaObstaculo::AMegaObstaculo()
 	if (Sonido.Succeeded())
 		SonidoDestruccion = Sonido.Object;
 
-	VelocidadMovimiento = 600.f;
+	VelocidadMovimiento = 1000.f;
 }
 
 void AMegaObstaculo::BeginPlay()
@@ -56,8 +56,7 @@ void AMegaObstaculo::AsignarMallaAleatoria()
 	if (Malla)
 	{
 		MeshComp->SetStaticMesh(Malla);
-		float Escala = FMath::RandRange(0.5f, 1.5f);
-		MeshComp->SetRelativeScale3D(FVector(Escala));
+		
 	}
 }
 

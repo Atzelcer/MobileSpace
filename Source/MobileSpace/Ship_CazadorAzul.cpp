@@ -18,6 +18,13 @@ AShip_CazadorAzul::AShip_CazadorAzul()
 	}
 
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
+
+	if (MoveComp)
+	{
+		MoveComp->Pattern = EArcadeMovement::SuperSequence;
+		MoveComp->Speed = 700.f;
+		MoveComp->Amplitude = 120.f;
+	}
 }
 
 void AShip_CazadorAzul::BeginPlay()
@@ -25,7 +32,7 @@ void AShip_CazadorAzul::BeginPlay()
 	Super::BeginPlay();
 	
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorAzul::AutoFire, TimeBetweenShots, true, 1.2f);
+	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorAzul::AutoFire, TimeBetweenShots, true, 3.0f);
 }
 
 void AShip_CazadorAzul::Tick(float DeltaTime)

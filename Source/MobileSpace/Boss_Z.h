@@ -5,16 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
-#include "Animation/AnimSequence.h"
+#include "Components/StaticMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundBase.h"
 #include "Boss_Z.generated.h"
 
-UENUM(BlueprintType)
-enum class EBossState : uint8
-{
-	Idle,
-	Attack,
-	Death
-};
 
 UCLASS()
 class MOBILESPACE_API ABoss_Z : public ACharacter
@@ -22,44 +17,10 @@ class MOBILESPACE_API ABoss_Z : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ABoss_Z();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	// Animation sequences - to be set by child classes
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	UAnimSequence* IdleAnimation;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	UAnimSequence* AttackAnimation;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	UAnimSequence* DeathAnimation;
-
-	// Boss state management
-	UPROPERTY(BlueprintReadOnly, Category = "Boss State")
-	EBossState CurrentState;
-
-	// Timer handles
-	UPROPERTY()
-	FTimerHandle IdleTimerHandle;
-
-	UPROPERTY()
-	FTimerHandle DeathTimerHandle;
-
-	
-
-	
-	// Animation state methods
-	virtual void StartIdlePhase();
-	virtual void StartAttackPhase();
-	virtual void StartDeathPhase();
-	virtual void DestroyBoss();
-
-	
 
 	// Collision hit event
 	UFUNCTION()
@@ -73,18 +34,32 @@ protected:
 	);
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	USkeletalMeshComponent* BossMesh;
+	UStaticMeshComponent* BossMesh;
 
 	UBoxComponent* ShipCollision;
 
-private:
-	// Time constants
-	static constexpr float IDLE_DURATION = 5.0f;
+	void SpawnSequence();
+	void DeathSequence();
+	// Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxHealth = 100.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Stats")
+	float CurrentHealth;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Stats")
+	bool bIsDead = false;
+
+	// Partículas
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UParticleSystem* SpawnParticle;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UParticleSystem* DeathParticle;
+
+	
 };
 

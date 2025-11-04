@@ -16,8 +16,8 @@ AShip_X* UShipFactoryGeneral::CrearNave(UWorld* World, ENaveTipo Tipo, FVector L
 
 	if (Loc.IsZero())
 	{
-		float RandomY = FMath::FRandRange(-2100.f, 2100.f);
-		Loc = FVector(1350.f, RandomY, 300.f);
+		float RandomY = FMath::FRandRange(-3000.f, 3000.f);
+		Loc = FVector(1400.f, RandomY, 300.f);
 	}
 
 	if (Rot.IsZero())

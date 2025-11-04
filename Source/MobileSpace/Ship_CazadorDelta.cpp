@@ -18,6 +18,13 @@ AShip_CazadorDelta::AShip_CazadorDelta()
 	}
 
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
+
+	if (MoveComp)
+	{
+		MoveComp->Pattern = EArcadeMovement::SuperSequence;
+		MoveComp->Speed = 700.f;
+		MoveComp->Amplitude = 120.f;
+	}
 }
 
 void AShip_CazadorDelta::BeginPlay()
