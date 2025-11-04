@@ -134,7 +134,15 @@ private:
 	UFUNCTION()
 	void MoverJugador(float DeltaTime);
 
+	void SpawnBoss();
+	void GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVector Centro, float Espaciado = 350.f, int32 Filas = 1);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	USoundBase* OleadaSound;
+
 	FTimerHandle TimerHandle_Teletransporte;
+	FTimerHandle TimerHandle_SpawnBoss;
+
 
 	bool bJugadorMoviendose = false;
 	float VelocidadTeletransporte = 550.f;

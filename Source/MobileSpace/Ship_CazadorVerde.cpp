@@ -23,7 +23,7 @@ AShip_CazadorVerde::AShip_CazadorVerde()
 
 	if (MoveComp)
 	{
-		MoveComp->Pattern = EArcadeMovement::Wave;
+		MoveComp->Pattern = EArcadeMovement::SuperSequence;
 		MoveComp->Speed = 700.f;
 		MoveComp->Amplitude = 120.f;
 	}
@@ -33,13 +33,14 @@ AShip_CazadorVerde::AShip_CazadorVerde()
 	{
 		DestructionEffect = ParticleAsset.Object;
 	}
+
+	
 }
 
 void AShip_CazadorVerde::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
 	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorVerde::AutoFire, TimeBetweenShots, true, 1.0f);
 }

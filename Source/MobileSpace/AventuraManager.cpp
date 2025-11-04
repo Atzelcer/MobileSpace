@@ -19,6 +19,7 @@
 #include "MegaPortal.h"
 #include "Components/AudioComponent.h"
 #include "MegaObstaculo.h"
+#include "Boss_Z.h"
 
 
 AAventuraManager::AAventuraManager()
@@ -33,6 +34,12 @@ AAventuraManager::AAventuraManager()
 	AudioComp_SonidoCarga->bAutoActivate = false;
 
 	SonidoCarga = LoadObject<USoundWave>(nullptr, TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Interstellar_Drift.Interstellar_Drift'"));
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> OleadaSoundAsset(TEXT("SoundWave'/Game/Musica_D/EpicToonSFX/BonusChargeWhooshAudio/CartoonyChargeMid.CartoonyChargeMid'"));
+	if (OleadaSoundAsset.Succeeded())
+	{
+		OleadaSound = OleadaSoundAsset.Object;
+	}
 
 }
 
@@ -216,21 +223,23 @@ void AAventuraManager::ActivarEfectoSonidoPantallaCarga(bool bActivarSonido)
 
 void AAventuraManager::GenerarOleada()
 {
-	if (OleadaActual > OleadasTotales)
+	if (OleadaActual >= OleadasTotales)
 	{
 		SpawnPortalFinal();
 		return;
 	}
 
-	ENaveTipo Tipo = TiposActuales[OleadaActual % TiposActuales.Num()];
-
-	for (int32 i = 0; i < CantidadPorOleada; i++)
+	// ¡AQUÍ! Sonido de nueva oleada
+	if (OleadaSound)
 	{
-		ShipFactory->CrearNave(GetWorld(), Tipo);
+		UGameplayStatics::PlaySound2D(GetWorld(), OleadaSound);
 	}
 
-	OleadaActual++;
+	ENaveTipo Tipo = TiposActuales[OleadaActual % TiposActuales.Num()];
+	FVector centro = FVector(1350.f, OleadaActual * 480.f, 300.f);
+	GenerarEnjambre(Tipo, CantidadPorOleada, centro, 320.f, 1);
 
+	OleadaActual++;
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AAventuraManager::ComprobarOleadaGeneral);
 }
 
@@ -362,13 +371,50 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 	}
 }
 
+void AAventuraManager::SpawnBoss()
+{
+	FVector BossLocation(1200.f, 0.f, 300.f); // Ajusta la posición que prefieras
+	FRotator BossRotation = FRotator::ZeroRotator;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	// Aquí elige el boss según el nivel; ejemplo para el Kraken:
+	ADKraken_Boss_Z* KrakenBoss = GetWorld()->SpawnActor<ADKraken_Boss_Z>(BossLocation, BossRotation, Params);
+
+	// Opcional: puedes guardar la referencia
+	CurrentBoss = KrakenBoss;
+}
+
+void AAventuraManager::GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVector Centro, float Espaciado, int32 Filas)
+{
+	int32 Columnas = FMath::CeilToInt((float)Cantidad / (float)Filas);
+	int32 NavesCreadas = 0;
+
+	for (int32 fila = 0; fila < Filas && NavesCreadas < Cantidad; fila++)
+	{
+		for (int32 col = 0; col < Columnas && NavesCreadas < Cantidad; col++, NavesCreadas++)
+		{
+			FVector Offset(
+				0.f,
+				(col - Columnas / 2) * Espaciado + ((fila % 2) * Espaciado * 0.5f),
+				(fila * Espaciado)
+			);
+			FVector Loc = Centro + Offset;
+			ShipFactory->CrearNave(GetWorld(), TipoNave, Loc, FRotator::ZeroRotator);
+		}
+	}
+}
+
 void AAventuraManager::Nivel1()
 {
-	OleadasTotales = 3;
-	CantidadPorOleada = 3;
-	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
+	OleadasTotales = 3;                           
+	CantidadPorOleada = 8;                         
+	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde }; 
 	OleadaActual = 0;
-	GenerarOleada();
+
+	GenerarOleada();                               
+
+	
 }
 
 void AAventuraManager::Nivel2()
@@ -377,18 +423,20 @@ void AAventuraManager::Nivel2()
 	OleadasTotalesObstaculos = 7;
 	CantidadPorOleadaObstaculos = 3;
 	GenerarOleadaObstaculos();
+
+	
 }
 
 
 void AAventuraManager::Nivel3()
 {
-	OleadasTotales = 3;
+	OleadasTotales = 4;
 	CantidadPorOleada = 5;
 	TiposActuales = { ENaveTipo::Omega, ENaveTipo::Delta, ENaveTipo::Alfa };
 	OleadaActual = 0;
 	GenerarOleada();
 
-	//deberia de haber jefe 
+	
 }
 
 void AAventuraManager::Nivel4()

@@ -17,6 +17,13 @@ AShip_CazadorAlfa::AShip_CazadorAlfa()
 		ShipMesh->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
 	}
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
+
+	if (MoveComp)
+	{
+		MoveComp->Pattern = EArcadeMovement::SEntry;
+		MoveComp->Speed = 700.f;
+		MoveComp->Amplitude = 120.f;
+	}
 }
 
 void AShip_CazadorAlfa::BeginPlay()

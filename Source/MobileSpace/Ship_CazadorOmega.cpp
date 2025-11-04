@@ -18,6 +18,13 @@ AShip_CazadorOmega::AShip_CazadorOmega()
 	}
 
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
+
+	if (MoveComp)
+	{
+		MoveComp->Pattern = EArcadeMovement::ExpandingCircle;
+		MoveComp->Speed = 350.f;
+		MoveComp->Amplitude = 120.f;
+	}
 }
 
 void AShip_CazadorOmega::BeginPlay()

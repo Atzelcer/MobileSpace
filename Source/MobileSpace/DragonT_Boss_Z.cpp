@@ -1,38 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DragonT_Boss_Z.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "UObject/ConstructorHelpers.h"
 
 ADragonT_Boss_Z::ADragonT_Boss_Z()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Setup DragonT-specific mesh
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> DragonTMesh(TEXT("SkeletalMesh'/Game/FourEvilDragonsHP/Meshes/DragonTheTerrorBringer/DragonTheTerrorBringerSK.DragonTheTerrorBringerSK'"));
-	if (DragonTMesh.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BossMeshAsset(TEXT("StaticMesh'/Game/intrepid/source/Intrepid_Type.Intrepid_Type'"));
+	if (BossMeshAsset.Succeeded())
 	{
-		BossMesh->SetSkeletalMesh(DragonTMesh.Object);
+		BossMesh->SetStaticMesh(BossMeshAsset.Object);
+		BossMesh->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+		BossMesh->SetWorldScale3D(FVector(5.f, 5.f, 5.f));
 	}
 
-	// Load DragonT-specific animations from DragonTheTerrorBringer folder
-	static ConstructorHelpers::FObjectFinder<UAnimSequence> IdleAnim(TEXT("AnimSequence'/Game/FourEvilDragonsHP/Animations/DragonTheTerrorBringer/FlyIdleAnim.FlyIdleAnim'"));
-	if (IdleAnim.Succeeded())
-	{
-		IdleAnimation = IdleAnim.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UAnimSequence> AttackAnim(TEXT("AnimSequence'/Game/FourEvilDragonsHP/Animations/DragonTheTerrorBringer/AttackFlameAnim.AttackFlameAnim'"));
-	if (AttackAnim.Succeeded())
-	{
-		AttackAnimation = AttackAnim.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UAnimSequence> DeathAnim(TEXT("AnimSequence'/Game/FourEvilDragonsHP/Animations/DragonTheTerrorBringer/DieAnim.DieAnim'"));
-	if (DeathAnim.Succeeded())
-	{
-		DeathAnimation = DeathAnim.Object;
-	}
 }
 
 

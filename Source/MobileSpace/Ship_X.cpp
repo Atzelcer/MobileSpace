@@ -31,9 +31,22 @@ AShip_X::AShip_X()
 
 	MoveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("MoveComp"));
 
+	TrailEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailEffect"));
+	TrailEffect->SetupAttachment(ShipMesh); // Adjunta al mesh para que siga el movimiento
+
+	// Puedes cargar un asset de partícula desde el content browser por ruta.
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/VFXSeries1/Particles/Tails/P_Plasmatrail01.P_Plasmatrail01'"));
+	if (TrailParticleAsset.Succeeded())
+	{
+		TrailEffect->SetTemplate(TrailParticleAsset.Object);
+		TrailEffect->SetWorldScale3D(FVector(2.5f, 2.5f, 2.5f));
+
+	}
+
 	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSound(TEXT("SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
 	if (ExplosionSound.Succeeded())
 		SonidoExplosion = ExplosionSound.Object;
+
 
 
 	ProbabilidadSpawnCapsula = 23;
