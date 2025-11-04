@@ -28,30 +28,32 @@ const FName AMobileSpacePawn::FireRightBinding("FireRight");
 
 AMobileSpacePawn::AMobileSpacePawn()
 {
-	// --- Colisión principal ---
+	PrimaryActorTick.bCanEverTick = true;
+
 	CollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionComponent"));
 	RootComponent = CollisionComponent;
-	CollisionComponent->InitCapsuleSize(250.f, 160.f); // ajustado al tamaño visual del mesh
+	CollisionComponent->InitCapsuleSize(250.f, 160.f);
 	CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
 	CollisionComponent->SetNotifyRigidBodyCollision(true);
 	CollisionComponent->SetGenerateOverlapEvents(true);
 	CollisionComponent->SetHiddenInGame(true);
+	CollisionComponent->SetCollisionObjectType(ECC_Pawn);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 
-	// --- Malla de la nave ---
+	CapsuleBaseRadius = 250.f;
+	CapsuleBaseHalfHeight = 160.f;
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow09.SM_StarSparrow09'"));
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	ShipMeshComponent->SetupAttachment(CollisionComponent);
 	if (ShipMesh.Succeeded())
-	{
 		ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	}
-
-	// Escala reducida del mesh (pero alineada con la colisión)
 	ShipMeshComponent->SetRelativeScale3D(FVector(0.45f));
-	ShipMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -60.f)); // centrado dentro de la cápsula
+	ShipMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -60.f));
 	ShipMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// --- Partícula propulsora ---
 	ParticleTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleTrail"));
 	ParticleTrail->SetupAttachment(ShipMeshComponent);
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_ElectricBall01_Yellow.P_Projectile_ElectricBall01_Yellow'"));
@@ -62,7 +64,6 @@ AMobileSpacePawn::AMobileSpacePawn()
 		ParticleTrail->SetRelativeScale3D(FVector(1.0f));
 	}
 
-	// --- FX Escudo ---
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> EscudoFX(TEXT("/Game/GrimzaFX/Particles/NS_BubbleGex.NS_BubbleGex"));
 	if (EscudoFX.Succeeded())
 	{
@@ -73,7 +74,6 @@ AMobileSpacePawn::AMobileSpacePawn()
 		EscudoNiagara->SetWorldScale3D(FVector(1.2f));
 	}
 
-	// --- Sonidos ---
 	static ConstructorHelpers::FObjectFinder<USoundWave> EscudoSnd(TEXT("SoundWave'/Game/Musica_D/EpicToonSFX/MagicCombatAudio/Magic/MagicField2_Normalloops.MagicField2_Normalloops'"));
 	if (EscudoSnd.Succeeded())
 		EscudoSound = EscudoSnd.Object;
@@ -82,14 +82,18 @@ AMobileSpacePawn::AMobileSpacePawn()
 	if (VelSnd.Succeeded())
 		VelocidadSound = VelSnd.Object;
 
+	static ConstructorHelpers::FObjectFinder<USoundWave> SndSobrecargaTotal(TEXT("SoundWave'/Game/GoodFXLevelUp/SFX/Sound_Wave/A_GFXLU_lightning.A_GFXLU_lightning'"));
+	if (SndSobrecargaTotal.Succeeded())
+		SoundSobrecargaTotal = SndSobrecargaTotal.Object;
+
+
 	ExplosionFX = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/FXVarietyPack/Particles/P_ky_waterBallHit.P_ky_waterBallHit"));
 	ExplosionSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MagicCombatAudio/NovaExplosion/Nova_Frost.Nova_Frost"));
 
-	// --- Propiedades de juego ---
 	ProjectileClass = AProjectile_1::StaticClass();
 	MoveSpeed = 1800.f;
 	VelocidadNormal = MoveSpeed;
-	GunOffset = FVector(380.f, 0.f, 0.f);
+	GunOffset = FVector(270.f, 0.f, 0.f);
 	FireRate = 0.2f;
 	bCanFire = true;
 	bInmuneEscudo = false;
@@ -100,7 +104,6 @@ AMobileSpacePawn::AMobileSpacePawn()
 	CantVelocidad = 3;
 	CantVida = 3;
 }
-
 
 
 void AMobileSpacePawn::BeginPlay()
@@ -164,44 +167,120 @@ void AMobileSpacePawn::Tick(float DeltaSeconds)
 		}
 	}
 
+
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
-	if (FMath::Abs(FireForwardValue) > 0.0f || FMath::Abs(FireRightValue) > 0.0f)
+	bPresionandoDisparo = (FMath::Abs(FireForwardValue) > 0.0f || FMath::Abs(FireRightValue) > 0.0f);
+
+	if (bPresionandoDisparo)
 		FireShot(FVector(1.f, 0.f, 0.f));
 
+	
 	FVector ActorLocation = GetActorLocation();
 	ActorLocation.X = FMath::Clamp(ActorLocation.X, MovementMin.X, MovementMax.X);
 	ActorLocation.Y = FMath::Clamp(ActorLocation.Y, MovementMin.Y, MovementMax.Y);
 	SetActorLocation(ActorLocation);
 
+
+	if (!bPresionandoDisparo && SobrecargaActual > 0.f)
+	{
+		SobrecargaActual -= TasaEnfriamiento * DeltaSeconds;
+		SobrecargaActual = FMath::Max(SobrecargaActual, 0.f);
+
+		if (bEstaSobrecargado && SobrecargaActual <= 0.f)
+		{
+			bEstaSobrecargado = false;
+			bCanFire = true;
+		}
+	}
+
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
+	{
+		AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+		if (HUD && HUD->WidgetOnGameInstance)
+			HUD->WidgetOnGameInstance->ActualizarSobrecarga(SobrecargaActual, SobrecargaMax);
+	}
+
 	if (CantVida <= 0)
 	{
 		Destroy();
-		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (!PC) return;
+		APlayerController* PC2 = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (!PC2) return;
 
-		if (AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD()))
+		if (AHUDmain* HUD = Cast<AHUDmain>(PC2->GetHUD()))
 			HUD->MostrarGameOver();
-
 	}
 }
 
+
 void AMobileSpacePawn::FireShot(FVector FireDirection)
 {
-	if (!bCanFire || !ProjectileClass) return;
+	if (bInmuneEscudo || bEstaSobrecargado || !bCanFire || !ProjectileClass) return;
+
 	UWorld* World = GetWorld();
 	if (!World) return;
 
-	const FRotator FireRotation = FireDirection.Rotation();
-	FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
 
-	AMobileSpaceProjectile* Proj = World->SpawnActor<AMobileSpaceProjectile>(ProjectileClass, SpawnLocation, FireRotation);
-	if (Proj)
-		Proj->PlayFireSound();
+	SobrecargaActual += TasaSobrecarga;
+	SobrecargaActual = FMath::Clamp(SobrecargaActual, 0.f, SobrecargaMax);
+
+
+	if (SobrecargaActual >= SobrecargaMax)
+	{
+		bEstaSobrecargado = true;
+		bCanFire = false;
+
+		if (SoundSobrecargaTotal)
+			UGameplayStatics::PlaySoundAtLocation(this, SoundSobrecargaTotal, GetActorLocation());
+
+		return;
+	}
+
+	const FRotator BaseRotation = FireDirection.Rotation();
+	FVector BaseLocation = GetActorLocation() + BaseRotation.RotateVector(GunOffset);
+
+	int32 NumDisparos = FMath::Clamp(NivelEvolucion, 1, 5);
+	TArray<float> Angulos;
+	switch (NumDisparos)
+	{
+	case 1: Angulos = { 0.f }; break;
+	case 2: Angulos = { -10.f, 10.f }; break;
+	case 3: Angulos = { -17.f, 0.f, 17.f }; break;
+	case 4: Angulos = { -22.f, -10.f, 10.f, 22.f }; break;
+	case 5: Angulos = { -20.f, -10.f, 0.f, 10.f, 20.f }; break;
+	default: Angulos = { 0.f }; break;
+	}
+
+	for (float AngleOffset : Angulos)
+	{
+		FRotator ShotRotation = BaseRotation + FRotator(0.f, AngleOffset, 0.f);
+		FVector SpawnLocation = BaseLocation + ShotRotation.Vector() * 100.f;
+
+		AMobileSpaceProjectile* Proj = World->SpawnActor<AMobileSpaceProjectile>(
+			ProjectileClass,
+			SpawnLocation,
+			ShotRotation
+		);
+
+		if (Proj)
+		{
+			Proj->SetWeaponAndEvolution(TipoArmaActual, NivelEvolucion);
+			Proj->PlayFireSound();
+		}
+	}
 
 	bCanFire = false;
-	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMobileSpacePawn::ShotTimerExpired, FireRate);
+	World->GetTimerManager().SetTimer(
+		TimerHandle_ShotTimerExpired,
+		this,
+		&AMobileSpacePawn::ShotTimerExpired,
+		FireRate
+	);
 }
+
+
 
 void AMobileSpacePawn::ShotTimerExpired()
 {
@@ -213,7 +292,8 @@ void AMobileSpacePawn::DispararMisil()
 	UWorld* World = GetWorld();
 	if (!World) return;
 
-	FVector SpawnLocation = GetActorLocation() + FVector(85.471046f, 0.0f, 300.0f);
+	FVector ForwardDir = ShipMeshComponent->GetForwardVector();
+	FVector SpawnLocation = GetActorLocation() + ForwardDir * 200.f + FVector(0.f, 0.f, 50.f);
 	FRotator SpawnRotation = (FVector(85.471046f, 0.0f, 300.0f) - SpawnLocation).Rotation();
 
 	FActorSpawnParameters Params;
@@ -222,6 +302,7 @@ void AMobileSpacePawn::DispararMisil()
 
 	World->SpawnActor<AMegaMIssil>(AMegaMIssil::StaticClass(), SpawnLocation, SpawnRotation, Params);
 }
+
 
 void AMobileSpacePawn::InicializarPowerUpsHUD()
 {
@@ -253,12 +334,74 @@ void AMobileSpacePawn::EstablecerCapsula(int32 TipoCapsula)
 
 	switch (TipoCapsula)
 	{
-	case 1: CantVida += 1; Widget->ActualizarVida(CantVida); break;
-	case 2: CantVelocidad += 1; Widget->ActualizarVelocidad(CantVelocidad); break;
-	case 3: CantMissil += 1; Widget->ActualizarMisiles(CantMissil); break;
-	case 4: CantEscudo += 1; Widget->ActualizarEscudo(CantEscudo); break;
-	default: break;
+	case 1: // VIDA
+		CantVida += 1;
+		Widget->ActualizarVida(CantVida);
+		break;
+
+	case 2: // VELOCIDAD
+		CantVelocidad += 1;
+		Widget->ActualizarVelocidad(CantVelocidad);
+		break;
+
+	case 3: // MISIL
+		CantMissil += 1;
+		Widget->ActualizarMisiles(CantMissil);
+		break;
+
+	case 4: // ESCUDO
+		CantEscudo += 1;
+		Widget->ActualizarEscudo(CantEscudo);
+		break;
+
+	case 5: // Arma1
+		if (TipoArmaActual == EWeaponType::Arma1)
+			NivelEvolucion = FMath::Clamp(NivelEvolucion + 1, 1, 3);
+		else
+		{
+			TipoArmaActual = EWeaponType::Arma1;
+			NivelEvolucion = 1;
+		}
+		Widget->ActualizarArmaActual(1);
+		break;
+
+	case 6: // Arma2
+		if (TipoArmaActual == EWeaponType::Arma2)
+			NivelEvolucion = FMath::Clamp(NivelEvolucion + 1, 1, 3);
+		else
+		{
+			TipoArmaActual = EWeaponType::Arma2;
+			NivelEvolucion = 1;
+		}
+		Widget->ActualizarArmaActual(2);
+		break;
+
+	case 7: // Arma3
+		if (TipoArmaActual == EWeaponType::Arma3)
+			NivelEvolucion = FMath::Clamp(NivelEvolucion + 1, 1, 3);
+		else
+		{
+			TipoArmaActual = EWeaponType::Arma3;
+			NivelEvolucion = 1;
+		}
+		Widget->ActualizarArmaActual(3);
+		break;
+
+	case 8: // Arma4
+		if (TipoArmaActual == EWeaponType::Arma4)
+			NivelEvolucion = FMath::Clamp(NivelEvolucion + 1, 1, 3);
+		else
+		{
+			TipoArmaActual = EWeaponType::Arma4;
+			NivelEvolucion = 1;
+		}
+		Widget->ActualizarArmaActual(4);
+		break;
+
+	default:
+		break;
 	}
+
 }
 
 void AMobileSpacePawn::HacerDanio()
@@ -304,6 +447,7 @@ void AMobileSpacePawn::ActivarEscudo()
 		return;
 
 	bInmuneEscudo = true;
+	bCanFire = false;
 
 	if (EscudoNiagara)
 	{
@@ -315,11 +459,11 @@ void AMobileSpacePawn::ActivarEscudo()
 	if (EscudoSound)
 		UGameplayStatics::SpawnSoundAttached(EscudoSound, RootComponent);
 
+	CollisionComponent->SetCapsuleSize(CapsuleBaseRadius * 1.5f, CapsuleBaseHalfHeight * 1.5f, true);
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-
-	float BaseRadius, BaseHalfHeight;
-	CollisionComponent->GetUnscaledCapsuleSize(BaseRadius, BaseHalfHeight);
-	CollisionComponent->SetCapsuleSize(BaseRadius * 1.5f, BaseHalfHeight * 1.5f);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Escudo, this, &AMobileSpacePawn::DesactivarEscudo, 8.0f, false);
 }
@@ -327,15 +471,19 @@ void AMobileSpacePawn::ActivarEscudo()
 void AMobileSpacePawn::DesactivarEscudo()
 {
 	bInmuneEscudo = false;
+	bCanFire = true;
 
-	CollisionComponent->InitCapsuleSize(250.f, 160.f);
-	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	CollisionComponent->SetCapsuleSize(CapsuleBaseRadius, CapsuleBaseHalfHeight, true);
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 
 	if (EscudoNiagara)
 	{
 		EscudoNiagara->Deactivate();
 		EscudoNiagara->SetVisibility(false);
-		EscudoNiagara->SetWorldScale3D(FVector(0.45f));
+		EscudoNiagara->SetWorldScale3D(FVector(1.2f));
 	}
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);

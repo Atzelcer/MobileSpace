@@ -24,7 +24,7 @@ AMegaMIssil::AMegaMIssil()
 	TrailParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailParticle"));
 	TrailParticle->SetupAttachment(RootComponent);
 	TrailParticle->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/VFXSeries1/Particles/Tails/P_RocketTypeB.P_RocketTypeB")));
-	TrailParticle->SetWorldScale3D(FVector(2.0f, 3.0f, 2.0f));
+	TrailParticle->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrailParticle->SetRelativeRotation(FRotator(0.0f, 180.0f, 0.0f));
 
 	// --- Movimiento del proyectil ---

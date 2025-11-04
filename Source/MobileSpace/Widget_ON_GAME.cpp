@@ -19,6 +19,13 @@ void UWidget_ON_GAME::NativeConstruct()
 	ONmissil = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/ONmissil.ONmissil'"));
 	ONmissil_off = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/botones/ONmissil_off.ONmissil_off'"));
 
+
+	Arma1_Tex = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/armas/armas1.armas1'"));
+	Arma2_Tex = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/armas/armas2.armas2'"));
+	Arma3_Tex = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/armas/armas6.armas6'"));
+	Arma4_Tex = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Imagenes/armas/armas5.armas5'"));
+
+
 	if (Button_escudo) Button_escudo->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnEscudoClicked);
 	if (Button_velocidad) Button_velocidad->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnVelocidadClicked);
 	if (Button_missil) Button_missil->OnClicked.AddDynamic(this, &UWidget_ON_GAME::OnMissilClicked);
@@ -106,12 +113,6 @@ void UWidget_ON_GAME::ActualizarSobrecarga(float Valor, float MaxValor)
 	}
 }
 
-void UWidget_ON_GAME::CambiarArma(UTexture2D* NuevaArma)
-{
-	if (image_arma_cambio && NuevaArma)
-		image_arma_cambio->SetBrushFromTexture(NuevaArma);
-}
-
 void UWidget_ON_GAME::ActualizarEstadoBotones()
 {
 	int32 Escudos = FCString::Atoi(*TextBlock_cantidad_escudo->GetText().ToString());
@@ -186,16 +187,38 @@ void UWidget_ON_GAME::OnVelocidadClicked()
 void UWidget_ON_GAME::ReactivarEscudo()
 {
 	bEscudoActivo = true;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Escudo Reactivado desde el HUD"));
 	ActualizarEstadoBotones();
 }
 
 void UWidget_ON_GAME::ReactivarVelocidad()
 {
 	bVelocidadActiva = true;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Velocidad Reactivada desde el HUD"));
 	ActualizarEstadoBotones();
 }
+
+void UWidget_ON_GAME::ActualizarArmaActual(int32 TipoArma)
+{
+	if (!image_arma_cambio) return;
+
+	switch (TipoArma)
+	{
+	case 1:
+		image_arma_cambio->SetBrushFromTexture(Arma1_Tex);
+		break;
+	case 2:
+		image_arma_cambio->SetBrushFromTexture(Arma2_Tex);
+		break;
+	case 3:
+		image_arma_cambio->SetBrushFromTexture(Arma3_Tex);
+		break;
+	case 4:
+		image_arma_cambio->SetBrushFromTexture(Arma4_Tex);
+		break;
+	default:
+		break;
+	}
+}
+
 
 void UWidget_ON_GAME::OnMissilClicked()
 {

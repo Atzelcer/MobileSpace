@@ -360,8 +360,8 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 
 void AAventuraManager::Nivel1()
 {
-	OleadasTotales = 3;
-	CantidadPorOleada = 3;
+	OleadasTotales = 8;
+	CantidadPorOleada = 8;
 	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
 	OleadaActual = 0;
 	GenerarOleada();

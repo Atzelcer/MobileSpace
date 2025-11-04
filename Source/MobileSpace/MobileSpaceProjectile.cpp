@@ -2,78 +2,152 @@
 
 #include "MobileSpaceProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
-#include "Engine/StaticMesh.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ship_X.h"
 #include "MegaObstaculo.h"
 
-AMobileSpaceProjectile::AMobileSpaceProjectile() 
+AMobileSpaceProjectile::AMobileSpaceProjectile()
 {
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
+	RootComponent = ProjectileMesh;
 
-    ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
-    RootComponent = ProjectileMesh;
-    ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// Evita colisión entre proyectiles
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ProjectileMesh->SetCollisionObjectType(ECC_GameTraceChannel2);
+	ProjectileMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	ProjectileMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	ProjectileMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	ProjectileMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	ProjectileMesh->SetNotifyRigidBodyCollision(true);
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);
 
-    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
-    ProjectileMovement->UpdatedComponent = ProjectileMesh;
-    ProjectileMovement->InitialSpeed = 5000.f;
-    ProjectileMovement->MaxSpeed = 5000.f;
-    ProjectileMovement->bRotationFollowsVelocity = true;
-    ProjectileMovement->ProjectileGravityScale = 0.f;
-    ProjectileMovement->bSweepCollision = true;
-    InitialLifeSpan = 3.0f;
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
+	ProjectileMovement->UpdatedComponent = ProjectileMesh;
+	ProjectileMovement->InitialSpeed = 5000.f;
+	ProjectileMovement->MaxSpeed = 5000.f;
+	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->ProjectileGravityScale = 0.f;
+	ProjectileMovement->bSweepCollision = true;
 
-    ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
-    ParticleProjectile->SetupAttachment(RootComponent);
 
-    ProjectileMesh->OnComponentHit.AddDynamic(this, &AMobileSpaceProjectile::OnHit);
-    
-    FireSound = nullptr;
+
+	ParticleProjectile = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
+	ParticleProjectile->SetupAttachment(RootComponent);
+
+	WeaponType = EWeaponType::Arma1;
+
+	EvolutionLevel = 1;
+	FireSound = nullptr;
+	ExplosionParticle = nullptr;
+	InitialLifeSpan = 3.0f;
 }
 
-void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AMobileSpaceProjectile::ApplyWeaponConfig(EWeaponType NewType)
 {
-    
-    if (OtherActor && OtherActor != GetOwner() && OtherActor != this)
-    {
-        // Aplicar impulso físico si el objeto tiene física
-        if (OtherComp && OtherComp->IsSimulatingPhysics())
-        {
-            OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
-        }
+	WeaponType = NewType;
 
-        if (OtherActor->IsA(AShip_X::StaticClass()))
-        {
-            Cast<AShip_X>(OtherActor)->HandleDestruction();
-        }
+	switch (NewType)
+	{
+	case EWeaponType::Arma1:
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/P_Circle.P_Circle")));
+		ParticleProjectile->SetRelativeScale3D(FVector(7.0f));
+		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MagicCombatAudio/ETC/RoundHitIce.RoundHitIce"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Water_Hit.P_Water_Hit"));
+		ExplosionScale = 0.5f;
+		break;
 
+	case EWeaponType::Arma2:
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MegaSci-FiParticleFXBundle3in1/Particles/P_Projectile.P_Projectile")));
+		ParticleProjectile->SetRelativeScale3D(FVector(2.5f));
+		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MagicCombatAudio/ETC/RoundHitPoison.RoundHitPoison"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Poison_Hit.P_Poison_Hit"));
+		ExplosionScale = 0.6f;
+		break;
 
-        if (OtherActor->IsA(AMegaObstaculo::StaticClass()))
-        {
-            Cast<AMegaObstaculo>(OtherActor)->DestruirObstaculo();
-		}
-        //else
-        //{
-        //    OtherActor->Destroy();
-        //}
+	case EWeaponType::Arma3:
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/P_FireBall.P_FireBall")));
+		ParticleProjectile->SetRelativeScale3D(FVector(2.5f));
+		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MissleSetAudio/Soul/SoulMissile_CrimsonExplosion.SoulMissile_CrimsonExplosion"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Triangle_Hit.P_Triangle_Hit"));
+		ExplosionScale = 0.8f;
+		break;
 
-        Destroy();
-		
-    }
-
-
+	case EWeaponType::Arma4:
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/FXVarietyPack/Particles/P_ky_thunderBall.P_ky_thunderBall")));
+		ParticleProjectile->SetRelativeScale3D(FVector(1.3f));
+		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MissleSetAudio/Mystic/MysticMissle_PoisonShoot.MysticMissle_PoisonShoot"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/FXVarietyPack/Particles/P_ky_ThunderBallHit.P_ky_ThunderBallHit"));
+		ExplosionScale = 0.9f;
+		break;
+	}
 }
+
+
+void AMobileSpaceProjectile::SetWeaponAndEvolution(EWeaponType NewType, int32 NewLevel)
+{
+	EvolutionLevel = FMath::Clamp(NewLevel, 1, 5);
+	ApplyWeaponConfig(NewType);
+
+	FVector BaseScale = ParticleProjectile->GetRelativeScale3D();
+
+
+	float ScaleMultiplier = 1.0f + (EvolutionLevel - 1) * 0.2f;
+	float BaseSpeed = 5000.f;
+	float SpeedIncrement = 200.f;
+
+	float SpeedFactor = BaseSpeed + (EvolutionLevel - 1) * SpeedIncrement;
+
+	ParticleProjectile->SetRelativeScale3D(BaseScale * ScaleMultiplier);
+
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->InitialSpeed = SpeedFactor;
+		ProjectileMovement->MaxSpeed = SpeedFactor;
+	}
+}
+
+
+
 
 
 void AMobileSpaceProjectile::PlayFireSound()
 {
-    if (FireSound)
-    {   
-        UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-    }
+	if (FireSound)
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 }
-   
-    
+
+void AMobileSpaceProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!OtherActor || OtherActor == GetOwner() || OtherActor == this) return;
+
+	if (OtherComp && OtherComp->IsSimulatingPhysics())
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 90.0f, GetActorLocation());
+
+	if (OtherActor->IsA(AShip_X::StaticClass()))
+		Cast<AShip_X>(OtherActor)->HandleDestruction();
+
+	if (OtherActor->IsA(AMegaObstaculo::StaticClass()))
+		Cast<AMegaObstaculo>(OtherActor)->DestruirObstaculo();
+
+	if (ExplosionParticle)
+	{
+		FVector ExplosionScaleVec(ExplosionScale);
+		UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			ExplosionParticle,
+			GetActorLocation(),
+			FRotator::ZeroRotator,
+			ExplosionScaleVec
+		);
+	}
+
+	Destroy();
+}
+

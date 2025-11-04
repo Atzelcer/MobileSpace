@@ -28,7 +28,7 @@ public:
 	UPROPERTY(meta = (BindWidget)) UImage* Image_ESCUDO;
 	UPROPERTY(meta = (BindWidget)) UImage* Image_VELOCIDAD;
 	UPROPERTY(meta = (BindWidget)) UImage* Image_Missil;
-	UPROPERTY(meta = (BindWidget)) UImage* image_arma_cambio;
+	UPROPERTY(meta = (BindWidget)) UImage* image_arma_cambio; // esta es la imagen para cambiar .entre las 4 armas 
 	UPROPERTY(meta = (BindWidget)) UButton* Button_menu;
 	UPROPERTY(meta = (BindWidget)) UButton* Button_escudo;
 	UPROPERTY(meta = (BindWidget)) UButton* Button_velocidad;
@@ -62,7 +62,6 @@ public:
 	void ActualizarMisiles(int32 Cantidad);
 	void ActualizarEscudo(int32 Cantidad);
 	void ActualizarSobrecarga(float Valor, float MaxValor);
-	void CambiarArma(UTexture2D* NuevaArma);
 
 	// --- Botones ---
 	UFUNCTION() void OnEscudoClicked();
@@ -73,4 +72,15 @@ public:
 	// --- Reactivaciones controladas desde el Pawn ---
 	void ReactivarEscudo();
 	void ReactivarVelocidad();
+
+	// --- Imágenes de armas ---
+	UPROPERTY() UTexture2D* Arma1_Tex;
+	UPROPERTY() UTexture2D* Arma2_Tex;
+	UPROPERTY() UTexture2D* Arma3_Tex;
+	UPROPERTY() UTexture2D* Arma4_Tex;
+
+	UFUNCTION(BlueprintCallable)
+	void ActualizarArmaActual(int32 TipoArma);
+
+
 };

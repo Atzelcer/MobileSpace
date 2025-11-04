@@ -153,4 +153,40 @@ public:
 	UPROPERTY()
 	class AHUDmain* HUDRef;
 
+	float CapsuleBaseRadius;
+	float CapsuleBaseHalfHeight;
+
+	// ------------------------------------------------------------
+// Sistema de armas
+// ------------------------------------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armas")
+	EWeaponType TipoArmaActual = EWeaponType::Arma1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armas")
+	int32 NivelEvolucion = 1; // 1, 2 o 3
+
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	float SobrecargaActual = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	float SobrecargaMax = 300.f; 
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	float TasaSobrecarga = 15.f; 
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	float TasaEnfriamiento = 80.f; // enfría más rápido
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	bool bEstaSobrecargado = false;
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	bool bSonidoAdvertenciaActivo = false;
+
+	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
+	bool bPresionandoDisparo = false; 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Efectos|Audio")
+	USoundWave* SoundSobrecargaTotal;
 };

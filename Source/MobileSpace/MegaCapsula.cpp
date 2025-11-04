@@ -21,6 +21,8 @@ AMegaCapsula::AMegaCapsula()
 	static ConstructorHelpers::FObjectFinder<USoundWave> Sonido(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Whoosh_4-1.Whoosh_4-1'"));
 	if (Sonido.Succeeded())
 		SonidoRecoleccion = Sonido.Object;
+
+	Velocidad = 320.f;
 }
 
 void AMegaCapsula::BeginPlay()
@@ -92,6 +94,6 @@ void AMegaCapsula::MoverCapsula(float DeltaTime)
 
 void AMegaCapsula::VerificarDestruccion()
 {
-	if (GetActorLocation().X <= -1100.000244f)
+	if (GetActorLocation().X <= -1400.000244f)
 		Destroy();
 }
