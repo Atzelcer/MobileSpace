@@ -19,6 +19,7 @@ class MOBILESPACE_API AShip_X : public AActor
 	GENERATED_BODY()
 	
 public:	
+
 	AShip_X();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

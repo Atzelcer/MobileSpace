@@ -97,7 +97,7 @@ void AMegaObstaculo::MoverObstaculo(float DeltaTime)
 
 void AMegaObstaculo::VerificarDestruccion()
 {
-	if (GetActorLocation().X <= -1100.000244f)
+	if (GetActorLocation().X <= -1500.000244f)
 		Destroy();
 }
 

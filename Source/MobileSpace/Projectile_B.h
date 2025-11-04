@@ -6,9 +6,6 @@
 #include "ProjectileZero.h"
 #include "Projectile_B.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class MOBILESPACE_API AProjectile_B : public AProjectileZero
 {

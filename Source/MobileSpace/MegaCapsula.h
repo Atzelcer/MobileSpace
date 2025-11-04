@@ -40,7 +40,7 @@ public:
 	void DestruirCapsula();
 
 	UPROPERTY(EditAnywhere, Category = "Movimiento")
-	float Velocidad = 600.f;
+	float Velocidad;
 
 	void MoverCapsula(float DeltaTime);
 	void VerificarDestruccion();

@@ -24,6 +24,7 @@
 #include "MultiplayerManager.h"
 #include "MobileSpacePawn.h"
 #include "Widget_Indicar_level.h"
+#include "WidgetGameOver.h"
 
 AHUDmain::AHUDmain()
 {
@@ -80,6 +81,11 @@ AHUDmain::AHUDmain()
 	static ConstructorHelpers::FClassFinder<UWidget_Indicar_level> LevelWidgetBP(TEXT("/Game/WIDGETS/IndicadorLevel.IndicadorLevel_C"));
 	if (LevelWidgetBP.Succeeded())
 		WidgetLevelClass = LevelWidgetBP.Class;
+
+	//para el panel de Game over
+	static ConstructorHelpers::FClassFinder<UWidgetGameOver> GameOverBPClass(TEXT("/Game/WIDGETS/GameOver.GameOver_C"));
+	if (GameOverBPClass.Succeeded())
+		WidgetGameOverClass = GameOverBPClass.Class;
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
 	if (MusicaAsset.Succeeded())
@@ -458,6 +464,28 @@ void AHUDmain::OcultarOnGameMulti()
 	if (WidgetOnGameMultiInstance && WidgetOnGameMultiInstance->IsInViewport())
 	{
 		WidgetOnGameMultiInstance->RemoveFromParent();
+	}
+}
+
+void AHUDmain::MostrarGameOver()
+{
+	if (!WidgetGameOverInstance && WidgetGameOverClass)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		WidgetGameOverInstance = CreateWidget<UWidgetGameOver>(PC, WidgetGameOverClass);
+	}
+	if (WidgetGameOverInstance)
+	{
+		if (!WidgetGameOverInstance->IsInViewport())
+			WidgetGameOverInstance->AddToViewport();
+	}
+}
+
+void AHUDmain::OcultarGameOver()
+{
+	if (WidgetGameOverInstance && WidgetGameOverInstance->IsInViewport())
+	{
+		WidgetGameOverInstance->RemoveFromParent();
 	}
 }
 
