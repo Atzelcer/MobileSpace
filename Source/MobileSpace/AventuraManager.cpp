@@ -373,7 +373,7 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 
 void AAventuraManager::SpawnBoss()
 {
-	FVector BossLocation(1200.f, 0.f, 300.f); // Ajusta la posición que prefieras
+	FVector BossLocation(1500.f, 0.f, 300.f); // Ajusta la posición que prefieras
 	FRotator BossRotation = FRotator::ZeroRotator;
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -414,6 +414,13 @@ void AAventuraManager::Nivel1()
 
 	GenerarOleada();                               
 
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_SpawnBoss,
+		this,
+		&AAventuraManager::SpawnBoss,
+		10.0f, // Tiempo después de la última oleada
+		false
+	);
 	
 }
 

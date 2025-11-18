@@ -8,24 +8,36 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "MobileSpaceProjectile.h"
+#include "MoveComponent.h"
 
 
 // Sets default values
 ABoss_Z::ABoss_Z()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//mesh
-	BossMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BossMesh"));
-	BossMesh->SetupAttachment(RootComponent);
-	
+
+	// Configurar el BoxComponent como colisión principal
 	ShipCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShipCollision"));
-	ShipCollision->SetupAttachment(RootComponent);
 	ShipCollision->SetBoxExtent(FVector(300.f, 300.f, 300.f));
-	
+	ShipCollision->SetupAttachment(RootComponent);
+
+	// CRÍTICO: Habilitar eventos de overlap
+	ShipCollision->SetGenerateOverlapEvents(true);
+
+	// Configuración de colisión más específica
 	ShipCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	ShipCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	 
+	ShipCollision->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	ShipCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	ShipCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	ShipCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+	// Mesh
+	BossMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BossMesh"));
+	BossMesh->SetupAttachment(ShipCollision);
+	BossMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Evitar conflictos
+
+	MoveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("MoveComp"));
+
 
 	
 }
@@ -88,6 +100,10 @@ void ABoss_Z::DeathSequence()
 		);
 	}
 	Destroy();
+}
+
+void ABoss_Z::DispararAtaque()
+{
 }
 
 

@@ -16,4 +16,6 @@ class MOBILESPACE_API ADragonR_Boss_Z : public ABoss_Z
 
 public:
 	ADragonR_Boss_Z();
+
+	virtual void DispararAtaque() override;
 };

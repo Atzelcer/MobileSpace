@@ -15,6 +15,7 @@ enum class EArcadeMovement : uint8
 	RadialBurst,
 	WavyWave,
 	ExpandingCircle,
+	BossMajesticArc,
 	SuperSequence
 	
 };

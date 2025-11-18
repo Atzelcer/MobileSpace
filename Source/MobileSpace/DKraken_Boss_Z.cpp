@@ -32,7 +32,18 @@ ADKraken_Boss_Z::ADKraken_Boss_Z()
 		DeathParticle = DeathParticleAsset.Object;
 	}
 
+	if (MoveComp)
+	{
+		MoveComp->Pattern = EArcadeMovement::BossMajesticArc;
+		MoveComp->Speed = 300.f;
+		MoveComp->Amplitude = 120.f;
+	}
+
 	
+}
+
+void ADKraken_Boss_Z::DispararAtaque()
+{
 }
 
 

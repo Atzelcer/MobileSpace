@@ -14,4 +14,8 @@ ADragonR_Boss_Z::ADragonR_Boss_Z()
 	}
 }
 
+void ADragonR_Boss_Z::DispararAtaque()
+{
+}
+
 
