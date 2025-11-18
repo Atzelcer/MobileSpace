@@ -11,20 +11,19 @@
 #include "DragonR_Boss_Z.h"
 #include "DragonT_Boss_Z.h"
 #include "MobileSpacePawn.h"
-#include "GameFramework/PlayerStart.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "HUDmain.h"
-#include "MegaPortal.h"
 #include "Components/AudioComponent.h"
+#include "MegaPortal.h"
 #include "MegaObstaculo.h"
 #include "Boss_Z.h"
-
+#include "HUDmain.h"
 
 AAventuraManager::AAventuraManager()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
 	NivelActual = 1;
 	CurrentWave = 1;
 	CurrentBoss = nullptr;
@@ -33,14 +32,14 @@ AAventuraManager::AAventuraManager()
 	AudioComp_SonidoCarga->SetupAttachment(RootComponent);
 	AudioComp_SonidoCarga->bAutoActivate = false;
 
-	SonidoCarga = LoadObject<USoundWave>(nullptr, TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Interstellar_Drift.Interstellar_Drift'"));
+	SonidoCarga = LoadObject<USoundWave>(nullptr,
+		TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Interstellar_Drift.Interstellar_Drift'"));
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> OleadaSoundAsset(TEXT("SoundWave'/Game/Musica_D/EpicToonSFX/BonusChargeWhooshAudio/CartoonyChargeMid.CartoonyChargeMid'"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> OleadaSoundAsset(
+		TEXT("SoundWave'/Game/Musica_D/EpicToonSFX/BonusChargeWhooshAudio/CartoonyChargeMid.CartoonyChargeMid'"));
+
 	if (OleadaSoundAsset.Succeeded())
-	{
 		OleadaSound = OleadaSoundAsset.Object;
-	}
-
 }
 
 void AAventuraManager::BeginPlay()
@@ -50,13 +49,14 @@ void AAventuraManager::BeginPlay()
 	ShipFactory = NewObject<UShipFactoryGeneral>(this);
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC)
-		return;
+	if (!PC) return;
 
-	FVector SpawnLocation = FVector(-1200.f, 0.f, 300.f);
+	FVector SpawnLocation(-1200.f, 0.f, 300.f);
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	AMobileSpacePawn* NewPawn = GetWorld()->SpawnActor<AMobileSpacePawn>(AMobileSpacePawn::StaticClass(), SpawnLocation, SpawnRotation);
+	AMobileSpacePawn* NewPawn =
+		GetWorld()->SpawnActor<AMobileSpacePawn>(AMobileSpacePawn::StaticClass(), SpawnLocation, SpawnRotation);
+
 	if (PC && NewPawn)
 	{
 		PC->Possess(NewPawn);
@@ -69,47 +69,38 @@ void AAventuraManager::BeginPlay()
 void AAventuraManager::SetupFixedCamera()
 {
 	UWorld* World = GetWorld();
-	if (!World)
+	if (!World) return;
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	FVector CameraLocation(0.f, 0.f, 2000.f);
+	FRotator CameraRotation(-90.f, 0.f, 0.f);
+
+	FixedCamera = World->SpawnActor<ACameraActor>(CameraLocation, CameraRotation, Params);
+	if (!FixedCamera) return;
+
+	UCameraComponent* Cam = FixedCamera->GetCameraComponent();
+	if (!Cam) return;
+
+	// Modo ORTOGRÁFICO
+	Cam->SetProjectionMode(ECameraProjectionMode::Orthographic);
+
+	// Ajuste según dispositivo
+	const FVector2D ViewportSize = GEngine->GameViewport->Viewport->GetSizeXY();
+	float AspectRatio = ViewportSize.X / ViewportSize.Y;
+
+	float BaseWidth = 4000.f;
+	float AdjustedWidth = BaseWidth * AspectRatio;
+
+	Cam->SetOrthoWidth(AdjustedWidth);
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+	if (PC)
 	{
-		return;
-	}
-
-	// Create a fixed camera actor
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	// Position for top-down view (like classic arcade games)
-	//FVector CameraLocation = FVector(-163190.0f, 6103422.0f, 9825.0f); // High above the map
-	FVector CameraLocation = FVector(0.0f, 0.0f, 2000.0f); // High above the map
-	FRotator CameraRotation = FRotator(-90.0f, 0.0f, 0.0f); // Looking straight down
-
-	FixedCamera = World->SpawnActor<ACameraActor>(CameraLocation, CameraRotation, SpawnParams);
-
-	if (FixedCamera)
-	{
-		// Configure camera for orthographic view (optional - for true 2D feel)
-		UCameraComponent* CameraComponent = FixedCamera->GetCameraComponent();
-		if (CameraComponent)
-		{
-			// Uncomment next line for pure 2D orthographic view
-			// CameraComponent->SetProjectionMode(ECameraProjectionMode::Orthographic);
-			// CameraComponent->SetOrthoWidth(3000.0f);
-
-			// For perspective but wide field of view
-			CameraComponent->SetFieldOfView(120.0f);
-		}
-
-		// Set this camera as the view target for all players
-		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
-		if (PC)
-		{
-			PC->SetViewTarget(FixedCamera);
-			//UE_LOG(LogTemp, Warning, TEXT("Fixed camera created and set as view target!"));
-		}
+		PC->SetViewTarget(FixedCamera);
 	}
 }
-
-
 
 void AAventuraManager::Tick(float DeltaTime)
 {

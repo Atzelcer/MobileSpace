@@ -118,6 +118,13 @@ public:
 	UPROPERTY(Transient)
 	class UAudioComponent* MusicaComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UWidgetMegaBoss> WidgetMegaBossClass;
+
+	UPROPERTY(Transient)
+	class UWidgetMegaBoss* WidgetMegaBossInstance;
+
+
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void ReproducirMusicaInicio();
 
@@ -217,6 +224,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarTodo();
+
+	UFUNCTION(BlueprintCallable)
+	void MostrarMegaBoss();
+
+	UFUNCTION(BlueprintCallable)
+	void OcultarMegaBoss();
+
 
 	FTimerHandle TimerHandle_OcultarNivel;
 	FTimerHandle TimerHandle_OcultarPantallaCarga;
