@@ -229,6 +229,25 @@ void UMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	}
 	break;
 
+	case EArcadeMovement::BossMajesticArc:
+	{
+		float tSweep = 10.0f; // Lento y elegante
+
+		float rango = 0.2f; // Solo 20% del área total Y
+		float centerY = (MovementMin.Y + MovementMax.Y) * 0.5f;
+		float minY = centerY - (MovementMax.Y - MovementMin.Y) * rango * 0.5f;
+		float maxY = centerY + (MovementMax.Y - MovementMin.Y) * rango * 0.5f;
+
+		float Xboss = GetOwner()->GetActorLocation().X;
+
+		float alpha = (1.0f + FMath::Sin(2 * PI * Elapsed / tSweep)) * 0.5f;
+		Y = FMath::Lerp(minY, maxY, alpha);
+		X = Xboss;
+
+		if (Elapsed > tSweep) Elapsed = 0.f;
+	}
+	break;
+
 	default:
 		X -= Speed * Elapsed;
 		break;
