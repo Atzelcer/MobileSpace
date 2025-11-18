@@ -25,8 +25,6 @@
 #include "MobileSpacePawn.h"
 #include "Widget_Indicar_level.h"
 #include "WidgetGameOver.h"
-#include "WidgetMegaBoss.h"
-
 
 AHUDmain::AHUDmain()
 {
@@ -89,11 +87,6 @@ AHUDmain::AHUDmain()
 	if (GameOverBPClass.Succeeded())
 		WidgetGameOverClass = GameOverBPClass.Class;
 
-	static ConstructorHelpers::FClassFinder<UWidgetMegaBoss> WidgetMegaBossBPClass(TEXT("/Game/WIDGETS/BossBar.BossBar_C"));
-	if (WidgetMegaBossBPClass.Succeeded())
-		WidgetMegaBossClass = WidgetMegaBossBPClass.Class;
-
-
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
 	if (MusicaAsset.Succeeded())
 		MusicaInicio = MusicaAsset.Object;
@@ -123,8 +116,6 @@ void AHUDmain::BeginPlay()
 			Params
 		);
 	}
-
-	MostrarMegaBoss();
 
 	MostrarPanelPrincipal();
 }
@@ -572,25 +563,4 @@ void AHUDmain::OcultarTodo()
 	OcultarModoJuego();
 	OcultarAjustes();
 	OcultarCreditos();
-}
-
-void AHUDmain::MostrarMegaBoss()
-{
-	if (!WidgetMegaBossInstance && WidgetMegaBossClass)
-	{
-		WidgetMegaBossInstance = CreateWidget<UWidgetMegaBoss>(GetWorld(), WidgetMegaBossClass);
-	}
-
-	if (WidgetMegaBossInstance && !WidgetMegaBossInstance->IsInViewport())
-	{
-		WidgetMegaBossInstance->AddToViewport(10);
-	}
-}
-
-void AHUDmain::OcultarMegaBoss()
-{
-	if (WidgetMegaBossInstance && WidgetMegaBossInstance->IsInViewport())
-	{
-		WidgetMegaBossInstance->RemoveFromParent();
-	}
 }
