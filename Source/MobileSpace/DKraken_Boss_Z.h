@@ -14,4 +14,6 @@ class MOBILESPACE_API ADKraken_Boss_Z : public ABoss_Z
 
 public:
 	ADKraken_Boss_Z();
+
+	virtual void DispararAtaque() override;
 };

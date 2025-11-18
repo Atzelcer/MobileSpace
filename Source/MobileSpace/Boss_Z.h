@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundBase.h"
+#include "MoveComponent.h"
 #include "Boss_Z.generated.h"
 
 
@@ -59,6 +60,11 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DeathParticle;
+
+	UPROPERTY(VisibleAnywhere)
+	UMoveComponent* MoveComp;
+
+	virtual void DispararAtaque();
 
 	
 };

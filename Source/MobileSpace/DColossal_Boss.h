@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Boss_Z.h"
-#include "DragonT_Boss_Z.generated.h"
+#include "DColossal_Boss.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MOBILESPACE_API ADragonT_Boss_Z : public ABoss_Z
+class MOBILESPACE_API ADColossal_Boss : public ABoss_Z
 {
 	GENERATED_BODY()
-
+	
 public:
-	ADragonT_Boss_Z();
+	ADColossal_Boss();
 
 	virtual void DispararAtaque() override;
 };
