@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Ship_X.h"
-#include "Boss_Z.h"
 #include "ShipFactoryGeneral.h"
 #include "AventuraManager.generated.h"
 
@@ -57,8 +56,7 @@ protected:
 	UPROPERTY()
 	TArray<AShip_X*> ActiveShips;
 
-	UPROPERTY()
-	ABoss_Z* CurrentBoss;
+
 
 	UPROPERTY()
 	FTimerHandle WaveTimerHandle;
@@ -112,7 +110,6 @@ public:
 	UFUNCTION()
 	void MoverJugador(float DeltaTime);
 
-	void SpawnBoss();
 
 	void GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVector Centro, float Espaciado = 350.f, int32 Filas = 1);
 

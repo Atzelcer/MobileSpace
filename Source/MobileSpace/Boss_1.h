@@ -3,21 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Boss_Z.h"
-#include "DLoop_Boss.generated.h"
+#include "Boss.h"
+#include "Boss_1.generated.h"
 
 /**
- * 
+ * Jefe 1 - Nave Intrepid Type 1
  */
 UCLASS()
-class MOBILESPACE_API ADLoop_Boss : public ABoss_Z
+class MOBILESPACE_API ABoss_1 : public ABoss
 {
 	GENERATED_BODY()
 
 public:
-
-	ADLoop_Boss();
-	virtual void DispararAtaque() override;
-
+	ABoss_1();
 	
 };

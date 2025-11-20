@@ -11,7 +11,12 @@ enum class EAtackPattern : uint8
 	Single      UMETA(DisplayName = "Single Shot"),
 	Spread      UMETA(DisplayName = "Spread"),
 	Burst       UMETA(DisplayName = "Burst"),
-	// Puedes agregar m�s patrones si quieres
+	// ===== NUEVOS PATRONES PARA JEFES =====
+	BossCircular        UMETA(DisplayName = "Boss Circular - 360 degrees"),
+	BossSpiral          UMETA(DisplayName = "Boss Spiral - Rotating spread"),
+	BossWaveBarrage     UMETA(DisplayName = "Boss Wave Barrage"),
+	BossTargeted        UMETA(DisplayName = "Boss Targeted - Aims at player"),
+	BossEpicFinal       UMETA(DisplayName = "Boss Epic Final - Ultimate attack")
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -50,6 +55,16 @@ private:
 	void FireSingle();
 	void FireSpread();
 	void FireBurst();
+	
+	// ===== NUEVOS ATAQUES PARA JEFES =====
+	void FireBossCircular();        // Disparo circular 360 grados
+	void FireBossSpiral();          // Disparo en espiral rotativa
+	void FireBossWaveBarrage();     // Ráfaga en ondas
+	void FireBossTargeted();        // Disparo dirigido al jugador
+	void FireBossEpicFinal();       // Ataque épico final
+
+	// Para patrones rotativos
+	float SpiralAngle = 0.0f;
 
 	// Para alternar proyectiles en single
 	int32 ProjectileCycle = 0;

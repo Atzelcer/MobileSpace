@@ -7,9 +7,6 @@
 #include "Ship_CazadorRojo.h"
 #include "Ship_CazadorAzul.h"
 #include "Ship_CazadorOmega.h"
-#include "DKraken_Boss_Z.h"
-#include "DragonR_Boss_Z.h"
-#include "DragonT_Boss_Z.h"
 #include "MobileSpacePawn.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
@@ -17,8 +14,9 @@
 #include "Components/AudioComponent.h"
 #include "MegaPortal.h"
 #include "MegaObstaculo.h"
-#include "Boss_Z.h"
 #include "HUDmain.h"
+#include "Boss_6.h"
+
 
 AAventuraManager::AAventuraManager()
 {
@@ -26,7 +24,6 @@ AAventuraManager::AAventuraManager()
 
 	NivelActual = 1;
 	CurrentWave = 1;
-	CurrentBoss = nullptr;
 
 	AudioComp_SonidoCarga = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp_SonidoCarga"));
 	AudioComp_SonidoCarga->SetupAttachment(RootComponent);
@@ -83,10 +80,10 @@ void AAventuraManager::SetupFixedCamera()
 	UCameraComponent* Cam = FixedCamera->GetCameraComponent();
 	if (!Cam) return;
 
-	// Modo ORTOGR¡FICO
+	// Modo ORTOGRÔøΩFICO
 	Cam->SetProjectionMode(ECameraProjectionMode::Orthographic);
 
-	// Ajuste seg˙n dispositivo
+	// Ajuste segÔøΩn dispositivo
 	const FVector2D ViewportSize = GEngine->GameViewport->Viewport->GetSizeXY();
 	float AspectRatio = ViewportSize.X / ViewportSize.Y;
 
@@ -220,7 +217,7 @@ void AAventuraManager::GenerarOleada()
 		return;
 	}
 
-	// °AQUÕ! Sonido de nueva oleada
+	// ÔøΩAQUÔøΩ! Sonido de nueva oleada
 	if (OleadaSound)
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), OleadaSound);
@@ -333,7 +330,7 @@ void AAventuraManager::TeletransportarJugador()
 	FVector NuevaPosicion(-2800.f, 0.f, 300.f);
 	PawnJugador->SetActorLocation(NuevaPosicion);
 
-	// Iniciar movimiento autom·tico hacia +X
+	// Iniciar movimiento automÔøΩtico hacia +X
 	bJugadorMoviendose = true;
 	SetActorTickEnabled(true);
 }
@@ -357,24 +354,11 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 
 	if (Pos.X >= -1100.f)
 	{
-		// LlegÛ a la posiciÛn final
+		// LlegÔøΩ a la posiciÔøΩn final
 		bJugadorMoviendose = false;
 	}
 }
 
-void AAventuraManager::SpawnBoss()
-{
-	FVector BossLocation(1500.f, 0.f, 300.f); // Ajusta la posiciÛn que prefieras
-	FRotator BossRotation = FRotator::ZeroRotator;
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	// AquÌ elige el boss seg˙n el nivel; ejemplo para el Kraken:
-	ADKraken_Boss_Z* KrakenBoss = GetWorld()->SpawnActor<ADKraken_Boss_Z>(BossLocation, BossRotation, Params);
-
-	// Opcional: puedes guardar la referencia
-	CurrentBoss = KrakenBoss;
-}
 
 void AAventuraManager::GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVector Centro, float Espaciado, int32 Filas)
 {
@@ -398,21 +382,33 @@ void AAventuraManager::GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVect
 
 void AAventuraManager::Nivel1()
 {
-	OleadasTotales = 3;                           
-	CantidadPorOleada = 8;                         
-	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde }; 
-	OleadaActual = 0;
-
-	GenerarOleada();                               
-
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_SpawnBoss,
-		this,
-		&AAventuraManager::SpawnBoss,
-		10.0f, // Tiempo despuÈs de la ˙ltima oleada
-		false
-	);
+	// ===== PRUEBA DE BOSS_1 =====
+	// En lugar de oleadas normales, spawnear Boss_1 para pruebas
 	
+	FVector SpawnLocation(600.0f, 0.0f, 600.0f); // Arriba del jugador
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	
+	if (GetWorld())
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		
+		ABoss_6* Boss = GetWorld()->SpawnActor<ABoss_6>(ABoss_6::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
+		
+		if (Boss)
+		{
+			// Boss spawneado exitosamente para pruebas
+		}
+	}
+	
+	// Comentar el c√≥digo original para las pruebas:
+	/*
+	OleadasTotales = 3;
+	CantidadPorOleada = 8;
+	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
+	OleadaActual = 0;
+	GenerarOleada();
+	*/
 }
 
 void AAventuraManager::Nivel2()

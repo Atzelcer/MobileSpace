@@ -248,6 +248,146 @@ void UMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	}
 	break;
 
+	// ===== NUEVOS PATRONES ESPECÍFICOS PARA JEFES =====
+	case EArcadeMovement::BossSlowSweep:
+	{
+		float tSweep = 8.0f; // Movimiento lento y elegante
+		
+		float centerY = (MovementMin.Y + MovementMax.Y) * 0.5f;
+		float rangeY = (MovementMax.Y - MovementMin.Y) * 0.3f; // 30% del rango
+		
+		// Movimiento sinusoidal lento y elegante
+		float progress = Elapsed / tSweep;
+		Y = centerY + (rangeY * FMath::Sin(progress * 2.0f * PI));
+		X = Origin.X; // Se mantiene en su posición X
+		
+		if (Elapsed > tSweep) Elapsed = 0.f;
+	}
+	break;
+
+	case EArcadeMovement::BossThreatening:
+	{
+		float tMove = 3.0f;
+		float tPause = 1.5f;
+		float tTotal = tMove + tPause;
+		
+		float cycleTime = FMath::Fmod(Elapsed, tTotal);
+		
+		if (cycleTime < tMove)
+		{
+			// Movimiento amenazante en zigzag
+			float moveProgress = cycleTime / tMove;
+			float centerY = (MovementMin.Y + MovementMax.Y) * 0.5f;
+			float rangeY = (MovementMax.Y - MovementMin.Y) * 0.4f;
+			
+			Y = centerY + rangeY * FMath::Sin(moveProgress * 3.0f * PI);
+			X = Origin.X + 50.0f * FMath::Sin(moveProgress * 4.0f * PI); // Pequeña oscilación en X
+		}
+		else
+		{
+			// Pausa amenazante - se queda quieto
+			Y = Y; // Mantiene posición
+			X = X;
+		}
+	}
+	break;
+
+	case EArcadeMovement::BossCircularDominance:
+	{
+		float tCircle = 12.0f; // Círculo lento y grande
+		
+		float centerX = Origin.X;
+		float centerY = (MovementMin.Y + MovementMax.Y) * 0.5f;
+		float radiusX = 300.0f; // Círculo grande e imponente
+		float radiusY = 200.0f; // Elipse para efecto visual
+		
+		float angle = (Elapsed / tCircle) * 2.0f * PI;
+		X = centerX + radiusX * FMath::Cos(angle);
+		Y = centerY + radiusY * FMath::Sin(angle);
+		
+		if (Elapsed > tCircle) Elapsed = 0.f;
+	}
+	break;
+
+	case EArcadeMovement::BossErraticPower:
+	{
+		float tPhase1 = 2.0f;
+		float tPhase2 = 1.0f;
+		float tPhase3 = 1.5f;
+		float tTotal = tPhase1 + tPhase2 + tPhase3;
+		
+		float cycleTime = FMath::Fmod(Elapsed, tTotal);
+		float centerY = (MovementMin.Y + MovementMax.Y) * 0.5f;
+		
+		if (cycleTime < tPhase1)
+		{
+			// Fase 1: Movimiento errático rápido
+			float t = cycleTime;
+			X = Origin.X + 150.0f * FMath::Sin(t * 5.0f);
+			Y = centerY + 100.0f * FMath::Cos(t * 7.0f);
+		}
+		else if (cycleTime < tPhase1 + tPhase2)
+		{
+			// Fase 2: Parada súbita en el centro
+			X = Origin.X;
+			Y = centerY;
+		}
+		else
+		{
+			// Fase 3: Movimiento lateral agresivo
+			float t = cycleTime - tPhase1 - tPhase2;
+			float progress = t / tPhase3;
+			Y = centerY + 250.0f * FMath::Sin(progress * 4.0f * PI);
+			X = Origin.X + 80.0f * FMath::Cos(progress * 6.0f * PI);
+		}
+	}
+	break;
+
+	case EArcadeMovement::BossEpicFinal:
+	{
+		// Patrón épico para el jefe final - combinación de varios movimientos
+		float tPhase = 4.0f;
+		float totalPhases = 4;
+		float tTotal = tPhase * totalPhases;
+		
+		float cycleTime = FMath::Fmod(Elapsed, tTotal);
+		int32 currentPhase = (int32)(cycleTime / tPhase);
+		float phaseProgress = FMath::Fmod(cycleTime, tPhase) / tPhase;
+		
+		float centerY = (MovementMin.Y + MovementMax.Y) * 0.5f;
+		
+		switch (currentPhase)
+		{
+		case 0: // Fase dominante - círculo grande
+			{
+				float angle = phaseProgress * 2.0f * PI;
+				X = Origin.X + 250.0f * FMath::Cos(angle);
+				Y = centerY + 180.0f * FMath::Sin(angle);
+			}
+			break;
+		case 1: // Fase amenazante - zigzag agresivo
+			{
+				X = Origin.X + 100.0f * FMath::Sin(phaseProgress * 6.0f * PI);
+				Y = centerY + 150.0f * (phaseProgress - 0.5f) * 2.0f;
+			}
+			break;
+		case 2: // Fase de poder - movimiento en 8
+			{
+				float t = phaseProgress * 2.0f * PI;
+				X = Origin.X + 200.0f * FMath::Sin(t);
+				Y = centerY + 120.0f * FMath::Sin(2.0f * t);
+			}
+			break;
+		case 3: // Fase final - movimiento impredecible
+			{
+				X = Origin.X + 180.0f * FMath::Sin(phaseProgress * 8.0f * PI + Owner->GetUniqueID());
+				Y = centerY + 100.0f * FMath::Cos(phaseProgress * 5.0f * PI + Owner->GetUniqueID() * 2);
+			}
+			break;
+		}
+	}
+	break;
+
 	default:
 		X -= Speed * Elapsed;
 		break;
