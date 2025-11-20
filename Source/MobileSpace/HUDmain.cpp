@@ -124,8 +124,6 @@ void AHUDmain::BeginPlay()
 		);
 	}
 
-	MostrarMegaBoss();
-
 	MostrarPanelPrincipal();
 }
 

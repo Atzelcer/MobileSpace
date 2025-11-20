@@ -124,4 +124,10 @@ public:
 
 	bool bJugadorMoviendose = false;
 	float VelocidadTeletransporte = 550.f;
+
+	private:
+
+	UPROPERTY()
+	class AMegaPlataforma* PlataformaSpawn;
+
 };

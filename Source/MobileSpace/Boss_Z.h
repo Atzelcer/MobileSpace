@@ -1,16 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Particles/ParticleSystemComponent.h"
-#include "Sound/SoundBase.h"
+#include "Particles/ParticleSystem.h"
 #include "MoveComponent.h"
 #include "Boss_Z.generated.h"
 
+class AHUDmain;
 
 UCLASS()
 class MOBILESPACE_API ABoss_Z : public ACharacter
@@ -23,7 +21,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	// Collision hit event
+	// NOTIFY ? Evento general de overlap del actor
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+	// EVENTO DE OVERLAP DEL COMPONENTE
 	UFUNCTION()
 	virtual void OnBossHit(
 		UPrimitiveComponent* OverlappedComponent,
@@ -34,17 +35,20 @@ protected:
 		const FHitResult& SweepResult
 	);
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
-
+	// Componentes
+	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BossMesh;
 
+	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* ShipCollision;
 
-	void SpawnSequence();
-	void DeathSequence();
-	// Health
+	UPROPERTY(VisibleAnywhere)
+	UMoveComponent* MoveComp;
+
+	// Vida
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MaxHealth = 100.f;
 
@@ -54,18 +58,19 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Stats")
 	bool bIsDead = false;
 
-	// Partículas
+	// Efectos
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* SpawnParticle;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DeathParticle;
 
-	UPROPERTY(VisibleAnywhere)
-	UMoveComponent* MoveComp;
-
+	// Funciones
+	void SpawnSequence();
+	void DeathSequence();
 	virtual void DispararAtaque();
 
-	
+	// Referencia al HUD
+	UPROPERTY()
+	AHUDmain* HUD;
 };
-

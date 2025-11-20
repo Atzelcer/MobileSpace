@@ -19,6 +19,7 @@
 #include "MegaObstaculo.h"
 #include "Boss_Z.h"
 #include "HUDmain.h"
+#include "MegaPlataforma.h"
 
 AAventuraManager::AAventuraManager()
 {
@@ -62,9 +63,19 @@ void AAventuraManager::BeginPlay()
 		PC->Possess(NewPawn);
 	}
 
+	//FVector PlataformaLoc(-116.168701f, 6.159666f, -940.0f);
+	//FRotator PlataformaRot(0.f, 0.f, 0.f);
+	//FActorSpawnParameters Params;
+	//PlataformaSpawn = GetWorld()->SpawnActor<AMegaPlataforma>(AMegaPlataforma::StaticClass(), PlataformaLoc, PlataformaRot, Params);
+	//if (PlataformaSpawn)
+	//{
+	//	PlataformaSpawn->SetActorScale3D(FVector(8.f, 9.75f, 3.f));
+	//}
+
 	SetupFixedCamera();
 	ControladorNiveles();
 }
+
 
 void AAventuraManager::SetupFixedCamera()
 {
@@ -367,6 +378,8 @@ void AAventuraManager::SpawnBoss()
 	FVector BossLocation(1500.f, 0.f, 300.f); // Ajusta la posición que prefieras
 	FRotator BossRotation = FRotator::ZeroRotator;
 	FActorSpawnParameters Params;
+
+
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	// Aquí elige el boss según el nivel; ejemplo para el Kraken:
@@ -398,6 +411,8 @@ void AAventuraManager::GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVect
 
 void AAventuraManager::Nivel1()
 {
+	//PlataformaSpawn->CambiarMaterialAleatorio();
+
 	OleadasTotales = 3;                           
 	CantidadPorOleada = 8;                         
 	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde }; 
@@ -417,6 +432,8 @@ void AAventuraManager::Nivel1()
 
 void AAventuraManager::Nivel2()
 {
+	//PlataformaSpawn->CambiarMaterialAleatorio();
+
 	OleadaActualObstaculos = 2;
 	OleadasTotalesObstaculos = 7;
 	CantidadPorOleadaObstaculos = 3;
