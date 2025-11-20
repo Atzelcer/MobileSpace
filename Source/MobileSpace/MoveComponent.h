@@ -16,7 +16,13 @@ enum class EArcadeMovement : uint8
 	WavyWave,
 	ExpandingCircle,
 	BossMajesticArc,
-	SuperSequence
+	SuperSequence,
+	// ===== NUEVOS PATRONES ESPECÍFICOS PARA JEFES =====
+	BossSlowSweep,          // Movimiento lento y elegante horizontal
+	BossThreatening,        // Movimiento amenazante con paradas
+	BossCircularDominance,  // Círculo grande y dominante
+	BossErraticPower,       // Errático pero controlado
+	BossEpicFinal          // Para jefe final - muy especial
 	
 };
 

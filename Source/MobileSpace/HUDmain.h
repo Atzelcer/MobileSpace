@@ -225,11 +225,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarTodo();
 
-	UFUNCTION(BlueprintCallable)
+	/*UFUNCTION(BlueprintCallable)
 	void MostrarMegaBoss();
 
 	UFUNCTION(BlueprintCallable)
-	void OcultarMegaBoss();
+	void OcultarMegaBoss();*/
 
 
 	FTimerHandle TimerHandle_OcultarNivel;
