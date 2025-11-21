@@ -23,6 +23,26 @@ ABoss_3::ABoss_3()
 	FireRate = 1.2f; // Dispara más rápido
 	AttackPattern = EAtackPattern::BossSpiral; // Nuevo patrón en espiral
 
+	// Configurar efectos de aparición para Boss_3 (veneno/verde)
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Halfs/Par_ExpFire_01_H_Rain.Par_ExpFire_01_H_Rain'"));
+	
+	if (AppearanceEffectAsset.Succeeded())
+	{
+		AppearanceEffect = AppearanceEffectAsset.Object;
+	}
+
+	// Efecto de destrucción verde para Boss_3
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+	
+	if (DestructionEffectAsset.Succeeded())
+	{
+		DestructionEffect = DestructionEffectAsset.Object;
+	}
+	
+	DestructionEffectScale = FVector(4.0f, 4.0f, 4.0f);
+
 	// Configurar movimiento más dinámico
 	if (MoveComp)
 	{

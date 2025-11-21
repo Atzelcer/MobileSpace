@@ -23,6 +23,26 @@ ABoss_2::ABoss_2()
 	FireRate = 1.5f;
 	AttackPattern = EAtackPattern::BossCircular; // Nuevo patrón circular
 
+	// Configurar efectos de aparición para Boss_2 (fuego/rojo)
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
+	
+	if (AppearanceEffectAsset.Succeeded())
+	{
+		AppearanceEffect = AppearanceEffectAsset.Object;
+	}
+
+	// Efecto de destrucción rojo para Boss_2
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
+	
+	if (DestructionEffectAsset.Succeeded())
+	{
+		DestructionEffect = DestructionEffectAsset.Object;
+	}
+	
+	DestructionEffectScale = FVector(3.5f, 3.5f, 3.5f);
+
 	// Configurar movimiento específico - Nuevo patrón elegante
 	if (MoveComp)
 	{

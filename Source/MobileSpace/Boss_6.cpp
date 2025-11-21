@@ -23,6 +23,26 @@ ABoss_6::ABoss_6()
 	FireRate = 0.6f; // Disparos devastadores constantes
 	AttackPattern = EAtackPattern::BossSpiral; // Empezar con espiral normal
 
+	// Configurar efectos de aparición ÉPICOS para Boss_6 (dorado/final)
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
+	
+	if (AppearanceEffectAsset.Succeeded())
+	{
+		AppearanceEffect = AppearanceEffectAsset.Object;
+	}
+
+	// Efecto de destrucción ÉPICO para Boss_6
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+	
+	if (DestructionEffectAsset.Succeeded())
+	{
+		DestructionEffect = DestructionEffectAsset.Object;
+	}
+	
+	DestructionEffectScale = FVector(6.0f, 6.0f, 6.0f); // ¡ÉPICO!
+
 	// Configurar movimiento de jefe final épico
 	if (MoveComp)
 	{

@@ -23,6 +23,26 @@ ABoss_5::ABoss_5()
 	FireRate = 0.8f; // Ráfagas muy rápidas
 	AttackPattern = EAtackPattern::BossTargeted; // Nuevo patrón dirigido
 
+	// Configurar efectos de aparición para Boss_5 (plasma/púrpura)
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
+	
+	if (AppearanceEffectAsset.Succeeded())
+	{
+		AppearanceEffect = AppearanceEffectAsset.Object;
+	}
+
+	// Efecto de destrucción plasma para Boss_5
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+	
+	if (DestructionEffectAsset.Succeeded())
+	{
+		DestructionEffect = DestructionEffectAsset.Object;
+	}
+	
+	DestructionEffectScale = FVector(5.0f, 5.0f, 5.0f);
+
 	// Configurar movimiento errático
 	if (MoveComp)
 	{

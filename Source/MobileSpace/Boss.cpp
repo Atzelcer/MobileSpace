@@ -31,6 +31,8 @@ ABoss::ABoss()
 	MoveComp->Amplitude = 200.0f;
 	MoveComp->Frequency = 0.5f; // Muy lento
 
+	
+
 	// Componente de ataque
 	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
 
@@ -181,15 +183,13 @@ void ABoss::StartEpicEntrance()
 			GetActorLocation(), FRotator::ZeroRotator, FVector(1.5f, 1.5f, 1.5f));
 	}
 	
-	// Timer para actualizar la animación de entrada
-	GetWorld()->GetTimerManager().SetTimer(EntranceTimerHandle, this, &ABoss::UpdateEntrance, 0.016f, true); // 60 FPS
+	GetWorld()->GetTimerManager().SetTimer(EntranceTimerHandle, this, &ABoss::UpdateEntrance, 0.016f, true);
 	
-	UE_LOG(LogTemp, Warning, TEXT("🎬 ENTRADA ÉPICA INICIADA - Bajando desde las alturas! 🎬"));
 }
 
 void ABoss::UpdateEntrance()
 {
-	EntranceTimeElapsed += 0.016f; // 60 FPS
+	EntranceTimeElapsed += 0.016f; 
 	
 	if (EntranceTimeElapsed >= EntranceDuration)
 	{
@@ -197,41 +197,23 @@ void ABoss::UpdateEntrance()
 		return;
 	}
 	
-	// Interpolación suave desde posición inicial hasta final
 	float Alpha = EntranceTimeElapsed / EntranceDuration;
 	
-	// Usar curva de suavizado para entrada más dramática
 	float SmoothedAlpha = FMath::SmoothStep(0.0f, 1.0f, Alpha);
 	
-	// Calcular posición actual
 	FVector CurrentPos = FMath::Lerp(StartPosition, FinalPosition, SmoothedAlpha);
 	SetActorLocation(CurrentPos);
-	
-	// Efecto de temblor durante la bajada (opcional)
-	if (Alpha > 0.5f) // Solo en la segunda mitad
-	{
-		FVector Shake = FVector(
-			FMath::RandRange(-10.0f, 10.0f),
-			FMath::RandRange(-10.0f, 10.0f),
-			0.0f
-		) * (1.0f - Alpha); // Menos temblor cerca del final
-		
-		SetActorLocation(CurrentPos + Shake);
-	}
 }
+
 
 void ABoss::FinishEntrance()
 {
-	// Detener timer de entrada
 	GetWorld()->GetTimerManager().ClearTimer(EntranceTimerHandle);
 	
-	// Asegurar posición final exacta
 	SetActorLocation(FinalPosition);
 	
-	// Terminar entrada épica
 	bIsEntering = false;
 	
-	// ===== INICIAR COMBATE NORMAL =====
 	if (BossCollision)
 	{
 		BossCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -240,7 +222,6 @@ void ABoss::FinishEntrance()
 	
 	GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, this, &ABoss::AutoFire, FireRate, true);
 	
-	// Efectos de aterrizaje
 	if (AppearanceEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), AppearanceEffect, 
