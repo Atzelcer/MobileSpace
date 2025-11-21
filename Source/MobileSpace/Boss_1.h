@@ -1,0 +1,23 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Boss.h"
+#include "Boss_1.generated.h"
+
+/**
+ * Jefe 1 - Nave Intrepid Type 1
+ */
+UCLASS()
+class MOBILESPACE_API ABoss_1 : public ABoss
+{
+	GENERATED_BODY()
+
+public:
+	ABoss_1();
+
+	// Override Tick para rotar hacia el jugador
+	virtual void Tick(float DeltaTime) override;
+	
+};
