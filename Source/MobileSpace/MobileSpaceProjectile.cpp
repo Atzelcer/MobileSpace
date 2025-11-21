@@ -61,7 +61,7 @@ void AMobileSpaceProjectile::ApplyWeaponConfig(EWeaponType NewType)
 
 	case EWeaponType::Arma2:
 		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/VFXSeries1/Particles/Energy/P_ChargedPlasma_2.P_ChargedPlasma_2")));
-		ParticleProjectile->SetRelativeScale3D(FVector(2.5f));
+		ParticleProjectile->SetRelativeScale3D(FVector(3.0f));
 		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
 		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MagicCombatAudio/ETC/RoundHitPoison.RoundHitPoison"));
 		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Poison_Hit.P_Poison_Hit"));

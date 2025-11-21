@@ -231,7 +231,6 @@ void AAventuraManager::GenerarOleada()
 		return;
 	}
 
-	// ¡AQUÍ! Sonido de nueva oleada
 	if (OleadaSound)
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), OleadaSound);
