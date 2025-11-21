@@ -51,38 +51,38 @@ void AMobileSpaceProjectile::ApplyWeaponConfig(EWeaponType NewType)
 	switch (NewType)
 	{
 	case EWeaponType::Arma1:
-		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/P_Circle.P_Circle")));
-		ParticleProjectile->SetRelativeScale3D(FVector(7.0f));
-		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Slash01_Blue.P_Projectile_Slash01_Blue")));
+		ParticleProjectile->SetRelativeScale3D(FVector(0.70f));
+		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 2.f, 0.f));
 		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MagicCombatAudio/ETC/RoundHitIce.RoundHitIce"));
-		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Water_Hit.P_Water_Hit"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Slash01_Blue.P_Hit_Slash01_Blue"));
 		ExplosionScale = 0.5f;
 		break;
 
 	case EWeaponType::Arma2:
-		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MegaSci-FiParticleFXBundle3in1/Particles/P_Projectile.P_Projectile")));
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/VFXSeries1/Particles/Energy/P_ChargedPlasma_2.P_ChargedPlasma_2")));
 		ParticleProjectile->SetRelativeScale3D(FVector(2.5f));
-		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
 		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MagicCombatAudio/ETC/RoundHitPoison.RoundHitPoison"));
 		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Poison_Hit.P_Poison_Hit"));
 		ExplosionScale = 0.6f;
 		break;
 
 	case EWeaponType::Arma3:
-		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/P_FireBall.P_FireBall")));
-		ParticleProjectile->SetRelativeScale3D(FVector(2.5f));
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Orb01_Purple.P_Projectile_Orb01_Purple")));
+		ParticleProjectile->SetRelativeScale3D(FVector(1.8f));
 		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MissleSetAudio/Soul/SoulMissile_CrimsonExplosion.SoulMissile_CrimsonExplosion"));
-		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/TurretVFX/Sources/Particle/Hit/P_Triangle_Hit.P_Triangle_Hit"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Orb01_Purple.P_Hit_Orb01_Purple"));
 		ExplosionScale = 0.8f;
 		break;
 
 	case EWeaponType::Arma4:
-		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/FXVarietyPack/Particles/P_ky_thunderBall.P_ky_thunderBall")));
-		ParticleProjectile->SetRelativeScale3D(FVector(1.3f));
+		ParticleProjectile->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Orb05_Orange.P_Projectile_Orb05_Orange")));
+		ParticleProjectile->SetRelativeScale3D(FVector(1.9f));
 		ParticleProjectile->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 		FireSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Musica_D/EpicToonSFX/MissleSetAudio/Mystic/MysticMissle_PoisonShoot.MysticMissle_PoisonShoot"));
-		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/FXVarietyPack/Particles/P_ky_ThunderBallHit.P_ky_ThunderBallHit"));
+		ExplosionParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Fireball04_Orange.P_Hit_Fireball04_Orange"));
 		ExplosionScale = 0.9f;
 		break;
 	}

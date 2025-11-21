@@ -209,10 +209,10 @@ void UWidget_ON_GAME::ActualizarArmaActual(int32 TipoArma)
 		image_arma_cambio->SetBrushFromTexture(Arma2_Tex);
 		break;
 	case 3:
-		image_arma_cambio->SetBrushFromTexture(Arma3_Tex);
+		image_arma_cambio->SetBrushFromTexture(Arma4_Tex);
 		break;
 	case 4:
-		image_arma_cambio->SetBrushFromTexture(Arma4_Tex);
+		image_arma_cambio->SetBrushFromTexture(Arma3_Tex);
 		break;
 	default:
 		break;

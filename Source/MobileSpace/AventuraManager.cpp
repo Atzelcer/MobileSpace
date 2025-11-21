@@ -264,7 +264,7 @@ void AAventuraManager::ComprobarOleadaGeneral()
 
 void AAventuraManager::SpawnPortalFinal()
 {
-	FVector SpawnLocation(850.f, 0.f, 300.f);
+	FVector SpawnLocation(850.f, 0.f, -430.0f);
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
 	FActorSpawnParameters Params;
