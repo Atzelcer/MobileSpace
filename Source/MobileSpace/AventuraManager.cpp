@@ -41,6 +41,18 @@ AAventuraManager::AAventuraManager()
 
 	if (OleadaSoundAsset.Succeeded())
 		OleadaSound = OleadaSoundAsset.Object;
+	// Control global de disparos en oleadas
+	IntervaloControlAtaque = 0.25f;
+
+	//// Timer para revisar ataques de naves continuamente
+	//GetWorldTimerManager().SetTimer(
+	//	TimerHandle_ControlAtaques,
+	//	this,
+	//	&AAventuraManager::ControlarAtaquesNaves,
+	//	IntervaloControlAtaque,
+	//	true
+	//);
+
 }
 
 void AAventuraManager::BeginPlay()
@@ -71,6 +83,15 @@ void AAventuraManager::BeginPlay()
 	//{
 	//	PlataformaSpawn->SetActorScale3D(FVector(8.f, 9.75f, 3.f));
 	//}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_ControlAtaques,
+		this,
+		&AAventuraManager::ControlAtaqueAleatorio,
+		0.2f,
+		true
+	);
+
 
 	SetupFixedCamera();
 	ControladorNiveles();
@@ -221,8 +242,6 @@ void AAventuraManager::ActivarEfectoSonidoPantallaCarga(bool bActivarSonido)
 }
 
 
-
-
 void AAventuraManager::GenerarOleada()
 {
 	if (OleadaActual >= OleadasTotales)
@@ -232,17 +251,48 @@ void AAventuraManager::GenerarOleada()
 	}
 
 	if (OleadaSound)
-	{
 		UGameplayStatics::PlaySound2D(GetWorld(), OleadaSound);
-	}
 
 	ENaveTipo Tipo = TiposActuales[OleadaActual % TiposActuales.Num()];
-	FVector centro = FVector(1350.f, OleadaActual * 480.f, 300.f);
-	GenerarEnjambre(Tipo, CantidadPorOleada, centro, 320.f, 1);
+
+	FVector Centro = FVector(1350.f, OleadaActual * 480.f, 300.f);
+
+	TArray<AShip_X*> Nuevas = GenerarEnjambre(Tipo, CantidadPorOleada, Centro, 320.f, 1);
+
+	int32 Total = Nuevas.Num();
+	int32 Perseguidores = Total * 0.25f;
+	int32 Tiradores = Total * 0.50f;
+
+	for (int32 i = 0; i < Nuevas.Num(); i++)
+	{
+		AShip_X* S = Nuevas[i];
+		if (!S) continue;
+
+		if (i < Perseguidores)
+		{
+			S->SetRole(EShipRole::Perseguidor);
+			S->EnableFire(false);
+		}
+		else if (i < Perseguidores + Tiradores)
+		{
+			S->SetRole(EShipRole::Normal);
+			S->EnableFire(true);
+		}
+		else
+		{
+			S->SetRole(EShipRole::Rafaga);
+			S->EnableFire(true);
+		}
+	}
 
 	OleadaActual++;
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AAventuraManager::ComprobarOleadaGeneral);
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick(
+		this,
+		&AAventuraManager::ComprobarOleadaGeneral
+	);
 }
+
 
 void AAventuraManager::ComprobarOleadaGeneral()
 {
@@ -374,39 +424,147 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 
 void AAventuraManager::SpawnBoss()
 {
-	FVector BossLocation(1500.f, 0.f, 300.f); // Ajusta la posición que prefieras
+	FVector BossLocation(1500.f, 0.f, 300.f); 
 	FRotator BossRotation = FRotator::ZeroRotator;
 	FActorSpawnParameters Params;
 
 
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	// Aquí elige el boss según el nivel; ejemplo para el Kraken:
 	ADKraken_Boss_Z* KrakenBoss = GetWorld()->SpawnActor<ADKraken_Boss_Z>(BossLocation, BossRotation, Params);
 
-	// Opcional: puedes guardar la referencia
 	CurrentBoss = KrakenBoss;
 }
 
-void AAventuraManager::GenerarEnjambre(ENaveTipo TipoNave, int32 Cantidad, FVector Centro, float Espaciado, int32 Filas)
-{
-	int32 Columnas = FMath::CeilToInt((float)Cantidad / (float)Filas);
-	int32 NavesCreadas = 0;
 
-	for (int32 fila = 0; fila < Filas && NavesCreadas < Cantidad; fila++)
+TArray<AShip_X*> AAventuraManager::GenerarEnjambre(
+	ENaveTipo TipoNave,
+	int32 Cantidad,
+	FVector Centro,
+	float Espaciado,
+	int32 Filas)
+{
+	TArray<AShip_X*> SpawnedShips;
+
+	const float SpawnX = MovementMax.X + 500.f; // FUERA DEL BORDE DERECHO
+	const float MinDistance = 350.f; // Separación mínima entre naves
+
+	for (int32 i = 0; i < Cantidad; i++)
 	{
-		for (int32 col = 0; col < Columnas && NavesCreadas < Cantidad; col++, NavesCreadas++)
+		float RandY = FMath::FRandRange(MovementMin.Y, MovementMax.Y);
+		float RandZ = 300.f;
+
+		FVector SpawnLoc = FVector(SpawnX, RandY, RandZ);
+
+		// Comprobar distancia mínima
+		bool bValid = true;
+		for (AShip_X* S : SpawnedShips)
 		{
-			FVector Offset(
-				0.f,
-				(col - Columnas / 2) * Espaciado + ((fila % 2) * Espaciado * 0.5f),
-				(fila * Espaciado)
-			);
-			FVector Loc = Centro + Offset;
-			ShipFactory->CrearNave(GetWorld(), TipoNave, Loc, FRotator::ZeroRotator);
+			if (S && FVector::Dist(S->GetActorLocation(), SpawnLoc) < MinDistance)
+			{
+				bValid = false;
+				break;
+			}
+		}
+
+		if (!bValid)
+		{
+			i--;
+			continue;
+		}
+
+		AShip_X* Ship = ShipFactory->CrearNave(GetWorld(), TipoNave, SpawnLoc, FRotator(0.f, -180.f, 0.f));
+		if (Ship)
+		{
+			SpawnedShips.Add(Ship);
+			RegisterShip(Ship);
+		}
+	}
+
+	return SpawnedShips;
+}
+
+void AAventuraManager::ControlAtaqueAleatorio()
+{
+	if (ActiveShips.Num() == 0)
+		return;
+
+	for (AShip_X* Ship : ActiveShips)
+	{
+		if (!IsValid(Ship))
+			continue;
+
+		// Solo ciertas naves pueden disparar aleatoriamente
+		if (!Ship->bPuedeAtacar)
+			continue;
+
+		// Probabilidad entre 0 y 1
+		float R = FMath::FRand();
+
+		// 8% de probabilidad por tick de disparar
+		if (R < 0.08f)
+		{
+			Ship->FireIfReady();
 		}
 	}
 }
+
+
+void AAventuraManager::RegisterShip(AShip_X* Ship)
+{
+	if (!Ship) return;
+
+	ActiveShips.Add(Ship);
+
+	ShipsByType.FindOrAdd(Ship->Tipo).Add(Ship);
+	ShipsByRole.FindOrAdd(Ship->ShipRole).Add(Ship);
+}
+
+
+void AAventuraManager::UnregisterShip(AShip_X* Ship)
+{
+	if (!Ship) return;
+
+	ActiveShips.Remove(Ship);
+
+	if (ShipsByType.Contains(Ship->Tipo))
+		ShipsByType[Ship->Tipo].Remove(Ship);
+
+	if (ShipsByRole.Contains(Ship->ShipRole))
+		ShipsByRole[Ship->ShipRole].Remove(Ship);
+}
+
+TArray<AShip_X*> AAventuraManager::GetShipsOfType(ENaveTipo Tipo)
+{
+	return ShipsByType.Contains(Tipo) ? ShipsByType[Tipo] : TArray<AShip_X*>();
+}
+
+TArray<AShip_X*> AAventuraManager::GetShipsWithRole(EShipRole Rol)
+{
+	return ShipsByRole.Contains(Rol) ? ShipsByRole[Rol] : TArray<AShip_X*>();
+}
+
+void AAventuraManager::EnableAttackForType(ENaveTipo Tipo, bool bEnable)
+{
+	if (!ShipsByType.Contains(Tipo)) return;
+
+	for (AShip_X* Ship : ShipsByType[Tipo])
+		Ship->EnableFire(bEnable);
+}
+
+void AAventuraManager::EnableAttackForRole(EShipRole Rol, bool bEnable)
+{
+	if (!ShipsByRole.Contains(Rol)) return;
+
+	for (AShip_X* Ship : ShipsByRole[Rol])
+		Ship->EnableFire(bEnable);
+}
+
+bool AAventuraManager::IsWaveCleared() const
+{
+	return ActiveShips.Num() == 0;
+}
+
 
 void AAventuraManager::Nivel1()
 {
@@ -419,13 +577,13 @@ void AAventuraManager::Nivel1()
 
 	GenerarOleada();                               
 
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_SpawnBoss,
-		this,
-		&AAventuraManager::SpawnBoss,
-		10.0f, // Tiempo después de la última oleada
-		false
-	);
+	//GetWorld()->GetTimerManager().SetTimer(
+	//	TimerHandle_SpawnBoss,
+	//	this,
+	//	&AAventuraManager::SpawnBoss,
+	//	10.0f, // Tiempo después de la última oleada
+	//	false
+	//);
 	
 }
 

@@ -1,67 +1,100 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice...
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "MobEnums.h"
 #include "MoveComponent.generated.h"
 
+//UENUM(BlueprintType)
+//enum class EArcadeMovement : uint8
+//{
+//    None,
+//    Wave,
+//    SEntry,
+//    RadialBurst,
+//    WavyWave,
+//    ExpandingCircle,
+//    BossMajesticArc,
+//    SuperSequence
+//};
+
 UENUM(BlueprintType)
-enum class EArcadeMovement : uint8
+enum class ERotationMode : uint8
 {
-	None,
-	Wave,
-	SEntry,
-	RadialBurst,
-	WavyWave,
-	ExpandingCircle,
-	BossMajesticArc,
-	SuperSequence
-	
+    Exact,
+    Smooth
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MOBILESPACE_API UMoveComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
-	UMoveComponent();
+public:
+    UMoveComponent();
 
-	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	EArcadeMovement Pattern = EArcadeMovement::WavyWave;
+    UPROPERTY(EditAnywhere)
+    bool bMovementEnabled = true;
 
-	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	float Speed = 520.0f;
+    UPROPERTY(EditAnywhere)
+    EArcadeMovement Pattern = EArcadeMovement::WavyWave;
 
-	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	float Amplitude = 140.0f;
+    UPROPERTY(EditAnywhere)
+    ERotationMode RotationMode = ERotationMode::Smooth;
 
-	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	float Frequency = 2.1f;
+    UPROPERTY(EditAnywhere)
+    float OrientationSpeed = 8.0f;
 
-	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	FVector2D MovementMin = FVector2D(-1450.f, -2900.f);
+    UPROPERTY(EditAnywhere)
+    float Speed = 640.0f;
 
-	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
-	FVector2D MovementMax = FVector2D(1450.f, 2900.f);
-	
+    UPROPERTY(EditAnywhere)
+    float FollowSpeed = 880.0f;
 
+    UPROPERTY(EditAnywhere)
+    float FollowIntensity = 1.35f;
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+    UPROPERTY(EditAnywhere)
+    float Amplitude = 140.0f;
+
+    UPROPERTY(EditAnywhere)
+    float Frequency = 2.1f;
+
+    UPROPERTY(EditAnywhere)
+    FVector ConstantDirection = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere)
+    float ConstantSpeed = 900.0f;
+
+    UPROPERTY(EditAnywhere)
+    AActor* FollowTarget = nullptr;
+
+    UPROPERTY(EditAnywhere)
+    FVector2D MovementMin = FVector2D(-1450.f, -2900.f);
+
+    UPROPERTY(EditAnywhere)
+    FVector2D MovementMax = FVector2D(1450.f, 2900.f);
+
+    virtual void BeginPlay() override;
+    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+    void EnableMovement(bool bEnable);
+    void SetPattern(EArcadeMovement NewPattern);
+    void SetRotationMode(ERotationMode Mode);
+    void SetFollowTarget(AActor* Target);
+    void SetConstantDirection(FVector Dir);
+    void ResetOrigin();
 
 private:
+    FVector Origin;
+    float Elapsed;
 
-	FVector Origin;
-	float Elapsed;
+    FVector ComputePatternMovement(float DeltaTime);
+    FVector ComputeFollowMovement(float DeltaTime);
+    FVector ComputeConstantMovement(float DeltaTime);
 
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+    void ApplyRotation(const FVector& MoveDirection, float DeltaTime);
+    FVector ClampPosition(const FVector& Pos) const;
 };

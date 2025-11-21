@@ -1,57 +1,67 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "MobEnums.h"
 #include "AtackComponent.generated.h"
-UENUM(BlueprintType)
-enum class EAtackPattern : uint8
-{
-	Single      UMETA(DisplayName = "Single Shot"),
-	Spread      UMETA(DisplayName = "Spread"),
-	Burst       UMETA(DisplayName = "Burst"),
-	// Puedes agregar más patrones si quieres
-};
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MOBILESPACE_API UAtackComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
-	UAtackComponent();
+public:
+    UAtackComponent();
 
-	UFUNCTION(BlueprintCallable)
-	void Fire(EAtackPattern Pattern);
+    UPROPERTY(EditAnywhere)
+    bool bAttackEnabled = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float FireRate = 0.2f;
+    UPROPERTY(EditAnywhere)
+    EAttackPattern Pattern = EAttackPattern::Single;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	USoundBase* FireSound;
+    UPROPERTY(EditAnywhere)
+    float FireRate = 0.3f;
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+    UPROPERTY(EditAnywhere)
+    float SpreadAngle = 15.0f;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+    UPROPERTY(EditAnywhere)
+    float BurstDelay = 0.08f;
 
+    UPROPERTY(EditAnywhere)
+    TSubclassOf<AActor> ProjectileA;
+
+    UPROPERTY(EditAnywhere)
+    TSubclassOf<AActor> ProjectileB;
+
+    UPROPERTY(EditAnywhere)
+    TSubclassOf<AActor> ProjectileC;
+
+    UPROPERTY(EditAnywhere)
+    USoundBase* FireSound;
+
+    virtual void BeginPlay() override;
+    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+    void RequestFire();
+    void EnableAttack(bool bEnable);
+    void SetPattern(EAttackPattern NewPattern);
+    void SetProjectileClasses(TSubclassOf<AActor> A, TSubclassOf<AActor> B, TSubclassOf<AActor> C);
 
 private:
-	bool bCanFire;
-	FTimerHandle FireTimerHandle;
+    bool bCanFire;
+    FTimerHandle TimerHandle_FireRate;
+    int32 BurstCount;
+    int32 ProjectileCycle;
 
-	void OnFireTimerExpired();
-
-	void FireSingle();
-	void FireSpread();
-	void FireBurst();
-
-	// Para alternar proyectiles en single
-	int32 ProjectileCycle = 0;
-		
+    void ResetFire();
+    void ExecuteFirePattern();
+    void FireSingle();
+    void FireSpread();
+    void FireBurst();
+    void FireTripleArc();
+    void FireSniperShot();
+    void FireCircular();
+    void SpawnProjectile(TSubclassOf<AActor> ProjClass, const FVector& Loc, const FRotator& Rot);
 };

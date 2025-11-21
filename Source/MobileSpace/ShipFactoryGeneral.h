@@ -4,18 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "MobEnums.h"
 #include "ShipFactoryGeneral.generated.h"
-
-UENUM(BlueprintType)
-enum class ENaveTipo : uint8
-{
-    Roja,
-    Azul,
-    Verde,
-    Omega,
-    Delta,
-    Alfa
-};
 
 UCLASS()
 class MOBILESPACE_API UShipFactoryGeneral : public UObject
@@ -23,6 +13,7 @@ class MOBILESPACE_API UShipFactoryGeneral : public UObject
     GENERATED_BODY()
 
 public:
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FVector DefaultLocation = FVector(1000.f, 0.f, 300.f);
 
@@ -34,6 +25,6 @@ public:
         UWorld* World,
         ENaveTipo Tipo,
         FVector Loc = FVector::ZeroVector,
-        FRotator Rot = FRotator::ZeroRotator);
-	
+        FRotator Rot = FRotator::ZeroRotator
+    );
 };

@@ -1,75 +1,86 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "AtackComponent.h"
+﻿#include "AtackComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "TimerManager.h"
-#include "Sound/SoundBase.h"
-#include "UObject/ConstructorHelpers.h"
-#include "Projectile_A.h"  // ← Include directo
-#include "Projectile_B.h"  // ← Include directo
-#include "Projectile_C.h"  // ← Include directo
-// Sets default values for this component's properties
+
 UAtackComponent::UAtackComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-	bCanFire = true;
-
-    static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("SoundWave'/Game/Free_Sounds_Pack/wav/Explosion_Medium_2-1.Explosion_Medium_2-1'"));
-    if (FireAudio.Succeeded())
-    {
-        FireSound = FireAudio.Object;
-    }
-	// ...
+    PrimaryComponentTick.bCanEverTick = true;
+    bCanFire = true;
+    BurstCount = 0;
+    ProjectileCycle = 0;
 }
 
-void UAtackComponent::Fire(EAtackPattern Pattern)
-{
-    if (!bCanFire) return;
-
-    switch (Pattern)
-    {
-    case EAtackPattern::Single:
-        FireSingle();
-        break;
-    case EAtackPattern::Spread:
-        FireSpread();
-        break;
-    case EAtackPattern::Burst:
-        FireBurst();
-        break;
-    }
-
-    bCanFire = false;
-    GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, this, &UAtackComponent::OnFireTimerExpired, FireRate, false);
-}
-
-
-// Called when the game starts
 void UAtackComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	// ...
-	
+    Super::BeginPlay();
 }
 
-
-// Called every frame
 void UAtackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UAtackComponent::OnFireTimerExpired()
+void UAtackComponent::EnableAttack(bool bEnable)
+{
+    bAttackEnabled = bEnable;
+}
+
+void UAtackComponent::SetPattern(EAttackPattern NewPattern)
+{
+    Pattern = NewPattern;
+}
+
+void UAtackComponent::SetProjectileClasses(TSubclassOf<AActor> A, TSubclassOf<AActor> B, TSubclassOf<AActor> C)
+{
+    ProjectileA = A;
+    ProjectileB = B;
+    ProjectileC = C;
+}
+
+void UAtackComponent::RequestFire()
+{
+    if (!bAttackEnabled) return;
+    if (!bCanFire) return;
+
+    bCanFire = false;
+    ExecuteFirePattern();
+
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle_FireRate, this, &UAtackComponent::ResetFire, FireRate, false);
+}
+
+void UAtackComponent::ResetFire()
 {
     bCanFire = true;
+    BurstCount = 0;
+}
+
+void UAtackComponent::ExecuteFirePattern()
+{
+    switch (Pattern)
+    {
+    case EAttackPattern::Single:       FireSingle(); break;
+    case EAttackPattern::Spread:       FireSpread(); break;
+    case EAttackPattern::Burst:        FireBurst(); break;
+    case EAttackPattern::TripleArc:    FireTripleArc(); break;
+    case EAttackPattern::SniperShot:   FireSniperShot(); break;
+    case EAttackPattern::Circular:     FireCircular(); break;
+    default: break;
+    }
+}
+
+void UAtackComponent::SpawnProjectile(TSubclassOf<AActor> ProjClass, const FVector& Loc, const FRotator& Rot)
+{
+    if (!ProjClass) return;
+    if (!GetOwner()) return;
+
+    FActorSpawnParameters Params;
+    Params.Owner = GetOwner();
+    GetWorld()->SpawnActor<AActor>(ProjClass, Loc, Rot, Params);
+
+    if (FireSound)
+        UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetOwner()->GetActorLocation());
 }
 
 void UAtackComponent::FireSingle()
@@ -77,85 +88,78 @@ void UAtackComponent::FireSingle()
     AActor* Owner = GetOwner();
     if (!Owner) return;
 
-    FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 80.0f;
-    FRotator SpawnRotation = Owner->GetActorForwardVector().Rotation();
+    FVector L = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 120.f;
+    FRotator R = Owner->GetActorForwardVector().Rotation();
 
-    UWorld* World = GetWorld();
-    if (!World) return;
+    TSubclassOf<AActor> Proj = nullptr;
 
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = Owner;
-
-    // Alterna entre los 3 proyectiles
     switch (ProjectileCycle++ % 3)
     {
-    case 0:
-        World->SpawnActor<AProjectile_A>(AProjectile_A::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
-        //UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_A"));
-        break;
-    case 1:
-        //World->SpawnActor<AProjectile_B>(AProjectile_B::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
-        UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_B"));
-        break;
-    case 2:
-        World->SpawnActor<AProjectile_C>(AProjectile_C::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
-        //UE_LOG(LogTemp, Warning, TEXT("Spawned Projectile_C"));
-        break;
+    case 0: Proj = ProjectileA; break;
+    case 1: Proj = ProjectileB; break;
+    case 2: Proj = ProjectileC; break;
     }
 
-    if (FireSound)
-    {
-        UGameplayStatics::PlaySoundAtLocation(this, FireSound, Owner->GetActorLocation());
-    }
+    SpawnProjectile(Proj, L, R);
 }
-
-
 
 void UAtackComponent::FireSpread()
 {
     AActor* Owner = GetOwner();
     if (!Owner) return;
 
-    UWorld* World = GetWorld();
-    if (!World) return;
+    FVector L = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 120.f;
+    FRotator BaseRot = Owner->GetActorForwardVector().Rotation();
 
-    FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 80.0f;
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = Owner;
-
-    // Projectile_A (-15°)
-    FRotator RotA = Owner->GetActorForwardVector().Rotation();
-    RotA.Yaw -= 15.0f;
-    World->SpawnActor<AProjectile_A>(AProjectile_A::StaticClass(), SpawnLocation, RotA, SpawnParams);
-
-    // Projectile_B (recto)
-    FRotator RotB = Owner->GetActorForwardVector().Rotation();
-    World->SpawnActor<AProjectile_B>(AProjectile_B::StaticClass(), SpawnLocation, RotB, SpawnParams);
-
-    // Projectile_C (+15°)
-    FRotator RotC = Owner->GetActorForwardVector().Rotation();
-    RotC.Yaw += 15.0f;
-    World->SpawnActor<AProjectile_C>(AProjectile_C::StaticClass(), SpawnLocation, RotC, SpawnParams);
-
-    if (FireSound)
-    {
-        UGameplayStatics::PlaySoundAtLocation(this, FireSound, Owner->GetActorLocation());
-    }
-
-    //UE_LOG(LogTemp, Warning, TEXT("Spread pattern fired!"));
+    SpawnProjectile(ProjectileA, L, FRotator(BaseRot.Pitch, BaseRot.Yaw - SpreadAngle, BaseRot.Roll));
+    SpawnProjectile(ProjectileB, L, BaseRot);
+    SpawnProjectile(ProjectileC, L, FRotator(BaseRot.Pitch, BaseRot.Yaw + SpreadAngle, BaseRot.Roll));
 }
 
 void UAtackComponent::FireBurst()
 {
-    // Dispara 3 veces rápido
-    FireSingle();
-    FireSingle();
-    FireSingle();
+    AActor* Owner = GetOwner();
+    if (!Owner) return;
 
-    if (FireSound)
-    {
-        UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetOwner()->GetActorLocation());
-    }
+    FireSingle();
+    FireSingle();
+    FireSingle();
 }
 
+void UAtackComponent::FireTripleArc()
+{
+    AActor* Owner = GetOwner();
+    if (!Owner) return;
 
+    FVector L = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 120.f;
+    FRotator BaseRot = Owner->GetActorForwardVector().Rotation();
+
+    SpawnProjectile(ProjectileA, L, FRotator(BaseRot.Pitch, BaseRot.Yaw - 10.f, BaseRot.Roll));
+    SpawnProjectile(ProjectileB, L, BaseRot);
+    SpawnProjectile(ProjectileC, L, FRotator(BaseRot.Pitch, BaseRot.Yaw + 10.f, BaseRot.Roll));
+}
+
+void UAtackComponent::FireSniperShot()
+{
+    AActor* Owner = GetOwner();
+    if (!Owner) return;
+
+    FVector L = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 150.f;
+    FRotator R = Owner->GetActorForwardVector().Rotation();
+
+    SpawnProjectile(ProjectileC, L, R);
+}
+
+void UAtackComponent::FireCircular()
+{
+    AActor* Owner = GetOwner();
+    if (!Owner) return;
+
+    FVector L = Owner->GetActorLocation();
+
+    for (int32 i = 0; i < 12; i++)
+    {
+        float Yaw = i * 30.f;
+        SpawnProjectile(ProjectileA, L, FRotator(0.f, Yaw, 0.f));
+    }
+}
