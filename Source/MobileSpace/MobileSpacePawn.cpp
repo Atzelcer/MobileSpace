@@ -93,7 +93,7 @@ AMobileSpacePawn::AMobileSpacePawn()
 	ProjectileClass = AProjectile_1::StaticClass();
 	MoveSpeed = 1800.f;
 	VelocidadNormal = MoveSpeed;
-	GunOffset = FVector(270.f, 0.f, 0.f);
+	GunOffset = FVector(230.f, 0.f, 0.f);
 	FireRate = 0.2f;
 	bCanFire = true;
 	bInmuneEscudo = false;

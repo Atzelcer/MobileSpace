@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ShipFactoryGeneral.h"
+#include "MobEnums.h"
+#include "Ship_X.h"
+
 #include "Ship_CazadorRojo.h"
 #include "Ship_CazadorAzul.h"
 #include "Ship_CazadorVerde.h"
@@ -11,28 +13,49 @@
 
 AShip_X* UShipFactoryGeneral::CrearNave(UWorld* World, ENaveTipo Tipo, FVector Loc, FRotator Rot)
 {
-	if (!World)
-		return nullptr;
+    if (!World)
+        return nullptr;
 
-	if (Loc.IsZero())
-	{
-		float RandomY = FMath::FRandRange(-3000.f, 3000.f);
-		Loc = FVector(1400.f, RandomY, 300.f);
-	}
+    if (Loc.IsZero())
+    {
+        float RandomY = FMath::FRandRange(-3000.f, 3000.f);
+        Loc = FVector(1400.f, RandomY, 300.f);
+    }
 
-	if (Rot.IsZero())
-		Rot = DefaultRotation;
+    if (Rot.Equals(FRotator::ZeroRotator))
+        Rot = DefaultRotation;
 
-	AShip_X* Ship = nullptr;
-	switch (Tipo)
-	{
-	case ENaveTipo::Roja: Ship = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), Loc, Rot); break;
-	case ENaveTipo::Azul: Ship = World->SpawnActor<AShip_CazadorAzul>(AShip_CazadorAzul::StaticClass(), Loc, Rot); break;
-	case ENaveTipo::Verde: Ship = World->SpawnActor<AShip_CazadorVerde>(AShip_CazadorVerde::StaticClass(), Loc, Rot); break;
-	case ENaveTipo::Omega: Ship = World->SpawnActor<AShip_CazadorOmega>(AShip_CazadorOmega::StaticClass(), Loc, Rot); break;
-	case ENaveTipo::Delta: Ship = World->SpawnActor<AShip_CazadorDelta>(AShip_CazadorDelta::StaticClass(), Loc, Rot); break;
-	case ENaveTipo::Alfa: Ship = World->SpawnActor<AShip_CazadorAlfa>(AShip_CazadorAlfa::StaticClass(), Loc, Rot); break;
-	default: break;
-	}
-	return Ship;
+    AShip_X* Ship = nullptr;
+
+    switch (Tipo)
+    {
+    case ENaveTipo::Roja:
+        Ship = World->SpawnActor<AShip_CazadorRojo>(AShip_CazadorRojo::StaticClass(), Loc, Rot);
+        break;
+
+    case ENaveTipo::Azul:
+        Ship = World->SpawnActor<AShip_CazadorAzul>(AShip_CazadorAzul::StaticClass(), Loc, Rot);
+        break;
+
+    case ENaveTipo::Verde:
+        Ship = World->SpawnActor<AShip_CazadorVerde>(AShip_CazadorVerde::StaticClass(), Loc, Rot);
+        break;
+
+    case ENaveTipo::Omega:
+        Ship = World->SpawnActor<AShip_CazadorOmega>(AShip_CazadorOmega::StaticClass(), Loc, Rot);
+        break;
+
+    case ENaveTipo::Delta:
+        Ship = World->SpawnActor<AShip_CazadorDelta>(AShip_CazadorDelta::StaticClass(), Loc, Rot);
+        break;
+
+    case ENaveTipo::Alfa:
+        Ship = World->SpawnActor<AShip_CazadorAlfa>(AShip_CazadorAlfa::StaticClass(), Loc, Rot);
+        break;
+
+    default:
+        break;
+    }
+
+    return Ship;
 }

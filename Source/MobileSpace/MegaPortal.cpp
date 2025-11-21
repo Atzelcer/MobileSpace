@@ -13,7 +13,7 @@ AMegaPortal::AMegaPortal()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionComponent"));
-	CollisionComponent->InitCapsuleSize(100.f, 200.f);
+	CollisionComponent->InitCapsuleSize(100.f, 850.f);
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	RootComponent = CollisionComponent;
 
@@ -57,10 +57,11 @@ void AMegaPortal::CargarParticleSystems()
 		};
 
 	ParticleSystems = {
-		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_06_Y1.PS_06_Y1'")),
-		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_06_R1.PS_06_R1'")),
-		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_06_B.PS_06_B'")),
-		Cargar(TEXT("ParticleSystem'/Game/VE_PowerUps/Particles/PS_27_R.PS_27_R'"))
+		Cargar(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_aquaStorm.P_ky_aquaStorm'")),
+		Cargar(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_darkStorm.P_ky_darkStorm'")),
+		Cargar(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_fireStorm.P_ky_fireStorm'")),
+		Cargar(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_storm.P_ky_storm'")),
+		Cargar(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_thunderStorm.P_ky_thunderStorm'"))
 	};
 }
 
@@ -75,7 +76,7 @@ void AMegaPortal::EscogerEfectoAleatorio()
 	{
 		ParticlePortalComponent->SetTemplate(EfectoSeleccionado);
 		ParticlePortalComponent->SetVisibility(true);
-		ParticlePortalComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
+		ParticlePortalComponent->SetRelativeScale3D(FVector(2.5f, 2.5f, 2.5f));
 		ParticlePortalComponent->SetHiddenInGame(false);
 		ParticlePortalComponent->Activate(true);
 	}

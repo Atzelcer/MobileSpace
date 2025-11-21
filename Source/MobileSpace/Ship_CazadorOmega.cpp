@@ -1,53 +1,35 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Ship_CazadorOmega.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Components/StaticMeshComponent.h"
-#include "AtackComponent.h"
-#include "Engine/Engine.h"
-#include "TimerManager.h"
 
 AShip_CazadorOmega::AShip_CazadorOmega()
 {
-	PrimaryActorTick.bCanEverTick = true;
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMeshAsset(TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow15.SM_StarSparrow15'"));
-	if (ShipMeshAsset.Succeeded())
-	{
-		ShipMesh->SetStaticMesh(ShipMeshAsset.Object);
-		ShipMesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
-	}
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshObj(
+        TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow15.SM_StarSparrow15'")
+    );
 
-	AttackComp = CreateDefaultSubobject<UAtackComponent>(TEXT("AttackComponent"));
+    if (MeshObj.Succeeded())
+    {
+        ShipMesh->SetStaticMesh(MeshObj.Object);
+        ShipMesh->SetRelativeScale3D(FVector(0.5f));
+    }
 
-	if (MoveComp)
-	{
-		MoveComp->Pattern = EArcadeMovement::ExpandingCircle;
-		MoveComp->Speed = 350.f;
-		MoveComp->Amplitude = 120.f;
-	}
+    Tipo = ENaveTipo::Omega;
+    MovementPattern = EArcadeMovement::ExpandingCircle;
+
+    AttackPattern = EAttackPattern::Spread;
+    ShipRole = EShipRole::Tanque;
+
+    TimeBetweenShots = 1.0f;
+    bFireEnabled = true;
 }
 
 void AShip_CazadorOmega::BeginPlay()
 {
-	Super::BeginPlay();
-	SetActorRotation(FRotator(0.0f, -180.0f, 0.0f));
-	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AShip_CazadorOmega::AutoFire, TimeBetweenShots, true, 0.5f);
+    Super::BeginPlay();
+    SetActorRotation(FRotator(0.f, -180.f, 0.f));
 }
 
 void AShip_CazadorOmega::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-}
-
-void AShip_CazadorOmega::AutoFire()
-{
-	if (AttackComp)
-	{
-		AttackComp->Fire(AttackPattern);
-	}
-}
-
-void AShip_CazadorOmega::DestruirNave()
-{
-	Super::DestruirNave();
+    Super::Tick(DeltaTime);
 }
