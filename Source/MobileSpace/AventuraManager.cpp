@@ -15,7 +15,7 @@
 #include "MegaPortal.h"
 #include "MegaObstaculo.h"
 #include "HUDmain.h"
-#include "Boss_6.h"
+#include "Boss_1.h"
 
 
 AAventuraManager::AAventuraManager()
@@ -385,7 +385,7 @@ void AAventuraManager::Nivel1()
 	// ===== PRUEBA DE BOSS_1 =====
 	// En lugar de oleadas normales, spawnear Boss_1 para pruebas
 	
-	FVector SpawnLocation(600.0f, 0.0f, 600.0f); // Arriba del jugador
+	FVector SpawnLocation(1400.0f, 0.0f, 600.0f); // Arriba del jugador
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 	
 	if (GetWorld())
@@ -393,7 +393,7 @@ void AAventuraManager::Nivel1()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
-		ABoss_6* Boss = GetWorld()->SpawnActor<ABoss_6>(ABoss_6::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
+		ABoss_1* Boss = GetWorld()->SpawnActor<ABoss_1>(ABoss_1::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
 		
 		if (Boss)
 		{

@@ -23,6 +23,26 @@ ABoss_4::ABoss_4()
 	FireRate = 1.0f; // Dispara lento pero fuerte
 	AttackPattern = EAtackPattern::BossWaveBarrage; // Nuevo patrón de ráfagas
 
+	// Configurar efectos de aparición para Boss_4 (eléctrico/amarillo)
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
+	
+	if (AppearanceEffectAsset.Succeeded())
+	{
+		AppearanceEffect = AppearanceEffectAsset.Object;
+	}
+
+	// Efecto de destrucción eléctrico para Boss_4
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
+		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+	
+	if (DestructionEffectAsset.Succeeded())
+	{
+		DestructionEffect = DestructionEffectAsset.Object;
+	}
+	
+	DestructionEffectScale = FVector(4.5f, 4.5f, 4.5f);
+
 	// Configurar movimiento pesado pero constante
 	if (MoveComp)
 	{
