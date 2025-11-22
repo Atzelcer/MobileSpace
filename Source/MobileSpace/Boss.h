@@ -12,6 +12,8 @@
 #include "AtackComponent.h"
 #include "Boss.generated.h"
 
+
+
 UCLASS()
 class MOBILESPACE_API ABoss : public AActor
 {
@@ -129,7 +131,8 @@ public:
 		const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintCallable)
-	void TakeDamage(int32 DamageAmount);
+	void ApplyBossDamage(int32 DamageAmount);
+
 
 	UFUNCTION(BlueprintCallable)
 	virtual void DestroyBoss();

@@ -111,20 +111,20 @@ void ABoss::OnBossHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherAct
 {
 	if (OtherActor && OtherActor->IsA(AMobileSpaceProjectile::StaticClass()))
 	{
-		TakeDamage(100);
+		ApplyBossDamage(100);
 		OtherActor->Destroy();
 	}
 }
 
-void ABoss::TakeDamage(int32 DamageAmount)
+void ABoss::ApplyBossDamage(int32 DamageAmount)
 {
 	// Debug: mostrar daño y vida actual
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, 
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red,
 			FString::Printf(TEXT("Boss recibe %d daño. Vida: %d/%d"), DamageAmount, CurrentHealth - DamageAmount, BossHealth));
 	}
-	
+
 	CurrentHealth -= DamageAmount;
 
 	if (CurrentHealth <= 0)
@@ -132,6 +132,23 @@ void ABoss::TakeDamage(int32 DamageAmount)
 		DestroyBoss();
 	}
 }
+
+//void ABoss::TakeDamage(int32 DamageAmount)
+//{
+//	// Debug: mostrar daño y vida actual
+//	if (GEngine)
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, 
+//			FString::Printf(TEXT("Boss recibe %d daño. Vida: %d/%d"), DamageAmount, CurrentHealth - DamageAmount, BossHealth));
+//	}
+//	
+//	CurrentHealth -= DamageAmount;
+//
+//	if (CurrentHealth <= 0)
+//	{
+//		DestroyBoss();
+//	}
+//}
 
 void ABoss::DestroyBoss()
 {

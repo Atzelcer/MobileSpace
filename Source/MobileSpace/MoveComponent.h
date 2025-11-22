@@ -16,9 +16,15 @@ enum class EArcadeMovement : uint8
 	WavyWave,
 	ExpandingCircle,
 	BossMajesticArc,
-	SuperSequence
-	
+	SuperSequence,
+	BossSlowSweep,
+	BossSpiral,
+	BossThreatening,
+	BossCircularDominance,
+	BossErraticPower,
+	BossSineWave 
 };
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MOBILESPACE_API UMoveComponent : public UActorComponent
