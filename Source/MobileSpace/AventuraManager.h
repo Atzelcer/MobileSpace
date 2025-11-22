@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Ship_X.h"
-#include "Boss_Z.h"
+//#include "Boss_Z.h"
 #include "ShipFactoryGeneral.h"
 #include "MobEnums.h"
 #include "AventuraManager.generated.h"
@@ -61,8 +61,8 @@ protected:
     UPROPERTY()
     int32 CurrentWave;
 
-    UPROPERTY()
-    ABoss_Z* CurrentBoss;
+    //UPROPERTY()
+    //ABoss_Z* CurrentBoss;
 
     UPROPERTY()
     FTimerHandle WaveTimerHandle;

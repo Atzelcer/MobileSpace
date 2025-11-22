@@ -17,6 +17,7 @@ enum class EAttackPattern : uint8
     Circular
 };
 
+
 UENUM(BlueprintType)
 enum class EArcadeMovement : uint8
 {
@@ -30,6 +31,7 @@ enum class EArcadeMovement : uint8
     SuperSequence
 };
 
+
 UENUM(BlueprintType)
 enum class ENaveTipo : uint8
 {
@@ -40,6 +42,7 @@ enum class ENaveTipo : uint8
     Alfa,
     Omega
 };
+
 
 UENUM(BlueprintType)
 enum class EShipRole : uint8
@@ -55,6 +58,8 @@ enum class EShipRole : uint8
     Rafaga,
     Tanque
 };
+
+
 
 UENUM(BlueprintType)
 enum class EFormationType : uint8

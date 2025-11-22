@@ -7,9 +7,9 @@
 #include "Ship_CazadorRojo.h"
 #include "Ship_CazadorAzul.h"
 #include "Ship_CazadorOmega.h"
-#include "DKraken_Boss_Z.h"
-#include "DragonR_Boss_Z.h"
-#include "DragonT_Boss_Z.h"
+//#include "DKraken_Boss_Z.h"
+//#include "DragonR_Boss_Z.h"
+//#include "DragonT_Boss_Z.h"
 #include "MobileSpacePawn.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
@@ -17,7 +17,7 @@
 #include "Components/AudioComponent.h"
 #include "MegaPortal.h"
 #include "MegaObstaculo.h"
-#include "Boss_Z.h"
+//#include "Boss_Z.h"
 #include "HUDmain.h"
 #include "MegaPlataforma.h"
 
@@ -27,7 +27,7 @@ AAventuraManager::AAventuraManager()
 
 	NivelActual = 1;
 	CurrentWave = 1;
-	CurrentBoss = nullptr;
+	//CurrentBoss = nullptr;
 
 	AudioComp_SonidoCarga = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp_SonidoCarga"));
 	AudioComp_SonidoCarga->SetupAttachment(RootComponent);
@@ -431,9 +431,9 @@ void AAventuraManager::SpawnBoss()
 
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ADKraken_Boss_Z* KrakenBoss = GetWorld()->SpawnActor<ADKraken_Boss_Z>(BossLocation, BossRotation, Params);
+	//ADKraken_Boss_Z* KrakenBoss = GetWorld()->SpawnActor<ADKraken_Boss_Z>(BossLocation, BossRotation, Params);
 
-	CurrentBoss = KrakenBoss;
+	//CurrentBoss = KrakenBoss;
 }
 
 
