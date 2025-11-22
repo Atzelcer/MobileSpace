@@ -9,19 +9,37 @@ ABoss_2::ABoss_2()
 
 	// Cargar la malla SM_CF2_Shuttle desde BOSSES
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BossMeshAsset(
-		TEXT("StaticMesh'/Game/BOSSES/SM_CF2_Shuttle.SM_CF2_Shuttle'"));
+		TEXT("StaticMesh'/Game/BOSSES/fast_texturing_output.fast_texturing_output'"));
 
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f)); // Tamaño medio
+		BossMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f)); // Tamaño medio
 	}
 
 	// Configuración específica para Boss_2
-	BossHealth = 2000;
+	BossHealth = 2800;
 	CurrentHealth = BossHealth;
 	FireRate = 1.5f;
 	AttackPattern = EAtackPattern::BossCircular; // Nuevo patrón circular
+
+	// Sonido de aparición para Boss_2 (fuego/potente)
+	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
+		TEXT("/Game/BOSS_SOUNDS/ApeerBoss01.ApeerBoss01"));
+	
+	if (AppearanceSoundAsset.Succeeded())
+	{
+		AppearanceSound = AppearanceSoundAsset.Object;
+	}
+
+	// Sonido de destrucción épico para Boss_2
+	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
+		TEXT("/Game/BOSS_SOUNDS/BOSS02_EXPLO.BOSS02_EXPLO"));
+	
+	if (DestructionSoundAsset.Succeeded())
+	{
+		DestructionSound = DestructionSoundAsset.Object;
+	}
 
 	// Configurar efectos de aparición para Boss_2 (fuego/rojo)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(

@@ -2,8 +2,6 @@
 
 #include "Boss_1.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Kismet/GameplayStatics.h"
-#include "Engine/World.h"
 
 ABoss_1::ABoss_1()
 {
@@ -43,7 +41,7 @@ ABoss_1::ABoss_1()
 	}
 
 	// Configuración específica para Boss_1
-	BossHealth = 1500;
+	BossHealth = 3000;
 	CurrentHealth = BossHealth;
 	FireRate = 1.8f;
 	AttackPattern = EAtackPattern::Spread;
@@ -75,34 +73,6 @@ ABoss_1::ABoss_1()
 	if (DestructionSoundAsset.Succeeded())
 	{
 		DestructionSound = DestructionSoundAsset.Object;
-	}
-}
-
-void ABoss_1::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-	// Solo rotar si no está en entrada épica
-	if (!bIsEntering)
-	{
-		// Buscar al jugador
-		APawn* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		if (Player)
-		{
-			// Calcular dirección hacia el jugador
-			FVector PlayerLocation = Player->GetActorLocation();
-			FVector BossLocation = GetActorLocation();
-			FVector Direction = PlayerLocation - BossLocation;
-			Direction.Z = 0.0f; // Mantener rotación solo en el plano XY
-			
-			// Convertir dirección a rotación
-			FRotator TargetRotation = Direction.Rotation();
-			
-			// Rotar suavemente hacia el jugador
-			FRotator CurrentRotation = GetActorRotation();
-			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 2.0f);
-			SetActorRotation(NewRotation);
-		}
 	}
 }
 

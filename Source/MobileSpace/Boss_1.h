@@ -16,8 +16,5 @@ class MOBILESPACE_API ABoss_1 : public ABoss
 
 public:
 	ABoss_1();
-
-	// Override Tick para rotar hacia el jugador
-	virtual void Tick(float DeltaTime) override;
 	
 };

@@ -14,14 +14,32 @@ ABoss_3::ABoss_3()
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(1.1f, 1.1f, 1.1f)); // Tamaño medio-grande
+		BossMesh->SetRelativeScale3D(FVector(5.1f, 5.1f, 5.1f)); // Tamaño medio-grande
 	}
 
 	// Configuración específica para Boss_3 - Más agresivo
-	BossHealth = 1800;
+	BossHealth = 2800;
 	CurrentHealth = BossHealth;
 	FireRate = 1.2f; // Dispara más rápido
 	AttackPattern = EAtackPattern::BossSpiral; // Nuevo patrón en espiral
+
+	// Sonido de aparición para Boss_3 (agresivo/ácido)
+	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
+		TEXT("SoundWave'/Game/BOSS_SOUNDS/Roi.Roi'"));
+	
+	if (AppearanceSoundAsset.Succeeded())
+	{
+		AppearanceSound = AppearanceSoundAsset.Object;
+	}
+
+	// Sonido de destrucción épico para Boss_3
+	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
+		TEXT("/Game/BOSS_SOUNDS/EXPLO_BOSS.EXPLO_BOSS"));
+	
+	if (DestructionSoundAsset.Succeeded())
+	{
+		DestructionSound = DestructionSoundAsset.Object;
+	}
 
 	// Configurar efectos de aparición para Boss_3 (veneno/verde)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
@@ -34,7 +52,7 @@ ABoss_3::ABoss_3()
 
 	// Efecto de destrucción verde para Boss_3
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/Umbrella/Par_FW_Umbr_03_Tiny.Par_FW_Umbr_03_Tiny'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{
@@ -47,7 +65,7 @@ ABoss_3::ABoss_3()
 	if (MoveComp)
 	{
 		MoveComp->Pattern = EArcadeMovement::BossThreatening; // Nuevo patrón amenazante
-		MoveComp->Speed = 180.0f; // Más rápido
+		MoveComp->Speed = 140.0f; // Más rápido
 		MoveComp->Amplitude = 350.0f;
 		MoveComp->Frequency = 0.6f;
 	}
