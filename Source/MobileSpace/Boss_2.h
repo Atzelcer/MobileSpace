@@ -6,9 +6,6 @@
 #include "Boss.h"
 #include "Boss_2.generated.h"
 
-/**
- * Jefe 2 - Nave CF2 Shuttle
- */
 UCLASS()
 class MOBILESPACE_API ABoss_2 : public ABoss
 {
