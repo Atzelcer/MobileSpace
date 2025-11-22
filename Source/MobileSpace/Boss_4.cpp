@@ -14,14 +14,32 @@ ABoss_4::ABoss_4()
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(1.3f, 1.3f, 1.3f)); // Más grande = más fuerte
+		BossMesh->SetRelativeScale3D(FVector(5.3f, 5.3f, 5.3f)); // Más grande = más fuerte
 	}
 
 	// Configuración específica para Boss_4 - Tanque pesado
-	BossHealth = 2500;
+	BossHealth = 2900;
 	CurrentHealth = BossHealth;
 	FireRate = 1.0f; // Dispara lento pero fuerte
-	AttackPattern = EAtackPattern::BossWaveBarrage; // Nuevo patrón de ráfagas
+	AttackPattern = EAtackPattern::BossSpiral; // Nuevo patrón de ráfagas
+
+	// Sonido de aparición para Boss_4 (pesado/eléctrico)
+	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
+		TEXT("SoundWave'/Game/BOSS_SOUNDS/FLUX.FLUX'"));
+	
+	if (AppearanceSoundAsset.Succeeded())
+	{
+		AppearanceSound = AppearanceSoundAsset.Object;
+	}
+
+	// Sonido de destrucción poderoso para Boss_4 (tanque pesado)
+	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
+		TEXT("/Game/BOSS_SOUNDS/EX_GALAGAEXPLOTION.EX_GALAGAEXPLOTION"));
+	
+	if (DestructionSoundAsset.Succeeded())
+	{
+		DestructionSound = DestructionSoundAsset.Object;
+	}
 
 	// Configurar efectos de aparición para Boss_4 (eléctrico/amarillo)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
@@ -34,7 +52,7 @@ ABoss_4::ABoss_4()
 
 	// Efecto de destrucción eléctrico para Boss_4
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/SawSpark/Par_FW_Saw_01_Rain_Tiny.Par_FW_Saw_01_Rain_Tiny'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{

@@ -93,6 +93,9 @@ protected:
 	FVector StartPosition; // Posición inicial de entrada (arriba)
 	bool bIsEntering = true; // ¿Está en animación de entrada?
 	float EntranceTimeElapsed = 0.0f;
+	
+	// Control para evitar rotación inmediata después de entrada
+	bool bCanRotate = false;
 
 	// Función de disparo automático
 	UFUNCTION()

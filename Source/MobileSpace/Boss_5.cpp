@@ -14,14 +14,33 @@ ABoss_5::ABoss_5()
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(0.9f, 0.9f, 0.9f)); // Tamaño medio
+		BossMesh->SetRelativeScale3D(FVector(4.9f, 4.9f, 4.9f)); // Tamaño medio
+		BossMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f)); // Rotar para mirar hacia adelante
 	}
 
 	// Configuración específica para Boss_5 - Especialista en ráfagas
-	BossHealth = 1700;
+	BossHealth = 3600;
 	CurrentHealth = BossHealth;
-	FireRate = 0.8f; // Ráfagas muy rápidas
+	FireRate = 1.7f; // Ráfagas muy rápidas
 	AttackPattern = EAtackPattern::BossTargeted; // Nuevo patrón dirigido
+
+	// Sonido de aparición para Boss_5 (rápido/plasma)
+	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
+		TEXT("SoundWave'/Game/BOSS_SOUNDS/Descons.Descons'"));
+	
+	if (AppearanceSoundAsset.Succeeded())
+	{
+		AppearanceSound = AppearanceSoundAsset.Object;
+	}
+
+	// Sonido de destrucción explosivo para Boss_5 (rápido)
+	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
+		TEXT("SoundWave'/Game/MFK/Sounds/Explode/A_Explode_06.A_Explode_06'"));
+	
+	if (DestructionSoundAsset.Succeeded())
+	{
+		DestructionSound = DestructionSoundAsset.Object;
+	}
 
 	// Configurar efectos de aparición para Boss_5 (plasma/púrpura)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
@@ -34,7 +53,7 @@ ABoss_5::ABoss_5()
 
 	// Efecto de destrucción plasma para Boss_5
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles/SawSpark/Par_FW_Saw_01_Rain.Par_FW_Saw_01_Rain'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/SawSpark/Par_FW_Saw_01_Rain_Tiny.Par_FW_Saw_01_Rain_Tiny'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{

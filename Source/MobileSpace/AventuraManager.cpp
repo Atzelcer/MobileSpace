@@ -15,7 +15,7 @@
 #include "MegaPortal.h"
 #include "MegaObstaculo.h"
 #include "HUDmain.h"
-#include "Boss_1.h"
+#include "Boss_6.h"
 
 
 AAventuraManager::AAventuraManager()
@@ -393,7 +393,7 @@ void AAventuraManager::Nivel1()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
-		ABoss_1* Boss = GetWorld()->SpawnActor<ABoss_1>(ABoss_1::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
+		ABoss_6* Boss = GetWorld()->SpawnActor<ABoss_6>(ABoss_6::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
 		
 		if (Boss)
 		{

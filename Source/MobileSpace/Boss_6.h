@@ -20,11 +20,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	// Override del ataque especial para el jefe final
-	virtual void SpecialAttack() override;
-
-	// Override de destrucción para limpiar timers específicos
-	virtual void DestroyBoss() override;
+	
 
 	// Control de fases de ataque del jefe final
 	UFUNCTION()
