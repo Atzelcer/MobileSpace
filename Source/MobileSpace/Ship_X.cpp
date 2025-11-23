@@ -38,11 +38,11 @@ AShip_X::AShip_X()
         TrailEffect->SetWorldScale3D(FVector(2.5f, 2.5f, 2.5f));
     }
 
-    static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSound(TEXT("SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
+    static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSound(TEXT("SoundWave'/Game/GoodFXLevelUp/SFX/Sound_Wave/A_GFXLU_Iron_Impact.A_GFXLU_Iron_Impact'"));
     if (ExplosionSound.Succeeded())
         SonidoExplosion = ExplosionSound.Object;
 
-    static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionFX(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_explosion.P_ky_explosion'"));
+    static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Fireball03_Orange.P_Hit_Fireball03_Orange'"));
     if (ExplosionFX.Succeeded())
         DestructionEffect = ExplosionFX.Object;
 
@@ -50,14 +50,12 @@ AShip_X::AShip_X()
 
     ProbabilidadSpawnCapsula = 23;
 
-    Tipo = ENaveTipo::Roja;
-    ShipRole = EShipRole::Normal;
 
     MovementPattern = EArcadeMovement::Wave;
-    AttackPattern = EAttackPattern::Single;
+    AttackPattern = EAtackPattern::Single;
 
-
-    bFireEnabled = false;
+    // Habilitar disparo por defecto para enemigos
+    bFireEnabled = true;
     bUseFormation = false;
     bPuedeAtacar = true;
 
@@ -70,6 +68,21 @@ void AShip_X::BeginPlay()
     Super::BeginPlay();
     if (MoveComp)
         MoveComp->Pattern = MovementPattern;
+        
+    // Iniciar disparo automÃ¡tico con delay aleatorio
+    if (bFireEnabled && AttackComp)
+    {
+        float RandomDelay = FMath::FRandRange(0.5f, 2.0f);
+        FTimerDelegate TimerDelegate;
+        TimerDelegate.BindUFunction(this, FName("StartAutoFire"));
+        
+        GetWorld()->GetTimerManager().SetTimer(
+            AutoFireTimer,
+            TimerDelegate,
+            RandomDelay,
+            false
+        );
+    }
 }
 
 void AShip_X::Tick(float DeltaTime)
@@ -79,7 +92,7 @@ void AShip_X::Tick(float DeltaTime)
     FVector Loc = GetActorLocation();
 
     // ============================================================
-    // TELETRANSPORTACIÓN AL SALIR POR EL BORDE IZQUIERDO
+    // TELETRANSPORTACIï¿½N AL SALIR POR EL BORDE IZQUIERDO
     // ============================================================
     const float MinX = -1400.f;
     const float MaxX = 1400.f;
@@ -94,7 +107,7 @@ void AShip_X::Tick(float DeltaTime)
     }
 
     // ============================================================
-    // MOVIMIENTO POR FORMACIÓN
+    // MOVIMIENTO POR FORMACIï¿½N
     // ============================================================
     if (bUseFormation)
     {
@@ -103,27 +116,8 @@ void AShip_X::Tick(float DeltaTime)
         SetActorLocation(NewPos);
     }
 
-    // ============================================================
-    // MOVIMIENTO PERSEGUIDOR
-    // ============================================================
-    if (ShipRole == EShipRole::Perseguidor)
-    {
-        APawn* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-        if (Player)
-        {
-            FVector Dir = (Player->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-            SetActorRotation(Dir.Rotation());
 
-            FVector Forward = GetActorForwardVector() * 500.f * DeltaTime;
-            AddActorWorldOffset(Forward, true);
-        }
-    }
-
-    // ============================================================
-    // ATAQUE AUTOMÁTICO
-    // ============================================================
-    if (bFireEnabled)
-        FireIfReady();
+ 
 }
 
 
@@ -134,7 +128,7 @@ void AShip_X::SetMovement(EArcadeMovement NewPattern)
         MoveComp->Pattern = NewPattern;
 }
 
-void AShip_X::SetAttackPattern(EAttackPattern NewPattern)
+void AShip_X::SetAttackPattern(EAtackPattern NewPattern)
 {
     AttackPattern = NewPattern;
 }
@@ -144,25 +138,7 @@ void AShip_X::EnableFire(bool Enabled)
     bFireEnabled = Enabled;
 }
 
-void AShip_X::SetRole(EShipRole NewRole)
-{
-    ShipRole = NewRole;
-}
 
-void AShip_X::SetFormation(EFormationType Type, FVector Offset, FVector Anchor)
-{
-    FormationOffset = Offset;
-    FormationAnchor = Anchor;
-    bUseFormation = true;
-}
-
-void AShip_X::FireIfReady()
-{
-    if (!AttackComp) return;
-    if (!bPuedeAtacar) return;
-
-    AttackComp->RequestFire();
-}
 
 void AShip_X::OnShipHit(UPrimitiveComponent* OverlappedComponent,
     AActor* OtherActor,
@@ -177,6 +153,12 @@ void AShip_X::OnShipHit(UPrimitiveComponent* OverlappedComponent,
 
 void AShip_X::HandleDestruction()
 {
+    // Limpiar timer de disparo automÃ¡tico
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(AutoFireTimer);
+    }
+    
     if (DestructionEffect)
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DestructionEffect, GetActorLocation(), GetActorRotation(), DestructionEffectScale);
 
@@ -212,10 +194,26 @@ void AShip_X::SetAttackState(bool Estado)
     bPuedeAtacar = Estado;
 }
 
-void AShip_X::ForzarDisparo()
+void AShip_X::StartAutoFire()
 {
-    if (!AttackComp) return;
-    if (!bPuedeAtacar) return;
-
-    AttackComp->RequestFire();
+    if (bFireEnabled && AttackComp && bPuedeAtacar)
+    {
+        // Iniciar timer de disparo automÃ¡tico
+        GetWorld()->GetTimerManager().SetTimer(
+            AutoFireTimer,
+            this,
+            &AShip_X::AutoFire,
+            TimeBetweenShots,
+            true  // Repetir
+        );
+    }
 }
+
+void AShip_X::AutoFire()
+{
+    if (bFireEnabled && AttackComp && bPuedeAtacar)
+    {
+        AttackComp->Fire(AttackPattern);
+    }
+}
+

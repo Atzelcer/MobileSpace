@@ -13,11 +13,9 @@ AShip_CazadorDelta::AShip_CazadorDelta()
         ShipMesh->SetRelativeScale3D(FVector(0.3f));
     }
 
-    Tipo = ENaveTipo::Delta;
     MovementPattern = EArcadeMovement::SuperSequence;
 
-    AttackPattern = EAttackPattern::Burst;
-    ShipRole = EShipRole::Rafaga;
+    AttackPattern = EAtackPattern::Burst;
 
     TimeBetweenShots = 2.5f;
     bFireEnabled = true;

@@ -7,23 +7,20 @@ ABoss_4::ABoss_4()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Cargar la malla SM_SkyFly_v08 desde BOSSES
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BossMeshAsset(
-		TEXT("StaticMesh'/Game/BOSSES/SM_SkyFly_v08.SM_SkyFly_v08'"));
+		TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow20.SM_StarSparrow20'"));
 
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(5.3f, 5.3f, 5.3f)); // Más grande = más fuerte
+		BossMesh->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f)); 
 	}
 
-	// Configuración específica para Boss_4 - Tanque pesado
 	BossHealth = 2900;
 	CurrentHealth = BossHealth;
-	FireRate = 1.0f; // Dispara lento pero fuerte
-	AttackPattern = EAtackPattern::BossSpiral; // Nuevo patrón de ráfagas
+	FireRate = 1.0f; 
+	AttackPattern = EAtackPattern::BossSpiral; 
 
-	// Sonido de aparición para Boss_4 (pesado/eléctrico)
 	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
 		TEXT("SoundWave'/Game/BOSS_SOUNDS/FLUX.FLUX'"));
 	
@@ -32,7 +29,6 @@ ABoss_4::ABoss_4()
 		AppearanceSound = AppearanceSoundAsset.Object;
 	}
 
-	// Sonido de destrucción poderoso para Boss_4 (tanque pesado)
 	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
 		TEXT("/Game/BOSS_SOUNDS/EX_GALAGAEXPLOTION.EX_GALAGAEXPLOTION"));
 	
@@ -41,7 +37,6 @@ ABoss_4::ABoss_4()
 		DestructionSound = DestructionSoundAsset.Object;
 	}
 
-	// Configurar efectos de aparición para Boss_4 (eléctrico/amarillo)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
 		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
@@ -50,9 +45,8 @@ ABoss_4::ABoss_4()
 		AppearanceEffect = AppearanceEffectAsset.Object;
 	}
 
-	// Efecto de destrucción eléctrico para Boss_4
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/SawSpark/Par_FW_Saw_01_Rain_Tiny.Par_FW_Saw_01_Rain_Tiny'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{
@@ -61,13 +55,36 @@ ABoss_4::ABoss_4()
 	
 	DestructionEffectScale = FVector(4.5f, 4.5f, 4.5f);
 
-	// Configurar movimiento pesado pero constante
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailAsset(
+		TEXT("ParticleSystem'/Game/VFXSeries1/Particles/Tails/P_RocketTypeB.P_RocketTypeB'"));
+	if (TrailAsset.Succeeded())
+	{
+		TrailEffect = TrailAsset.Object;
+		TrailParticleComponent->SetRelativeRotation(FRotator(0.f, -180.f, 0.f));
+		TrailParticleComponent->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+
+	}
+
+	TrailOffset = FVector(-400.0f, 0.0f, 0.0f);
+
+	bTrailActiveOnSpawn = true;
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
+	if (ForceFieldAsset.Succeeded())
+	{
+		ForceFieldSystem = ForceFieldAsset.Object;
+
+	}
+	ForceFieldScale = FVector(1.0f, 1.0f, 1.0f);
 	if (MoveComp)
 	{
-		MoveComp->Pattern = EArcadeMovement::BossCircularDominance; // Nuevo patrón dominante
-		MoveComp->Speed = 80.0f; // Más lento pero resistente
+		MoveComp->Pattern = EArcadeMovement::BossCircularDominance;
+		MoveComp->Speed = 80.0f; 
 		MoveComp->Amplitude = 200.0f;
 		MoveComp->Frequency = 0.25f;
+	}
+	if (BossCollision)
+	{
+		BossCollision->SetBoxExtent(FVector(550.0f, 450.0f, 450.0f)); 
 	}
 }
 

@@ -1,5 +1,4 @@
 #include "Ship_CazadorVerde.h"
-#include "MobEnums.h"
 #include "UObject/ConstructorHelpers.h"
 
 AShip_CazadorVerde::AShip_CazadorVerde()
@@ -14,11 +13,9 @@ AShip_CazadorVerde::AShip_CazadorVerde()
         ShipMesh->SetRelativeScale3D(FVector(0.4f));
     }
 
-    Tipo = ENaveTipo::Verde;
     MovementPattern = EArcadeMovement::SuperSequence;
 
-    AttackPattern = EAttackPattern::Single;
-    ShipRole = EShipRole::Normal;
+    AttackPattern = EAtackPattern::Single;
 
     TimeBetweenShots = 2.0f;
     bFireEnabled = true;

@@ -7,12 +7,16 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h" 
 #include "Sound/SoundBase.h"
 #include "MoveComponent.h"
 #include "AtackComponent.h"
 #include "Boss.generated.h"
 
-
+class AHUDmain;
+class UWidgetMegaBoss;
 
 UCLASS()
 class MOBILESPACE_API ABoss : public AActor
@@ -20,10 +24,8 @@ class MOBILESPACE_API ABoss : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ABoss();
 
-	// ===== COMPONENTES BASE =====
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* BossMesh;
 
@@ -36,11 +38,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UAtackComponent* AttackComp;
 
-	// Componente de audio para sonidos del boss
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UAudioComponent* BossAudioComponent;
 
-	// ===== PROPIEDADES DE COMBATE =====
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	int32 BossHealth = 1000;
 
@@ -53,9 +53,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	EAtackPattern AttackPattern = EAtackPattern::Spread;
 
-	// ===== EFECTOS Y AUDIO =====
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
 	UParticleSystem* DestructionEffect;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UParticleSystemComponent* TrailParticleComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
 	USoundBase* DestructionSound;
@@ -63,7 +65,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
 	FVector DestructionEffectScale = FVector(2.0f, 2.0f, 2.0f);
 
-	// ===== ENTRADA ÉPICA =====
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UNiagaraComponent* ForceFieldComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|ForceField")
+	UNiagaraSystem* ForceFieldSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|ForceField")
+	FVector ForceFieldScale = FVector(2.f, 2.f, 2.f);
+
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Epic Entrance")
 	USoundBase* AppearanceSound;
 
@@ -71,43 +83,52 @@ public:
 	UParticleSystem* AppearanceEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Epic Entrance")
-	float EntranceHeight = 800.0f; // Altura desde donde aparece
+	float EntranceHeight = 800.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Epic Entrance")
-	float EntranceSpeed = 300.0f; // Velocidad de bajada
+	float EntranceSpeed = 300.0f; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Epic Entrance")
-	float EntranceDuration = 3.0f; // Duración de la entrada
+	float EntranceDuration = 3.0f; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|Trail")
+	bool bTrailActiveOnSpawn = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|Trail")
+	FVector TrailOffset = FVector(0.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|Trail")
+	UParticleSystem* TrailEffect = nullptr;
 
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 
-	// Timer para disparo automático
+	
 	FTimerHandle FireTimerHandle;
 
-	// Timer para ataque especial del jefe final
+	
 	FTimerHandle SpecialAttackTimerHandle;
 
-	// ===== SISTEMA DE ENTRADA ÉPICA =====
 	FTimerHandle EntranceTimerHandle;
-	FVector FinalPosition; // Posición final donde quedará el jefe
-	FVector StartPosition; // Posición inicial de entrada (arriba)
-	bool bIsEntering = true; // ¿Está en animación de entrada?
+	FVector FinalPosition; 
+	FVector StartPosition; 
+	bool bIsEntering = true; 
 	float EntranceTimeElapsed = 0.0f;
 	
-	// Control para evitar rotación inmediata después de entrada
 	bool bCanRotate = false;
 
-	// Función de disparo automático
+	
+
+	UPROPERTY()
+	AHUDmain* MainHUD;
+
 	UFUNCTION()
 	void AutoFire();
 
-	// Función de ataque especial (solo para jefe final)
 	UFUNCTION()
 	virtual void SpecialAttack() {};
 
-	// ===== FUNCIONES DE ENTRADA ÉPICA =====
 	UFUNCTION()
 	void StartEpicEntrance();
 
@@ -118,10 +139,8 @@ protected:
 	void FinishEntrance();
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// ===== FUNCIONES DE COMBATE =====
 	UFUNCTION()
 	void OnBossHit(UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -136,5 +155,22 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void DestroyBoss();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowBossHealthBar();
+
+	UFUNCTION(BlueprintCallable)
+	void HideBossHealthBar();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateBossHealthBar();
+
+	UFUNCTION(BlueprintCallable, Category = "VFX")
+	void ActivateTrail();
+
+	UFUNCTION(BlueprintCallable, Category = "VFX")
+	void DeactivateTrail();
+
+
 
 };

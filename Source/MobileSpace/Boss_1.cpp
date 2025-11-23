@@ -7,14 +7,13 @@ ABoss_1::ABoss_1()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Cargar la malla Intrepid_Type1 desde BOSSES
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BossMeshAsset(
-		TEXT("StaticMesh'/Game/BOSSES/Intrepid_Type1.Intrepid_Type1'"));
+		TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow11.SM_StarSparrow11'"));
 
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(5.2f, 5.2f, 5.2f));
+		BossMesh->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
 		
 	}
 	
@@ -26,27 +25,37 @@ ABoss_1::ABoss_1()
 		AppearanceSound = AppearanceSoundAsset.Object;
 	}
 	
-	// Configurar entrada épica
 	EntranceHeight = 800.0f;
 	EntranceSpeed = 200.0f;
 	EntranceDuration = 4.0f;
 
-	// Configurar efectos de aparición para Boss_1 (azul/hielo)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/FlatRings/Par_FW_FlatRing_03_Rain_Tiny.Par_FW_FlatRing_03_Rain_Tiny'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
 	if (AppearanceEffectAsset.Succeeded())
 	{
 		AppearanceEffect = AppearanceEffectAsset.Object;
 	}
 
-	// Configuración específica para Boss_1
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailAsset(
+		TEXT("ParticleSystem'/Game/VFXSeries1/Particles/Tails/P_RocketTypeB.P_RocketTypeB'"));
+	if (TrailAsset.Succeeded())
+	{
+		TrailEffect = TrailAsset.Object;
+		TrailParticleComponent->SetRelativeRotation(FRotator(0.f, -180.f, 0.f));
+		TrailParticleComponent->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+
+	}
+
+	TrailOffset = FVector(-400.0f, 0.0f, 0.0f); 
+
+	bTrailActiveOnSpawn = true; 
+
 	BossHealth = 3000;
 	CurrentHealth = BossHealth;
 	FireRate = 1.8f;
 	AttackPattern = EAtackPattern::Spread;
 
-	// Configurar movimiento específico
 	if (MoveComp)
 	{
 		MoveComp->Speed = 120.0f;
@@ -54,25 +63,33 @@ ABoss_1::ABoss_1()
 		MoveComp->Frequency = 0.4f;
 	}
 
-	// Configurar efectos de destrucción
 	DestructionEffectScale = FVector(3.0f, 3.0f, 3.0f);
 	
-	// Efecto de destrucción azul para Boss_1
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/Umbrella/Par_FW_Umbr_03_Tiny.Par_FW_Umbr_03_Tiny'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{
 		DestructionEffect = DestructionEffectAsset.Object;
 	}
 	
-	// Cargar sonido de destrucción
 	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
-		TEXT("/Game/BOSS_SOUNDS/EXPLO_BOSS.EXPLO_BOSS"));
+		TEXT("SoundWave'/Game/GoodFXLevelUp/SFX/Sound_Wave/A_GFXLU_cinematic-hit-deep-and-dirty-thud-with-pitch-time-wobble.A_GFXLU_cinematic-hit-deep-and-dirty-thud-with-pitch-time-wobble'"));
 	
 	if (DestructionSoundAsset.Succeeded())
 	{
 		DestructionSound = DestructionSoundAsset.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
+	if (ForceFieldAsset.Succeeded())
+	{
+		ForceFieldSystem = ForceFieldAsset.Object;
+
+	}
+	ForceFieldScale = FVector(1.3f, 1.3f, 1.3f); 
+	if (BossCollision)
+	{
+		BossCollision->SetBoxExtent(FVector(500.0f, 400.0f, 400.0f));
 	}
 }
 

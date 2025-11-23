@@ -45,10 +45,10 @@ void AMegaObstaculo::AsignarMallaAleatoria()
 
 	switch (TipoObstaculo)
 	{
-	case 1: Path = TEXT("StaticMesh'/Game/RockEnv_Pack/Meshes/Cave_Rocks/SM_Rock_Cave_5.SM_Rock_Cave_5'"); break;
-	case 2: Path = TEXT("StaticMesh'/Game/RockEnv_Pack/Meshes/Cave_Rocks/SM_Rock_Cave_4.SM_Rock_Cave_4'"); break;
-	case 3: Path = TEXT("StaticMesh'/Game/RockEnv_Pack/Meshes/Cave_Rocks/SM_Rock_Cave_2.SM_Rock_Cave_2'"); break;
-	case 4: Path = TEXT("StaticMesh'/Game/RockEnv_Pack/Meshes/Cave_Rocks/SM_Rock_Cave_1.SM_Rock_Cave_1'"); break;
+	case 1: Path = TEXT("StaticMesh'/Game/CF2Shuttle/Meshes/Asteroids/SM_Asteroid_A.SM_Asteroid_A'"); break;
+	case 2: Path = TEXT("StaticMesh'/Game/CF2Shuttle/Meshes/Asteroids/SM_Asteroid_A.SM_Asteroid_A'"); break;
+	case 3: Path = TEXT("StaticMesh'/Game/CF2Shuttle/Meshes/Asteroids/SM_Asteroid_B.SM_Asteroid_B'"); break;
+	case 4: Path = TEXT("StaticMesh'/Game/CF2Shuttle/Meshes/Asteroids/SM_Asteroid_B.SM_Asteroid_B'"); break;
 	default: return;
 	}
 
@@ -91,14 +91,32 @@ void AMegaObstaculo::DestruirObstaculo()
 void AMegaObstaculo::MoverObstaculo(float DeltaTime)
 {
 	FVector NuevaPos = GetActorLocation();
-	NuevaPos.X -= VelocidadMovimiento * DeltaTime;
+	
+	if (bMovimientoDiagonal)
+	{
+		// Movimiento diagonal usando la dirección configurada
+		NuevaPos += DireccionMovimiento * VelocidadMovimiento * DeltaTime;
+	}
+	else
+	{
+		// Movimiento tradicional solo en X (hacia la izquierda)
+		NuevaPos.X -= VelocidadMovimiento * DeltaTime;
+	}
+	
 	SetActorLocation(NuevaPos);
 }
 
 void AMegaObstaculo::VerificarDestruccion()
 {
-	if (GetActorLocation().X <= -1500.000244f)
+	FVector Pos = GetActorLocation();
+	
+	// Verificar si está fuera de los límites del mapa
+	if (Pos.X <= -1500.0f || Pos.X >= 2000.0f || 
+	    Pos.Y <= -3500.0f || Pos.Y >= 3500.0f ||
+	    Pos.Z <= -500.0f || Pos.Z >= 1000.0f)
+	{
 		Destroy();
+	}
 }
 
 void AMegaObstaculo::SetVelocidadMovimiento(float NuevaVelocidad)

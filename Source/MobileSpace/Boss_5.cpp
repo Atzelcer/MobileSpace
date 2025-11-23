@@ -7,24 +7,21 @@ ABoss_5::ABoss_5()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Cargar la malla tempes desde BOSSES
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BossMeshAsset(
-		TEXT("StaticMesh'/Game/BOSSES/tempes.tempes'"));
+		TEXT("StaticMesh'/Game/StarSparrow/Meshes/Examples/SM_StarSparrow10.SM_StarSparrow10'"));
 
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(4.9f, 4.9f, 4.9f)); // Tamaño medio
-		BossMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f)); // Rotar para mirar hacia adelante
+		BossMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+		BossMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f)); 
 	}
 
-	// Configuración específica para Boss_5 - Especialista en ráfagas
 	BossHealth = 3600;
 	CurrentHealth = BossHealth;
-	FireRate = 1.7f; // Ráfagas muy rápidas
-	AttackPattern = EAtackPattern::BossTargeted; // Nuevo patrón dirigido
+	FireRate = 1.7f; 
+	AttackPattern = EAtackPattern::BossTargeted;
 
-	// Sonido de aparición para Boss_5 (rápido/plasma)
 	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
 		TEXT("SoundWave'/Game/BOSS_SOUNDS/Descons.Descons'"));
 	
@@ -33,7 +30,6 @@ ABoss_5::ABoss_5()
 		AppearanceSound = AppearanceSoundAsset.Object;
 	}
 
-	// Sonido de destrucción explosivo para Boss_5 (rápido)
 	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
 		TEXT("SoundWave'/Game/MFK/Sounds/Explode/A_Explode_06.A_Explode_06'"));
 	
@@ -42,7 +38,6 @@ ABoss_5::ABoss_5()
 		DestructionSound = DestructionSoundAsset.Object;
 	}
 
-	// Configurar efectos de aparición para Boss_5 (plasma/púrpura)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
 		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
@@ -51,9 +46,8 @@ ABoss_5::ABoss_5()
 		AppearanceEffect = AppearanceEffectAsset.Object;
 	}
 
-	// Efecto de destrucción plasma para Boss_5
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/SawSpark/Par_FW_Saw_01_Rain_Tiny.Par_FW_Saw_01_Rain_Tiny'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{
@@ -62,13 +56,37 @@ ABoss_5::ABoss_5()
 	
 	DestructionEffectScale = FVector(5.0f, 5.0f, 5.0f);
 
-	// Configurar movimiento errático
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailAsset(
+		TEXT("ParticleSystem'/Game/VFXSeries1/Particles/Tails/P_RocketTypeB.P_RocketTypeB'"));
+	if (TrailAsset.Succeeded())
+	{
+		TrailEffect = TrailAsset.Object;
+		TrailParticleComponent->SetRelativeRotation(FRotator(0.f, -180.f, 0.f));
+		TrailParticleComponent->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+
+	}
+
+	TrailOffset = FVector(-400.0f, 0.0f, 0.0f);
+
+	bTrailActiveOnSpawn = true;
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
+	if (ForceFieldAsset.Succeeded())
+	{
+		ForceFieldSystem = ForceFieldAsset.Object;
+
+	}
+	ForceFieldScale = FVector(1.0f, 1.0f, 1.0f);
 	if (MoveComp)
 	{
-		MoveComp->Pattern = EArcadeMovement::BossErraticPower; // Nuevo patrón errático
-		MoveComp->Speed = 200.0f; // Muy móvil
+		MoveComp->Pattern = EArcadeMovement::BossErraticPower;
+		MoveComp->Speed = 200.0f; 
 		MoveComp->Amplitude = 400.0f;
 		MoveComp->Frequency = 0.7f;
+	}
+
+	if (BossCollision)
+	{
+		BossCollision->SetBoxExtent(FVector(500.0f, 600.0f, 400.0f)); 
 	}
 }
 

@@ -4,8 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "MobEnums.h"
 #include "ShipFactoryGeneral.generated.h"
+
+UENUM(BlueprintType)
+enum class ENaveTipo : uint8
+{
+    Roja        UMETA(DisplayName = "Cazador Rojo"),
+    Azul        UMETA(DisplayName = "Cazador Azul"),
+    Verde       UMETA(DisplayName = "Cazador Verde"),
+    Omega       UMETA(DisplayName = "Cazador Omega"),
+    Delta       UMETA(DisplayName = "Cazador Delta"),
+    Alfa        UMETA(DisplayName = "Cazador Alfa")
+};
 
 UCLASS()
 class MOBILESPACE_API UShipFactoryGeneral : public UObject

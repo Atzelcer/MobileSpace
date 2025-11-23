@@ -13,11 +13,9 @@ AShip_CazadorOmega::AShip_CazadorOmega()
         ShipMesh->SetRelativeScale3D(FVector(0.5f));
     }
 
-    Tipo = ENaveTipo::Omega;
     MovementPattern = EArcadeMovement::ExpandingCircle;
 
-    AttackPattern = EAttackPattern::Spread;
-    ShipRole = EShipRole::Tanque;
+    AttackPattern = EAtackPattern::Spread;
 
     TimeBetweenShots = 1.0f;
     bFireEnabled = true;
