@@ -17,12 +17,12 @@ enum class EArcadeMovement : uint8
 	ExpandingCircle,
 	BossMajesticArc,
 	SuperSequence,
-	BossSlowSweep,
-	BossSpiral,
-	BossThreatening,
-	BossCircularDominance,
-	BossErraticPower,
-	BossSineWave 
+	// ===== NUEVOS PATRONES ESPECÍFICOS PARA JEFES =====
+	BossSlowSweep,          // Movimiento lento y elegante horizontal
+	BossThreatening,        // Movimiento amenazante con paradas
+	BossCircularDominance,  // Círculo grande y dominante
+	BossErraticPower,       // Errático pero controlado
+	BossEpicFinal          // Para jefe final - muy especial
 };
 
 
@@ -52,18 +52,14 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
 	FVector2D MovementMax = FVector2D(1450.f, 2900.f);
-	
-
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
-
 	FVector Origin;
 	float Elapsed;
-
 
 public:	
 	// Called every frame

@@ -22,14 +22,11 @@ protected:
 	
 	
 
-	// Control de fases de ataque del jefe final
 	UFUNCTION()
 	void SwitchAttackPhase();
 
-	// Estados de ataque del jefe
-	bool bEpicPhase = false; // true = épico 3s, false = pausa 6s
+	bool bEpicPhase = false;
 	
-	// Timer para la fase épica (3 segundos)
 	FTimerHandle EpicPhaseTimerHandle;
 	
 };

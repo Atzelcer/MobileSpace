@@ -7,9 +7,6 @@
 #include "Ship_CazadorRojo.h"
 #include "Ship_CazadorAzul.h"
 #include "Ship_CazadorOmega.h"
-#include "DKraken_Boss_Z.h"
-#include "DragonR_Boss_Z.h"
-#include "DragonT_Boss_Z.h"
 #include "MobileSpacePawn.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
@@ -17,9 +14,15 @@
 #include "Components/AudioComponent.h"
 #include "MegaPortal.h"
 #include "MegaObstaculo.h"
-#include "Boss_Z.h"
 #include "HUDmain.h"
 #include "MegaPlataforma.h"
+#include "Boss.h"
+#include "Boss_1.h"
+#include "Boss_2.h"
+#include "Boss_3.h"
+#include "Boss_4.h"
+#include "Boss_5.h"
+#include "Boss_6.h"
 
 AAventuraManager::AAventuraManager()
 {
@@ -27,31 +30,20 @@ AAventuraManager::AAventuraManager()
 
 	NivelActual = 1;
 	CurrentWave = 1;
-	CurrentBoss = nullptr;
+	
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
 
 	AudioComp_SonidoCarga = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp_SonidoCarga"));
 	AudioComp_SonidoCarga->SetupAttachment(RootComponent);
 	AudioComp_SonidoCarga->bAutoActivate = false;
 
 	SonidoCarga = LoadObject<USoundWave>(nullptr,
-		TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Interstellar_Drift.Interstellar_Drift'"));
+		TEXT("SoundWave'/Game/BOSS_SOUNDS/PantallaCarga.PantallaCarga'"));
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> OleadaSoundAsset(
-		TEXT("SoundWave'/Game/Musica_D/EpicToonSFX/BonusChargeWhooshAudio/CartoonyChargeMid.CartoonyChargeMid'"));
-
-	if (OleadaSoundAsset.Succeeded())
-		OleadaSound = OleadaSoundAsset.Object;
-	// Control global de disparos en oleadas
 	IntervaloControlAtaque = 0.25f;
 
-	//// Timer para revisar ataques de naves continuamente
-	//GetWorldTimerManager().SetTimer(
-	//	TimerHandle_ControlAtaques,
-	//	this,
-	//	&AAventuraManager::ControlarAtaquesNaves,
-	//	IntervaloControlAtaque,
-	//	true
-	//);
 
 }
 
@@ -75,24 +67,6 @@ void AAventuraManager::BeginPlay()
 		PC->Possess(NewPawn);
 	}
 
-	//FVector PlataformaLoc(-116.168701f, 6.159666f, -940.0f);
-	//FRotator PlataformaRot(0.f, 0.f, 0.f);
-	//FActorSpawnParameters Params;
-	//PlataformaSpawn = GetWorld()->SpawnActor<AMegaPlataforma>(AMegaPlataforma::StaticClass(), PlataformaLoc, PlataformaRot, Params);
-	//if (PlataformaSpawn)
-	//{
-	//	PlataformaSpawn->SetActorScale3D(FVector(8.f, 9.75f, 3.f));
-	//}
-
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_ControlAtaques,
-		this,
-		&AAventuraManager::ControlAtaqueAleatorio,
-		0.2f,
-		true
-	);
-
-
 	SetupFixedCamera();
 	ControladorNiveles();
 }
@@ -115,10 +89,8 @@ void AAventuraManager::SetupFixedCamera()
 	UCameraComponent* Cam = FixedCamera->GetCameraComponent();
 	if (!Cam) return;
 
-	// Modo ORTOGRÁFICO
 	Cam->SetProjectionMode(ECameraProjectionMode::Orthographic);
 
-	// Ajuste según dispositivo
 	const FVector2D ViewportSize = GEngine->GameViewport->Viewport->GetSizeXY();
 	float AspectRatio = ViewportSize.X / ViewportSize.Y;
 
@@ -138,9 +110,28 @@ void AAventuraManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoverJugador(DeltaTime);
+	
+	static float DebugTimer = 0.0f;
+	DebugTimer += DeltaTime;
+	
+	if (DebugTimer >= 2.0f && bJefeActivo)
+	{
+		DebugTimer = 0.0f;
+		
+		TArray<AActor*> QuickBossCheck;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoss::StaticClass(), QuickBossCheck);
+		
+		if (bJefeActivo && QuickBossCheck.Num() == 0 && !bJefeEliminado)
+		{
+			bJefeEliminado = true;
+			bJefeActivo = false;
+			
+			
+			GetWorldTimerManager().ClearTimer(WaveTimerHandle);
+			SpawnPortalFinal();
+		}
+	}
 }
-
-
 void AAventuraManager::SetNivelActual(int32 NuevoNivel)
 {
 	NivelActual = NuevoNivel;
@@ -149,27 +140,43 @@ void AAventuraManager::SetNivelActual(int32 NuevoNivel)
 
 void AAventuraManager::SiguienteNivel()
 {
+	// VerificaciÃ³n de seguridad
+	if (!GetWorld())
+	{
+		UE_LOG(LogTemp, Error, TEXT("GetWorld() es nulo en SiguienteNivel()"));
+		return;
+	}
+	
 	NivelActual++;
 	ControladorNiveles();
 }
 
 void AAventuraManager::ControladorNiveles()
 {
+	// Verificaciones de seguridad
+	if (!GetWorld())
+	{
+		UE_LOG(LogTemp, Error, TEXT("GetWorld() es nulo en ControladorNiveles()"));
+		return;
+	}
+
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (!PC)
 	{
-		PC = GetWorld()->SpawnActor<APlayerController>(APlayerController::StaticClass());
-		if (!PC) return;
+		UE_LOG(LogTemp, Error, TEXT("No se pudo obtener PlayerController en ControladorNiveles()"));
+		return;
 	}
 
 	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 	if (!HUD)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("HUD no encontrado, intentando crear uno nuevo"));
 		HUD = GetWorld()->SpawnActor<AHUDmain>(AHUDmain::StaticClass());
-		if (HUD)
-			PC->MyHUD = HUD;
-		else
+		if (!HUD)
+		{
+			UE_LOG(LogTemp, Error, TEXT("No se pudo crear HUD en ControladorNiveles()"));
 			return;
+		}
 	}
 
 	FString NombreNivel;
@@ -192,7 +199,7 @@ void AAventuraManager::ControladorNiveles()
 
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle_IniciarNivel,
-		[this, HUD]()
+		[this]()
 		{
 			switch (NivelActual)
 			{
@@ -205,7 +212,17 @@ void AAventuraManager::ControladorNiveles()
 			case 7: Nivel7(); break;
 			default: break;
 			}
-			HUD->OcultarNivel();
+			
+			// Obtener HUD de forma segura cuando sea necesario
+			APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			if (PC)
+			{
+				AHUDmain* SafeHUD = Cast<AHUDmain>(PC->GetHUD());
+				if (SafeHUD)
+				{
+					SafeHUD->OcultarNivel();
+				}
+			}
 		},
 		3.0f, false);
 }
@@ -244,53 +261,25 @@ void AAventuraManager::ActivarEfectoSonidoPantallaCarga(bool bActivarSonido)
 
 void AAventuraManager::GenerarOleada()
 {
-	if (OleadaActual >= OleadasTotales)
-	{
-		SpawnPortalFinal();
-		return;
-	}
-
-	if (OleadaSound)
-		UGameplayStatics::PlaySound2D(GetWorld(), OleadaSound);
-
-	ENaveTipo Tipo = TiposActuales[OleadaActual % TiposActuales.Num()];
-
-	FVector Centro = FVector(1350.f, OleadaActual * 480.f, 300.f);
-
-	TArray<AShip_X*> Nuevas = GenerarEnjambre(Tipo, CantidadPorOleada, Centro, 320.f, 1);
-
-	int32 Total = Nuevas.Num();
-	int32 Perseguidores = Total * 0.25f;
-	int32 Tiradores = Total * 0.50f;
-
-	for (int32 i = 0; i < Nuevas.Num(); i++)
-	{
-		AShip_X* S = Nuevas[i];
-		if (!S) continue;
-
-		if (i < Perseguidores)
-		{
-			S->SetRole(EShipRole::Perseguidor);
-			S->EnableFire(false);
-		}
-		else if (i < Perseguidores + Tiradores)
-		{
-			S->SetRole(EShipRole::Normal);
-			S->EnableFire(true);
-		}
-		else
-		{
-			S->SetRole(EShipRole::Rafaga);
-			S->EnableFire(true);
-		}
-	}
-
 	OleadaActual++;
 
-	GetWorld()->GetTimerManager().SetTimerForNextTick(
-		this,
-		&AAventuraManager::ComprobarOleadaGeneral
-	);
+
+	for (int32 i = 0; i < CantidadPorOleada; i++)
+	{
+		int32 RandomIndex = FMath::RandRange(0, TiposActuales.Num() - 1);
+		ENaveTipo TipoSeleccionado = TiposActuales[RandomIndex];
+		
+		float RandomY = FMath::FRandRange(-2500.f, 2500.f);
+		float RandomX = FMath::FRandRange(1200.f, 1800.f);
+		FVector SpawnLocation(RandomX, RandomY, 300.f);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+		
+		AShip_X* NewShip = ShipFactory->CrearNave(GetWorld(), TipoSeleccionado, SpawnLocation, SpawnRotation);
+		
+		
+	}
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AAventuraManager::ComprobarOleadaGeneral);
 }
 
 
@@ -299,27 +288,99 @@ void AAventuraManager::ComprobarOleadaGeneral()
 	TArray<AActor*> Enemigos;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip_X::StaticClass(), Enemigos);
 
-	if (Enemigos.Num() == 0)
+	if (Enemigos.Num() == 0 && !bOleadasCompletadas)
 	{
-		if (GEngine)
-		GenerarOleada();
+		if (OleadaActual < OleadasTotales)
+		{
+			GenerarOleada();
+		}
+		else
+		{
+			bOleadasCompletadas = true;
+
+			GetWorldTimerManager().SetTimer(BossTimerHandle, this, &AAventuraManager::SpawnJefeDelNivel, 5.0f, false);
+		}
 	}
-	else
+	else if (bOleadasCompletadas && !bJefeEliminado)
 	{
-		if (GEngine)
+		ComprobarJefe();
+		
+		if (bJefeActivo && !bJefeEliminado)
+		{
+			TArray<AActor*> ManualBossCheck;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoss::StaticClass(), ManualBossCheck);
+			
+			if (ManualBossCheck.Num() == 0)
+			{
+				bJefeEliminado = true;
+				bJefeActivo = false;
+								
+				GetWorldTimerManager().ClearTimer(WaveTimerHandle);
+				GetWorldTimerManager().SetTimer(WaveTimerHandle, this, &AAventuraManager::SpawnPortalFinal, 1.0f, false);
+			}
+		}
+		
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AAventuraManager::ComprobarOleadaGeneral);
+	}
+	else if (Enemigos.Num() > 0)
+	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AAventuraManager::ComprobarOleadaGeneral);
 	}
 }
 
 void AAventuraManager::SpawnPortalFinal()
 {
+	
+	TArray<AActor*> ExistingPortals;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMegaPortal::StaticClass(), ExistingPortals);
+	
+	if (ExistingPortals.Num() > 0)
+	{
+		
+		for (AActor* Portal : ExistingPortals)
+		{
+			if (Portal)
+			{
+				Portal->Destroy();
+			}
+		}
+	}
+	
 	FVector SpawnLocation(850.f, 0.f, -430.0f);
 	FRotator SpawnRotation = FRotator::ZeroRotator;
+
 
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	AMegaPortal* Portal = GetWorld()->SpawnActor<AMegaPortal>(AMegaPortal::StaticClass(), SpawnLocation, SpawnRotation, Params);
+	
+	if (Portal)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AventuraManager: Portal spawneado exitosamente"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AventuraManager: Error al spawnear portal, intentando mÃ©todo alternativo"));
+		
+		FActorSpawnParameters AlternativeParams;
+		AlternativeParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AlternativeParams.bNoFail = true;
+		
+		FVector AlternativeLocation(800.f, 0.f, -400.0f);
+		
+		AMegaPortal* AlternativePortal = GetWorld()->SpawnActor<AMegaPortal>(
+			AMegaPortal::StaticClass(), 
+			AlternativeLocation, 
+			SpawnRotation, 
+			AlternativeParams);
+		
+		
+	}
+	
+	TArray<AActor*> PortalsAfterSpawn;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMegaPortal::StaticClass(), PortalsAfterSpawn);
+	
 }
 
 void AAventuraManager::GenerarOleadaObstaculos()
@@ -385,15 +446,12 @@ void AAventuraManager::TeletransportarJugador()
 	if (!PawnJugador)
 		return;
 
-	// Desactivar control del jugador
 	PC->SetIgnoreMoveInput(true);
 	PC->SetIgnoreLookInput(true);
 
-	// Colocar fuera de la vista
 	FVector NuevaPosicion(-2800.f, 0.f, 300.f);
 	PawnJugador->SetActorLocation(NuevaPosicion);
 
-	// Iniciar movimiento automático hacia +X
 	bJugadorMoviendose = true;
 	SetActorTickEnabled(true);
 }
@@ -417,186 +475,39 @@ void AAventuraManager::MoverJugador(float DeltaTime)
 
 	if (Pos.X >= -1100.f)
 	{
-		// Llegó a la posición final
 		bJugadorMoviendose = false;
 	}
 }
 
-void AAventuraManager::SpawnBoss()
-{
-	FVector BossLocation(1500.f, 0.f, 300.f); 
-	FRotator BossRotation = FRotator::ZeroRotator;
-	FActorSpawnParameters Params;
-
-
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	ADKraken_Boss_Z* KrakenBoss = GetWorld()->SpawnActor<ADKraken_Boss_Z>(BossLocation, BossRotation, Params);
-
-	CurrentBoss = KrakenBoss;
-}
-
-
-TArray<AShip_X*> AAventuraManager::GenerarEnjambre(
-	ENaveTipo TipoNave,
-	int32 Cantidad,
-	FVector Centro,
-	float Espaciado,
-	int32 Filas)
-{
-	TArray<AShip_X*> SpawnedShips;
-
-	const float SpawnX = MovementMax.X + 500.f; // FUERA DEL BORDE DERECHO
-	const float MinDistance = 350.f; // Separación mínima entre naves
-
-	for (int32 i = 0; i < Cantidad; i++)
-	{
-		float RandY = FMath::FRandRange(MovementMin.Y, MovementMax.Y);
-		float RandZ = 300.f;
-
-		FVector SpawnLoc = FVector(SpawnX, RandY, RandZ);
-
-		// Comprobar distancia mínima
-		bool bValid = true;
-		for (AShip_X* S : SpawnedShips)
-		{
-			if (S && FVector::Dist(S->GetActorLocation(), SpawnLoc) < MinDistance)
-			{
-				bValid = false;
-				break;
-			}
-		}
-
-		if (!bValid)
-		{
-			i--;
-			continue;
-		}
-
-		AShip_X* Ship = ShipFactory->CrearNave(GetWorld(), TipoNave, SpawnLoc, FRotator(0.f, -180.f, 0.f));
-		if (Ship)
-		{
-			SpawnedShips.Add(Ship);
-			RegisterShip(Ship);
-		}
-	}
-
-	return SpawnedShips;
-}
-
-void AAventuraManager::ControlAtaqueAleatorio()
-{
-	if (ActiveShips.Num() == 0)
-		return;
-
-	for (AShip_X* Ship : ActiveShips)
-	{
-		if (!IsValid(Ship))
-			continue;
-
-		// Solo ciertas naves pueden disparar aleatoriamente
-		if (!Ship->bPuedeAtacar)
-			continue;
-
-		// Probabilidad entre 0 y 1
-		float R = FMath::FRand();
-
-		// 8% de probabilidad por tick de disparar
-		if (R < 0.08f)
-		{
-			Ship->FireIfReady();
-		}
-	}
-}
-
-
-void AAventuraManager::RegisterShip(AShip_X* Ship)
-{
-	if (!Ship) return;
-
-	ActiveShips.Add(Ship);
-
-	ShipsByType.FindOrAdd(Ship->Tipo).Add(Ship);
-	ShipsByRole.FindOrAdd(Ship->ShipRole).Add(Ship);
-}
-
-
-void AAventuraManager::UnregisterShip(AShip_X* Ship)
-{
-	if (!Ship) return;
-
-	ActiveShips.Remove(Ship);
-
-	if (ShipsByType.Contains(Ship->Tipo))
-		ShipsByType[Ship->Tipo].Remove(Ship);
-
-	if (ShipsByRole.Contains(Ship->ShipRole))
-		ShipsByRole[Ship->ShipRole].Remove(Ship);
-}
-
-TArray<AShip_X*> AAventuraManager::GetShipsOfType(ENaveTipo Tipo)
-{
-	return ShipsByType.Contains(Tipo) ? ShipsByType[Tipo] : TArray<AShip_X*>();
-}
-
-TArray<AShip_X*> AAventuraManager::GetShipsWithRole(EShipRole Rol)
-{
-	return ShipsByRole.Contains(Rol) ? ShipsByRole[Rol] : TArray<AShip_X*>();
-}
-
-void AAventuraManager::EnableAttackForType(ENaveTipo Tipo, bool bEnable)
-{
-	if (!ShipsByType.Contains(Tipo)) return;
-
-	for (AShip_X* Ship : ShipsByType[Tipo])
-		Ship->EnableFire(bEnable);
-}
-
-void AAventuraManager::EnableAttackForRole(EShipRole Rol, bool bEnable)
-{
-	if (!ShipsByRole.Contains(Rol)) return;
-
-	for (AShip_X* Ship : ShipsByRole[Rol])
-		Ship->EnableFire(bEnable);
-}
-
-bool AAventuraManager::IsWaveCleared() const
-{
-	return ActiveShips.Num() == 0;
-}
-
-
 void AAventuraManager::Nivel1()
 {
-	//PlataformaSpawn->CambiarMaterialAleatorio();
 
 	OleadasTotales = 3;                           
 	CantidadPorOleada = 8;                         
 	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde }; 
 	OleadaActual = 0;
+	
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
 
 	GenerarOleada();                               
 
-	//GetWorld()->GetTimerManager().SetTimer(
-	//	TimerHandle_SpawnBoss,
-	//	this,
-	//	&AAventuraManager::SpawnBoss,
-	//	10.0f, // Tiempo después de la última oleada
-	//	false
-	//);
 	
 }
 
 void AAventuraManager::Nivel2()
 {
-	//PlataformaSpawn->CambiarMaterialAleatorio();
+	OleadasTotales = 4;
+	CantidadPorOleada = 5;
+	TiposActuales = { ENaveTipo::Omega, ENaveTipo::Delta, ENaveTipo::Alfa };
+	OleadaActual = 0;
 
-	OleadaActualObstaculos = 2;
-	OleadasTotalesObstaculos = 7;
-	CantidadPorOleadaObstaculos = 3;
-	GenerarOleadaObstaculos();
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
 
-	
+	GenerarOleada();
 }
 
 
@@ -606,6 +517,11 @@ void AAventuraManager::Nivel3()
 	CantidadPorOleada = 5;
 	TiposActuales = { ENaveTipo::Omega, ENaveTipo::Delta, ENaveTipo::Alfa };
 	OleadaActual = 0;
+	
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
+	
 	GenerarOleada();
 
 	
@@ -613,27 +529,41 @@ void AAventuraManager::Nivel3()
 
 void AAventuraManager::Nivel4()
 {
-	OleadaActualObstaculos = 0;
-	OleadasTotalesObstaculos = 12;
-	CantidadPorOleadaObstaculos = 3;
-	GenerarOleadaObstaculos();
+	OleadasTotales = 6;
+	CantidadPorOleada = 6;
+	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde, ENaveTipo::Omega };
+	OleadaActual = 0;
+	
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
+	
+	GenerarOleada();
 }
 
 void AAventuraManager::Nivel5()
 {
-	OleadasTotales = 12;
-	CantidadPorOleada = 8;
-	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
+	OleadasTotales = 8;
+	CantidadPorOleada = 7;
+	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde, ENaveTipo::Omega, ENaveTipo::Delta };
 	OleadaActual = 0;
+	
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
+	
 	GenerarOleada();
 }
 
 void AAventuraManager::Nivel6()
 {
-	OleadasTotales = 12;
+	OleadasTotales = 10;
 	CantidadPorOleada = 8;
 	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
 	OleadaActual = 0;
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
 	GenerarOleada();
 }
 
@@ -643,7 +573,133 @@ void AAventuraManager::Nivel7()
 	CantidadPorOleada = 8;
 	TiposActuales = { ENaveTipo::Roja, ENaveTipo::Azul, ENaveTipo::Verde };
 	OleadaActual = 0;
+	bOleadasCompletadas = false;
+	bJefeActivo = false;
+	bJefeEliminado = false;
 	GenerarOleada();
+}
+
+
+void AAventuraManager::SpawnJefeDelNivel()
+{
+	int32 TipoJefe = GetTipoJefeParaNivel(NivelActual);
+	
+	FVector SpawnLocation = FVector(1400.0f, 0.0f, 300.0f);
+	FRotator SpawnRotation = FRotator(0.0f, 180.0f, 0.0f);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	
+	ABoss* NuevoJefe = nullptr;
+	
+	switch (TipoJefe)
+	{
+	case 1:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_1>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	case 2:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_2>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	case 3:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_3>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	case 4:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_4>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	case 5:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_5>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	case 6:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_6>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	default:
+		NuevoJefe = GetWorld()->SpawnActor<ABoss_1>(SpawnLocation, SpawnRotation, SpawnParams);
+		break;
+	}
+	
+	if (NuevoJefe)
+	{
+		bJefeActivo = true;
+		bJefeEliminado = false;
+		
+	}
+	
+}
+
+void AAventuraManager::ComprobarJefe()
+{
+
+	TArray<AActor*> FoundBosses;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoss::StaticClass(), FoundBosses);
+	
+	
+	if (FoundBosses.Num() == 0)
+	{
+		bJefeEliminado = true;
+		bJefeActivo = false;
+				
+		GetWorldTimerManager().ClearTimer(WaveTimerHandle);
+		GetWorldTimerManager().SetTimer(WaveTimerHandle, this, &AAventuraManager::SpawnPortalFinal, 3.0f, false);
+	}
+}
+
+int32 AAventuraManager::GetTipoJefeParaNivel(int32 Nivel)
+{
+	switch (Nivel)
+	{
+	case 1:
+		return 1; 
+	case 2:
+		return 2; 
+	case 3:
+		return 1; 
+	case 4:
+		return 3; 
+	case 5:
+		return 4; 
+	case 6:
+		return 5;
+	case 7:
+		return 6; 
+	default:
+		return 1; 
+	}
+}
+
+void AAventuraManager::DebugEstadoJefe()
+{
+	TArray<AActor*> FoundBosses;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoss::StaticClass(), FoundBosses);
+	
+	
+	if (bJefeActivo && !bJefeEliminado && FoundBosses.Num() == 0)
+	{
+		
+		bJefeEliminado = true;
+		bJefeActivo = false;
+		
+		GetWorldTimerManager().ClearTimer(WaveTimerHandle);
+		GetWorldTimerManager().SetTimer(WaveTimerHandle, this, &AAventuraManager::SpawnPortalFinal, 1.0f, false);
+	}
+}
+
+void AAventuraManager::ForzarEliminacionJefe()
+{
+	TArray<AActor*> FoundBosses;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoss::StaticClass(), FoundBosses);
+	
+	for (AActor* BossActor : FoundBosses)
+	{
+		if (BossActor)
+		{
+			BossActor->Destroy();
+		}
+	}
+	
+	bJefeEliminado = true;
+	bJefeActivo = false;
+	
+	GetWorldTimerManager().ClearTimer(WaveTimerHandle);
+	SpawnPortalFinal();
 }
 
 

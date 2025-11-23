@@ -13,11 +13,9 @@ AShip_CazadorAlfa::AShip_CazadorAlfa()
         ShipMesh->SetRelativeScale3D(FVector(0.3f));
     }
 
-    Tipo = ENaveTipo::Alfa;
     MovementPattern = EArcadeMovement::SEntry;
 
-    AttackPattern = EAttackPattern::Burst;     // corregido
-    ShipRole = EShipRole::Perseguidor; 
+    AttackPattern = EAtackPattern::Burst;    
 
     TimeBetweenShots = 1.5f;
     bFireEnabled = true;

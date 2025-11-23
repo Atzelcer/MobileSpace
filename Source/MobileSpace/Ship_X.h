@@ -7,7 +7,6 @@
 #include "Particles/ParticleSystem.h"
 #include "AtackComponent.h"
 #include "MoveComponent.h"
-#include "MobEnums.h"
 #include "Sound/SoundBase.h"
 #include "Ship_X.generated.h"
 
@@ -21,11 +20,7 @@ public:
 
     AShip_X();
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship")
-    ENaveTipo Tipo;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship")
-    EShipRole ShipRole;
+ 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship")
     EArcadeMovement MovementPattern;
@@ -71,8 +66,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
     float TimeBetweenShots = 2.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-    EAttackPattern AttackPattern = EAttackPattern::Single;
+	EAtackPattern AttackPattern;
 
 
 protected:
@@ -82,12 +76,8 @@ public:
     virtual void Tick(float DeltaTime) override;
 
     void SetMovement(EArcadeMovement NewPattern);
-    void SetAttackPattern(EAttackPattern NewPattern);
+    void SetAttackPattern(EAtackPattern NewPattern);
     void EnableFire(bool Enabled);
-    void SetRole(EShipRole NewRole);
-    void SetFormation(EFormationType Type, FVector Offset, FVector Anchor);
-
-    void FireIfReady();
 
     UFUNCTION()
     void OnShipHit(UPrimitiveComponent* OverlappedComponent,
@@ -115,8 +105,19 @@ public:
     bool GetAttackState() const;
     void SetAttackState(bool Estado);
 
-    void ForzarDisparo();
+    // Sistema de disparo automático
+    UFUNCTION()
+    void StartAutoFire();
+    
+protected:
+    // Timer para disparo automático
+    FTimerHandle AutoFireTimer;
+    
+    // Función de disparo automático
+    UFUNCTION()
+    void AutoFire();
 
+public:
     bool bPuedeAtacar = false;
 
 

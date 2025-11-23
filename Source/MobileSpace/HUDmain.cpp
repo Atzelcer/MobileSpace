@@ -25,6 +25,7 @@
 #include "MobileSpacePawn.h"
 #include "Widget_Indicar_level.h"
 #include "WidgetGameOver.h"
+#include "WidgetMegaBoss.h"
 
 AHUDmain::AHUDmain()
 {
@@ -87,9 +88,17 @@ AHUDmain::AHUDmain()
 	if (GameOverBPClass.Succeeded())
 		WidgetGameOverClass = GameOverBPClass.Class;
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/AuroraSoundTrack/Wav/Cosmic_Horizons.Cosmic_Horizons'"));
+	// Para la barra de vida del jefe
+	static ConstructorHelpers::FClassFinder<UWidgetMegaBoss> MegaBossBPClass(TEXT("/Game/WIDGETS/BossBar.BossBar_C"));
+	if (MegaBossBPClass.Succeeded())
+		WidgetMegaBossClass = MegaBossBPClass.Class;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/BOSS_SOUNDS/Sound_TrackOFICIAL.Sound_TrackOFICIAL'"));
 	if (MusicaAsset.Succeeded())
 		MusicaInicio = MusicaAsset.Object;
+
+	// Inicializar instancia del widget
+	WidgetMegaBossInstance = nullptr;
 }
 
 void AHUDmain::BeginPlay()

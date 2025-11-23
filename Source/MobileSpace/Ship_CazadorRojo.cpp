@@ -13,11 +13,9 @@ AShip_CazadorRojo::AShip_CazadorRojo()
         ShipMesh->SetRelativeScale3D(FVector(0.3f));
     }
 
-    Tipo = ENaveTipo::Roja;
     MovementPattern = EArcadeMovement::WavyWave;
 
-    AttackPattern = EAttackPattern::Spread;
-    ShipRole = EShipRole::Normal;
+    AttackPattern = EAtackPattern::Spread;
 
     TimeBetweenShots = 2.5f;
     bFireEnabled = true;

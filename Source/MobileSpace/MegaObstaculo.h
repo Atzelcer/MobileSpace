@@ -40,11 +40,19 @@ public:
 	void DestruirObstaculo();
 
 	UPROPERTY(EditAnywhere, Category = "Movimiento")
-	float VelocidadMovimiento = 600.f;
+	float VelocidadMovimiento = 1200.f;
+
+	// ===== SISTEMA DE MOVIMIENTO DIAGONAL =====
+	UPROPERTY(EditAnywhere, Category = "Movimiento")
+	FVector DireccionMovimiento = FVector(1.0f, 0.0f, 0.0f); // Por defecto hacia la izquierda
+
+	UPROPERTY(EditAnywhere, Category = "Movimiento")
+	bool bMovimientoDiagonal = false;
 
 	void MoverObstaculo(float DeltaTime);
 	void VerificarDestruccion();
 
 	void SetVelocidadMovimiento(float NuevaVelocidad);
+
 
 };

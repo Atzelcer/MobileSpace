@@ -5,17 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Ship_X.h"
-#include "Boss_Z.h"
 #include "ShipFactoryGeneral.h"
-#include "MobEnums.h"
 #include "AventuraManager.generated.h"
-
 class AMobileSpacePawn;
 class ACameraActor;
 class UAudioComponent;
 class AMegaPlataforma;
-
 UCLASS()
+
 class MOBILESPACE_API AAventuraManager : public AActor
 {
     GENERATED_BODY()
@@ -29,11 +26,9 @@ protected:
 public:
     virtual void Tick(float DeltaTime) override;
 
-    // === Clases para Spawn ===
     UPROPERTY(EditAnywhere, Category = "Spawn")
     TSubclassOf<AMobileSpacePawn> PawnClass;
 
-    // === Control de niveles ===
     UFUNCTION() void Nivel1();
     UFUNCTION() void Nivel2();
     UFUNCTION() void Nivel3();
@@ -46,7 +41,6 @@ public:
 
     void SiguienteNivel();
 
-    // === Cámara fija ===
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     ACameraActor* FixedCamera;
 
@@ -54,15 +48,13 @@ public:
     void SetupFixedCamera();
 
 protected:
-    // === Estado del nivel ===
     UPROPERTY()
     int32 NivelActual;
 
     UPROPERTY()
     int32 CurrentWave;
 
-    UPROPERTY()
-    ABoss_Z* CurrentBoss;
+
 
     UPROPERTY()
     FTimerHandle WaveTimerHandle;
@@ -71,13 +63,11 @@ protected:
     FTimerHandle BossTimerHandle;
 
 public:
-    // === Fábrica de naves ===
     UPROPERTY()
     UShipFactoryGeneral* ShipFactory;
 
     FTimerHandle TimerHandle_IniciarNivel;
 
-    // === Audio pantalla carga ===
     UPROPERTY()
     UAudioComponent* AudioComp_SonidoCarga;
 
@@ -91,7 +81,6 @@ public:
     FTimerHandle TimerHandle_DetenerSonido;
 
 private:
-    // === Oleadas normales ===
     int32 OleadasTotales;
     int32 CantidadPorOleada;
     int32 OleadaActual;
@@ -100,8 +89,23 @@ private:
     void GenerarOleada();
     void ComprobarOleadaGeneral();
     void SpawnPortalFinal();
+    
+    bool bOleadasCompletadas = false;
+    bool bJefeActivo = false;
+    bool bJefeEliminado = false;
+    
+    void SpawnJefeDelNivel();
+    void ComprobarJefe();
+    int32 GetTipoJefeParaNivel(int32 Nivel);
+    
+    // FunciÃ³n de debug para verificar estado manualmente
+    UFUNCTION(BlueprintCallable, Category = "Debug")
+    void DebugEstadoJefe();
+    
+    // FunciÃ³n para forzar eliminaciÃ³n de jefe manualmente
+    UFUNCTION(BlueprintCallable, Category = "Debug") 
+    void ForzarEliminacionJefe();
 
-    // === Oleadas de obstáculos ===
     void GenerarOleadaObstaculos();
     void ComprobarOleadaObstaculos();
 
@@ -112,25 +116,11 @@ public:
 
     FTimerHandle TimerHandle_ComprobarObstaculos;
 
-    // === Movimiento jugador ===
     UFUNCTION() void TeletransportarJugador();
     UFUNCTION() void MoverJugador(float DeltaTime);
 
-    void SpawnBoss();
 
-    // === Generación de formaciones ===
-    UFUNCTION()
-    TArray<AShip_X*> GenerarEnjambre(
-        ENaveTipo TipoNave,
-        int32 Cantidad,
-        FVector Centro,
-        float Espaciado = 320.f,
-        int32 Filas = 1
-    );
-
-    // === Audio oleadas ===
-    UPROPERTY(EditDefaultsOnly, Category = "Audio")
-    USoundBase* OleadaSound;
+    //USoundBase* OleadaSound;
 
     FTimerHandle TimerHandle_Teletransporte;
     FTimerHandle TimerHandle_SpawnBoss;
@@ -140,7 +130,6 @@ public:
 
 private:
 
-    void ControlAtaqueAleatorio();
 
 
     UPROPERTY()
@@ -155,38 +144,8 @@ private:
     UPROPERTY(EditAnywhere, Category = "Gameplay|Movimiento")
     FVector2D MovementMax = FVector2D(1400.f, 3000.f);
 
-    UPROPERTY()
-    TArray<AShip_X*> ActiveShips;
-
-    // No usar UPROPERTY aquí (nested containers no permitidos por UHT)
-    TMap<ENaveTipo, TArray<AShip_X*>> ShipsByType;
-    TMap<EShipRole, TArray<AShip_X*>> ShipsByRole;
-
-
-    // ============================================================
-    // === FUNCIONES DE GESTIÓN DE NAVES ===
-    // ============================================================
-
-    // Añadir nave al registro general y a sus categorías
-    void RegisterShip(AShip_X* Ship);
-
-    // Remover nave del registro cuando muere o desaparece
-    void UnregisterShip(AShip_X* Ship);
-
-    // Obtener todas las naves de un tipo específico
-    TArray<AShip_X*> GetShipsOfType(ENaveTipo Tipo);
-
-    // Obtener naves con un rol específico
-    TArray<AShip_X*> GetShipsWithRole(EShipRole Rol);
-
-    // Activar/desactivar ataque en todas las naves de un tipo
-    void EnableAttackForType(ENaveTipo Tipo, bool bEnable);
-
-    // Activar/desactivar ataque en todas las naves de un rol
-    void EnableAttackForRole(EShipRole Rol, bool bEnable);
-
-    // Saber si ya no quedan naves activas (oleada terminada)
-    bool IsWaveCleared() const;
+  
+   
 
 };
 

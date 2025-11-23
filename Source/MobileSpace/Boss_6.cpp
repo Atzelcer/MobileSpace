@@ -7,23 +7,21 @@ ABoss_6::ABoss_6()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Cargar la malla SM_CF2_Shuttle1 desde BOSSES (versión mejorada del shuttle)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BossMeshAsset(
 		TEXT("StaticMesh'/Game/BOSSES/SM_CF2_Shuttle.SM_CF2_Shuttle'"));
 
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+		BossMesh->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
 	}
 
-	// Configuración específica para Boss_6 - JEFE FINAL
-	BossHealth = 5000; // Vida baja para testing rápido
+	
+	BossHealth = 5000; 
 	CurrentHealth = BossHealth;
-	FireRate = 0.6f; // Disparos devastadores constantes
-	AttackPattern = EAtackPattern::BossSpiral; // Empezar con espiral normal
+	FireRate = 0.6f; 
+	AttackPattern = EAtackPattern::BossSpiral; 
 
-	// Sonido de aparición ÉPICO para Boss_6 (jefe final)
 	static ConstructorHelpers::FObjectFinder<USoundBase> AppearanceSoundAsset(
 		TEXT("SoundWave'/Game/BOSS_SOUNDS/METAMO.METAMO'"));
 	
@@ -32,7 +30,6 @@ ABoss_6::ABoss_6()
 		AppearanceSound = AppearanceSoundAsset.Object;
 	}
 
-	// Sonido de destrucción TITANICO para Boss_6 (jefe final)
 	static ConstructorHelpers::FObjectFinder<USoundBase> DestructionSoundAsset(
 		TEXT("SoundWave'/Game/MFK/Sounds/Explode/A_Explode_06.A_Explode_06'"));
 	
@@ -41,42 +38,43 @@ ABoss_6::ABoss_6()
 		DestructionSound = DestructionSoundAsset.Object;
 	}
 
-	// Configurar efectos de aparición ÉPICOS para Boss_6 (dorado/final)
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> AppearanceEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/Umbrella/Par_FW_Umbr_03_Tiny.Par_FW_Umbr_03_Tiny'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
 	if (AppearanceEffectAsset.Succeeded())
 	{
 		AppearanceEffect = AppearanceEffectAsset.Object;
 	}
 
-	// Efecto de destrucción ÉPICO para Boss_6
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DestructionEffectAsset(
-		TEXT("ParticleSystem'/Game/MFK/Particles_Tiny/Expanders/Par_ExpFire_02_Rain_Tiny.Par_ExpFire_02_Rain_Tiny'"));
+		TEXT("ParticleSystem'/Game/MFK/Particles/Expanders/Par_ExpFire_01_Rain.Par_ExpFire_01_Rain'"));
 	
 	if (DestructionEffectAsset.Succeeded())
 	{
 		DestructionEffect = DestructionEffectAsset.Object;
 	}
 	
-	DestructionEffectScale = FVector(10.0f, 10.0f, 10.0f); // ¡ÉPICO!
+	DestructionEffectScale = FVector(10.0f, 10.0f, 10.0f); 
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
+	if (ForceFieldAsset.Succeeded())
+	{
+		ForceFieldSystem = ForceFieldAsset.Object;
 
-	// Configurar movimiento de jefe final épico
+	}
+	ForceFieldScale = FVector(1.0f, 1.0f, 1.0f);
 	if (MoveComp)
 	{
-		MoveComp->Pattern = EArcadeMovement::BossSlowSweep; // ¡MOVIMIENTO ÉPICO FINAL!
-		MoveComp->Speed = 60.0f; // Lento pero imponente
-		MoveComp->Amplitude = 150.0f; // Movimiento controlado
-		MoveComp->Frequency = 0.2f; // Muy lento y majestuoso
+		MoveComp->Pattern = EArcadeMovement::BossSlowSweep;
+		MoveComp->Speed = 60.0f; 
+		MoveComp->Amplitude = 150.0f; 
+		MoveComp->Frequency = 0.2f;
 	}
 
-	// Configurar hitbox MÁS GRANDE para Boss_6 (jefe final)
 	if (BossCollision)
 	{
-		BossCollision->SetBoxExtent(FVector(400.0f, 400.0f, 400.0f)); // ¡HITBOX MASIVA!
+		BossCollision->SetBoxExtent(FVector(1020.0f, 600.0f, 400.0f));
 	}
 
-	// Empezar en fase normal
 	bEpicPhase = false;
 }
 
@@ -84,7 +82,6 @@ void ABoss_6::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Empezar con 6 segundos de pausa, luego alternar
 	GetWorld()->GetTimerManager().SetTimer(SpecialAttackTimerHandle, this, &ABoss_6::SwitchAttackPhase, 6.0f, false);
 	
 }
@@ -93,20 +90,16 @@ void ABoss_6::SwitchAttackPhase()
 {
 	if (!bEpicPhase)
 	{
-		// Activar FASE ÉPICA por 3 segundos
 		bEpicPhase = true;
 		AttackPattern = EAtackPattern::BossEpicFinal;
-		FireRate = 0.3f; // ¡MUY RÁPIDO durante épico!
+		FireRate = 0.3f;
 		
-		// Timer para terminar fase épica después de 3 segundos
 		GetWorld()->GetTimerManager().SetTimer(EpicPhaseTimerHandle, [this]()
 		{
-			// Terminar fase épica y empezar pausa de 6 segundos
 			bEpicPhase = false;
-			AttackPattern = EAtackPattern::Single; // Sin ataques durante pausa
-			FireRate = 10.0f; // Prácticamente sin disparos
+			AttackPattern = EAtackPattern::Single; 
+			FireRate = 10.0f; 
 			
-			// Programar próxima fase épica en 6 segundos
 			GetWorld()->GetTimerManager().SetTimer(SpecialAttackTimerHandle, this, &ABoss_6::SwitchAttackPhase, 6.0f, false);
 			
 		}, 3.0f, false);
