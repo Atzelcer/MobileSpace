@@ -26,10 +26,7 @@ AProjectile_C::AProjectile_C()
 	
 	Damage = 25.0f; 
 	ProjectileSpeed = 0.0f;  
-	
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> HitFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Fireball03_Orange.P_Hit_Fireball03_Orange'"));
-	if (HitFX.Succeeded())
-		HitEffect = HitFX.Object;
+
 }
 
 void AProjectile_C::BeginPlay()
