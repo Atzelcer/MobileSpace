@@ -50,13 +50,6 @@ ABoss_2::ABoss_2()
 	if (DestructionEffectAsset.Succeeded()) DestructionEffect = DestructionEffectAsset.Object;
 
 	DestructionEffectScale = FVector(3.5f, 3.5f, 3.5f);
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
-	if (ForceFieldAsset.Succeeded())
-	{
-		ForceFieldSystem = ForceFieldAsset.Object;
-
-	}
-	ForceFieldScale = FVector(1.0f, 1.0f, 1.0f);
 
 	if (MoveComp)
 	{

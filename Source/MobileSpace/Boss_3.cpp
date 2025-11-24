@@ -68,13 +68,7 @@ ABoss_3::ABoss_3()
 	TrailOffset = FVector(-400.0f, 0.0f, 0.0f);
 
 	bTrailActiveOnSpawn = true;
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraMagic.NS_AuraMagic'"));
-	if (ForceFieldAsset.Succeeded())
-	{
-		ForceFieldSystem = ForceFieldAsset.Object;
-
-	}
-	ForceFieldScale = FVector(1.3f, 1.3f, 1.3f);
+	
 	if (MoveComp)
 	{
 		MoveComp->Pattern = EArcadeMovement::BossThreatening; 

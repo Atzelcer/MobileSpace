@@ -55,13 +55,7 @@ ABoss_6::ABoss_6()
 	}
 	
 	DestructionEffectScale = FVector(10.0f, 10.0f, 10.0f); 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
-	if (ForceFieldAsset.Succeeded())
-	{
-		ForceFieldSystem = ForceFieldAsset.Object;
 
-	}
-	ForceFieldScale = FVector(1.0f, 1.0f, 1.0f);
 	if (MoveComp)
 	{
 		MoveComp->Pattern = EArcadeMovement::BossSlowSweep;

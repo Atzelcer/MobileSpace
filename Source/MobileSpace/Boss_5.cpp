@@ -69,13 +69,7 @@ ABoss_5::ABoss_5()
 	TrailOffset = FVector(-400.0f, 0.0f, 0.0f);
 
 	bTrailActiveOnSpawn = true;
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
-	if (ForceFieldAsset.Succeeded())
-	{
-		ForceFieldSystem = ForceFieldAsset.Object;
-
-	}
-	ForceFieldScale = FVector(1.0f, 1.0f, 1.0f);
+	
 	if (MoveComp)
 	{
 		MoveComp->Pattern = EArcadeMovement::BossErraticPower;
