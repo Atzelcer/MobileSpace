@@ -17,12 +17,15 @@ enum class EArcadeMovement : uint8
 	ExpandingCircle,
 	BossMajesticArc,
 	SuperSequence,
-	// ===== NUEVOS PATRONES ESPECÍFICOS PARA JEFES =====
-	BossSlowSweep,          // Movimiento lento y elegante horizontal
-	BossThreatening,        // Movimiento amenazante con paradas
-	BossCircularDominance,  // Círculo grande y dominante
-	BossErraticPower,       // Errático pero controlado
-	BossEpicFinal          // Para jefe final - muy especial
+	BossSlowSweep,          
+	BossThreatening,        
+	BossCircularDominance,  
+	BossErraticPower,       
+	BossEpicFinal,          
+	// ===== PATRONES PARA ENJAMBRES =====
+	SwarmEntry,             // Entrada dramática desde el lado derecho
+	SwarmFormation,         // Movimiento en formación organizada
+	SwarmAdvance            // Avance coordinado hacia el jugador
 };
 
 
@@ -52,6 +55,29 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "ArcadeMove")
 	FVector2D MovementMax = FVector2D(1450.f, 2900.f);
+
+	// ===== VARIABLES PARA ENJAMBRES =====
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	FVector SwarmTargetPosition = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmEntrySpeed = 800.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmFormationSpeed = 300.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Swarm")
+	float SwarmAdvanceSpeed = 150.0f;
+
+	// Estado de la fase del enjambre
+	UPROPERTY(BlueprintReadOnly, Category = "Swarm")
+	int32 SwarmPhase = 0; // 0=Entry, 1=Formation, 2=Advance
+
+	UFUNCTION(BlueprintCallable, Category = "Swarm")
+	void SetSwarmTargetPosition(FVector NewTarget);
+
+	UFUNCTION(BlueprintCallable, Category = "Swarm")
+	void SetSwarmPhase(int32 NewPhase);
 
 protected:
 	// Called when the game starts

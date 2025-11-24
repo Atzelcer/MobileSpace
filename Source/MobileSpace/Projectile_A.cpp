@@ -8,6 +8,7 @@
 AProjectile_A::AProjectile_A()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("StaticMesh'/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere'"));
 	if (ProjectileMeshAsset.Succeeded())
 	{
@@ -17,13 +18,18 @@ AProjectile_A::AProjectile_A()
 	P1 = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
 	P1->SetupAttachment(RootComponent);
 	
-
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Projectiles/P_Projectile_Trail02_Red.P_Projectile_Trail02_Red'"));
 	if (ParticleSystemAsset.Succeeded())
 	{
 		P1->SetTemplate(ParticleSystemAsset.Object);
 	}
 	
+	Damage = 15.0f;  
+	ProjectileSpeed = 0.0f;  
+	
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> HitFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Fireball03_Red.P_Hit_Fireball03_Red'"));
+	if (HitFX.Succeeded())
+		HitEffect = HitFX.Object;
 }
 
 void AProjectile_A::BeginPlay()
@@ -34,8 +40,13 @@ void AProjectile_A::BeginPlay()
 
 void AProjectile_A::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	// Mover hacia adelante
+	
 	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime;
 	SetActorLocation(NewLocation);
+	
+	if (NewLocation.X < -2000.0f || NewLocation.X > 2000.0f || 
+		FMath::Abs(NewLocation.Y) > 3000.0f)
+	{
+		Destroy();
+	}
 }

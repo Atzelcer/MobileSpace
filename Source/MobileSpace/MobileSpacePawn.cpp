@@ -18,6 +18,7 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "MegaCapsula.h"
+#include "ProjectileZero.h"
 
 
 const FName AMobileSpacePawn::MoveForwardBinding("MoveForward");
@@ -137,6 +138,17 @@ void AMobileSpacePawn::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		HacerDanio();
 	}
+
+	if (OtherActor->IsA(AProjectileZero::StaticClass()))
+	{
+		Cast<AProjectileZero>(OtherActor)->DestroyProjectile();
+
+		HacerDanio();
+	}
+
+	
+
+
 }
 
 void AMobileSpacePawn::ActivarDanio()
