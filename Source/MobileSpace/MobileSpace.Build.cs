@@ -8,28 +8,28 @@ public class MobileSpace : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        // --- Módulos públicos requeridos por el juego ---
+        // --- Mï¿½dulos pï¿½blicos requeridos por el juego ---
         PublicDependencyModuleNames.AddRange(new string[]
         {
-            "Core",                 // Núcleo del motor Unreal
+            "Core",                 // Nï¿½cleo del motor Unreal
             "CoreUObject",          // Objetos base del motor
-            "Engine",               // Subsistema principal de render, físicas, etc.
+            "Engine",               // Subsistema principal de render, fï¿½sicas, etc.
             "InputCore",            // Soporte de entrada (teclado, touch, gamepad)
             "UMG",                  // Interfaz de usuario (Widgets)
             "Slate",                // Sistema de interfaz Slate
-            "SlateCore",            // Núcleo de Slate
-            "Niagara",              // Efectos visuales y partículas
+            "SlateCore",            // Nï¿½cleo de Slate
+            // "Niagara",              // REMOVIDO - causaba crashes en Android
             "AIModule",             // Inteligencia artificial
-            "NavigationSystem",     // Navegación en IA
-            "GameplayTasks",        // Tareas de gameplay asíncronas
-            "Sockets",              // Comunicación en red a bajo nivel
-            "Networking",           // Red básica (UDP/TCP)
-            "OnlineSubsystem",      // Sistema en línea (base)
+            "NavigationSystem",     // Navegaciï¿½n en IA
+            "GameplayTasks",        // Tareas de gameplay asï¿½ncronas
+            "Sockets",              // Comunicaciï¿½n en red a bajo nivel
+            "Networking",           // Red bï¿½sica (UDP/TCP)
+            "OnlineSubsystem",      // Sistema en lï¿½nea (base)
             "OnlineSubsystemUtils", // Herramientas de red avanzadas
-            "EngineSettings"        // Configuración del proyecto
+            "EngineSettings"        // Configuraciï¿½n del proyecto
         });
 
-        // --- Dependencias privadas (solo visibles dentro del módulo) ---
+        // --- Dependencias privadas (solo visibles dentro del mï¿½dulo) ---
         PrivateDependencyModuleNames.AddRange(new string[]
         {
             "UMG",
@@ -37,25 +37,27 @@ public class MobileSpace : ModuleRules
             "SlateCore"
         });
 
-        // --- Módulos dinámicos cargados en tiempo de ejecución ---
+        // --- Mï¿½dulos dinï¿½micos cargados en tiempo de ejecuciï¿½n ---
         DynamicallyLoadedModuleNames.AddRange(new string[]
         {
             "OnlineSubsystemNull"   // Activa soporte LAN local
         });
 
-        // --- Configuración específica por plataforma ---
+        // --- ConfiguraciÃ³n especÃ­fica por plataforma ---
         if (Target.Platform == UnrealTargetPlatform.Android)
         {
-            // Activa optimización móvil
+            // Activa optimizaciÃ³n mÃ³vil
             bEnableExceptions = false;
             bUseUnity = true;
             bEnableUndefinedIdentifierWarnings = false;
 
-            // Librerías adicionales Android (si se usan sockets directos)
+            // LibrerÃ­as adicionales Android (si se usan sockets directos)
             PublicAdditionalLibraries.Add("android");
+
+            // ConfiguraciÃ³n especÃ­fica para partÃ­culas en Android (Niagara removido)
         }
 
-        // --- Configuración para builds "Shipping" ---
+        // --- Configuraciï¿½n para builds "Shipping" ---
         if (Target.Configuration == UnrealTargetConfiguration.Shipping)
         {
             bUseUnity = true;

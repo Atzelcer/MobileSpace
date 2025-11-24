@@ -6,9 +6,7 @@
 #include "Boss.h"
 #include "Boss_1.generated.h"
 
-/**
- * Jefe 1 - Nave Intrepid Type 1
- */
+
 UCLASS()
 class MOBILESPACE_API ABoss_1 : public ABoss
 {

@@ -4,8 +4,6 @@
 #include "MegaMIssil.h"
 #include "HUDmain.h"
 #include "Widget_ON_GAME.h"
-#include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/CollisionProfile.h"
@@ -14,6 +12,7 @@
 #include "Components/BoxComponent.h"
 #include "AventuraManager.h"
 #include "Ship_X.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "MegaObstaculo.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -65,14 +64,28 @@ AMobileSpacePawn::AMobileSpacePawn()
 		ParticleTrail->SetRelativeScale3D(FVector(1.0f));
 	}
 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> EscudoFX(TEXT("/Game/GrimzaFX/Particles/NS_BubbleGex.NS_BubbleGex"));
-	if (EscudoFX.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> EscudoFX(TEXT("ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_healAura.P_ky_healAura'"));
+	if (EscudoFX.Succeeded() && EscudoFX.Object)
 	{
-		EscudoNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EscudoNiagara"));
-		EscudoNiagara->SetupAttachment(CollisionComponent);
-		EscudoNiagara->SetAsset(EscudoFX.Object);
-		EscudoNiagara->SetAutoActivate(false);
-		EscudoNiagara->SetWorldScale3D(FVector(1.2f));
+		EscudoSystem = EscudoFX.Object;
+		EscudoParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EscudoParticles"));
+		if (EscudoParticles)
+		{
+			EscudoParticles->SetupAttachment(CollisionComponent);
+			EscudoParticles->SetTemplate(EscudoSystem);
+			EscudoParticles->SetAutoActivate(false);
+			EscudoParticles->SetWorldScale3D(FVector(0.5f));
+		}
+	}
+	else
+	{
+		// Fallback: crear component sin asset para evitar crashes
+		EscudoParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EscudoParticles"));
+		if (EscudoParticles)
+		{
+			EscudoParticles->SetupAttachment(CollisionComponent);
+			EscudoParticles->SetAutoActivate(false);
+		}
 	}
 
 	static ConstructorHelpers::FObjectFinder<USoundWave> EscudoSnd(TEXT("SoundWave'/Game/Musica_D/EpicToonSFX/MagicCombatAudio/Magic/MagicField2_Normalloops.MagicField2_Normalloops'"));
@@ -461,11 +474,11 @@ void AMobileSpacePawn::ActivarEscudo()
 	bInmuneEscudo = true;
 	bCanFire = false;
 
-	if (EscudoNiagara)
+	if (EscudoParticles && IsValid(EscudoParticles))
 	{
-		EscudoNiagara->SetVisibility(true);
-		EscudoNiagara->Activate(true);
-		EscudoNiagara->SetWorldScale3D(FVector(0.8f));
+		EscudoParticles->SetVisibility(true);
+		EscudoParticles->Activate(true);
+		EscudoParticles->SetWorldScale3D(FVector(0.4f));
 	}
 
 	if (EscudoSound)
@@ -491,11 +504,11 @@ void AMobileSpacePawn::DesactivarEscudo()
 	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 
-	if (EscudoNiagara)
+	if (EscudoParticles && IsValid(EscudoParticles))
 	{
-		EscudoNiagara->Deactivate();
-		EscudoNiagara->SetVisibility(false);
-		EscudoNiagara->SetWorldScale3D(FVector(1.2f));
+		EscudoParticles->Deactivate();
+		EscudoParticles->SetVisibility(false);
+		EscudoParticles->SetWorldScale3D(FVector(0.5f));
 	}
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);

@@ -80,13 +80,7 @@ ABoss_1::ABoss_1()
 	{
 		DestructionSound = DestructionSoundAsset.Object;
 	}
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ForceFieldAsset(TEXT("NiagaraSystem'/Game/GrimzaFX/Particles/NS_AuraHeal.NS_AuraHeal'"));
-	if (ForceFieldAsset.Succeeded())
-	{
-		ForceFieldSystem = ForceFieldAsset.Object;
 
-	}
-	ForceFieldScale = FVector(1.3f, 1.3f, 1.3f); 
 	if (BossCollision)
 	{
 		BossCollision->SetBoxExtent(FVector(500.0f, 400.0f, 400.0f));
