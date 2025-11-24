@@ -12,8 +12,8 @@ AProjectile_B::AProjectile_B()
 	if (ProjectileMeshAsset.Succeeded())
 	{
 		ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
+		
 	}
-
 
 	P2 = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem_B"));
 	P2->SetupAttachment(RootComponent);
@@ -23,6 +23,13 @@ AProjectile_B::AProjectile_B()
 	{
 		P2->SetTemplate(ParticleSystemAsset.Object);
 	}
+	
+	Damage = 20.0f; 
+	ProjectileSpeed = 0.0f; 
+	
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> HitFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Magic01_Purple.P_Hit_Magic01_Purple'"));
+	if (HitFX.Succeeded())
+		HitEffect = HitFX.Object;
 }
 
 void AProjectile_B::BeginPlay()
@@ -33,7 +40,13 @@ void AProjectile_B::BeginPlay()
 
 void AProjectile_B::Tick(float DeltaTime)
 {
-	AProjectileZero::Tick(DeltaTime);
+	
 	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime;
 	SetActorLocation(NewLocation);
+	
+	if (NewLocation.X < -2000.0f || NewLocation.X > 2000.0f || 
+		FMath::Abs(NewLocation.Y) > 3000.0f)
+	{
+		Destroy();
+	}
 }

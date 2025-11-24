@@ -35,6 +35,17 @@ AAventuraManager::AAventuraManager()
 	bJefeActivo = false;
 	bJefeEliminado = false;
 
+	// Inicializar sistema de enjambres
+	bUseSwarmFormation = true;
+	SwarmRows = 2;
+	SwarmColumns = 3;
+	ShipSpacing = 800.0f;
+	RowSpacing = 600.0f;
+	EntryDelay = 0.5f;
+	NextShipToEnter = 0;
+	SwarmEntryTimer = 0.0f;
+	bSwarmForming = false;
+
 	AudioComp_SonidoCarga = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp_SonidoCarga"));
 	AudioComp_SonidoCarga->SetupAttachment(RootComponent);
 	AudioComp_SonidoCarga->bAutoActivate = false;
@@ -111,6 +122,11 @@ void AAventuraManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MoverJugador(DeltaTime);
 	
+	if (bUseSwarmFormation && bSwarmForming)
+	{
+		UpdateSwarmFormation(DeltaTime);
+	}
+	
 	static float DebugTimer = 0.0f;
 	DebugTimer += DeltaTime;
 	
@@ -140,7 +156,6 @@ void AAventuraManager::SetNivelActual(int32 NuevoNivel)
 
 void AAventuraManager::SiguienteNivel()
 {
-	// Verificación de seguridad
 	if (!GetWorld())
 	{
 		UE_LOG(LogTemp, Error, TEXT("GetWorld() es nulo en SiguienteNivel()"));
@@ -153,7 +168,6 @@ void AAventuraManager::SiguienteNivel()
 
 void AAventuraManager::ControladorNiveles()
 {
-	// Verificaciones de seguridad
 	if (!GetWorld())
 	{
 		UE_LOG(LogTemp, Error, TEXT("GetWorld() es nulo en ControladorNiveles()"));
@@ -213,7 +227,6 @@ void AAventuraManager::ControladorNiveles()
 			default: break;
 			}
 			
-			// Obtener HUD de forma segura cuando sea necesario
 			APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 			if (PC)
 			{
@@ -261,25 +274,184 @@ void AAventuraManager::ActivarEfectoSonidoPantallaCarga(bool bActivarSonido)
 
 void AAventuraManager::GenerarOleada()
 {
-	OleadaActual++;
-
-
-	for (int32 i = 0; i < CantidadPorOleada; i++)
+	if (bUseSwarmFormation)
 	{
-		int32 RandomIndex = FMath::RandRange(0, TiposActuales.Num() - 1);
-		ENaveTipo TipoSeleccionado = TiposActuales[RandomIndex];
-		
-		float RandomY = FMath::FRandRange(-2500.f, 2500.f);
-		float RandomX = FMath::FRandRange(1200.f, 1800.f);
-		FVector SpawnLocation(RandomX, RandomY, 300.f);
-		FRotator SpawnRotation = FRotator::ZeroRotator;
-		
-		AShip_X* NewShip = ShipFactory->CrearNave(GetWorld(), TipoSeleccionado, SpawnLocation, SpawnRotation);
-		
-		
+		GenerarEnjambre();
+	}
+	else
+	{
+		OleadaActual++;
+
+		for (int32 i = 0; i < CantidadPorOleada; i++)
+		{
+			int32 RandomIndex = FMath::RandRange(0, TiposActuales.Num() - 1);
+			ENaveTipo TipoSeleccionado = TiposActuales[RandomIndex];
+			
+			float RandomY = FMath::FRandRange(-2500.f, 2500.f);
+			float RandomX = FMath::FRandRange(1200.f, 1800.f);
+			FVector SpawnLocation(RandomX, RandomY, 300.f);
+			FRotator SpawnRotation = FRotator::ZeroRotator;
+			
+			AShip_X* NewShip = ShipFactory->CrearNave(GetWorld(), TipoSeleccionado, SpawnLocation, SpawnRotation);
+		}
 	}
 
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AAventuraManager::ComprobarOleadaGeneral);
+}
+
+void AAventuraManager::GenerarEnjambre()
+{
+	OleadaActual++;
+	
+	CurrentSwarmShips.Empty();
+	NextShipToEnter = 0;
+	SwarmEntryTimer = 0.0f;
+	bSwarmForming = true;
+
+	switch (NivelActual)
+	{
+	case 1:
+		SwarmRows = 3; SwarmColumns = 4;  
+		break;
+	case 2:
+		SwarmRows = 4; SwarmColumns = 3;  
+		break;
+	case 3:
+		SwarmRows = 4; SwarmColumns = 4; 
+		break;
+	case 4:
+		SwarmRows = 4; SwarmColumns = 5; 
+		break;
+	case 5:
+		SwarmRows = 5; SwarmColumns = 4; 
+		break;
+	case 6:
+		SwarmRows = 5; SwarmColumns = 5;
+		break;
+	case 7:
+		SwarmRows = 6; SwarmColumns = 4;
+		break;
+	default:
+		SwarmRows = 4; SwarmColumns = 4; 
+		break;
+	}
+
+
+	FVector BasePosition(1400.f, 0.f, 300.f);
+	
+	for (int32 Row = 0; Row < SwarmRows; Row++)
+	{
+		for (int32 Column = 0; Column < SwarmColumns; Column++)
+		{
+			if (TiposActuales.Num() == 0) break;
+			
+			int32 RandomIndex = FMath::RandRange(0, TiposActuales.Num() - 1);
+			ENaveTipo TipoSeleccionado = TiposActuales[RandomIndex];
+			
+			FVector FormationOffset;
+			FormationOffset.X = Row * -RowSpacing; 
+			FormationOffset.Y = (Column - (SwarmColumns * 0.5f)) * ShipSpacing;
+			FormationOffset.Z = 0.f;
+			
+			
+			FVector EntryPosition = BasePosition + FVector(600.f, FormationOffset.Y, 0.f);
+			FVector FinalPosition = BasePosition + FormationOffset;
+			
+		
+			
+			AShip_X* NewShip = ShipFactory->CrearNave(GetWorld(), TipoSeleccionado, 
+													EntryPosition, 
+													FRotator(0.f, -180.f, 0.f));
+			
+			if (NewShip)
+			{
+				NewShip->bUseFormation = false;
+				NewShip->FormationAnchor = FVector::ZeroVector;
+				NewShip->FormationOffset = FVector::ZeroVector;
+				
+				bool bIsFrontLine = (Row == 0);
+				NewShip->EnableFire(false); 
+				NewShip->SetAttackState(false);
+				
+				NewShip->SetMovement(EArcadeMovement::SwarmEntry);
+				
+				if (NewShip->MoveComp)
+				{
+					FVector TargetFormationPosition = BasePosition + FormationOffset;
+					NewShip->MoveComp->SetSwarmTargetPosition(TargetFormationPosition);
+					NewShip->MoveComp->SetSwarmPhase(0); 
+				}
+				
+				FVector TargetFormationPosition = BasePosition + FormationOffset;
+				
+				CurrentSwarmShips.Add(NewShip);
+				
+			
+			}
+		}
+	}
+	
+}
+
+void AAventuraManager::UpdateSwarmFormation(float DeltaTime)
+{
+	SwarmEntryTimer += DeltaTime;
+	
+	bool bAllInFormation = true;
+	int32 NavesEnFormacion = 0;
+	
+	for (AShip_X* Ship : CurrentSwarmShips)
+	{
+		if (!Ship || !IsValid(Ship)) continue;
+		
+		if (Ship->MoveComp && Ship->MoveComp->SwarmPhase < 2)
+		{
+			bAllInFormation = false;
+		}
+		else
+		{
+			NavesEnFormacion++;
+		}
+	}
+	
+	if (FMath::Fmod(SwarmEntryTimer, 2.0f) < DeltaTime)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Enjambre: %d/%d naves en formación"), NavesEnFormacion, CurrentSwarmShips.Num());
+	}
+	
+	if (bAllInFormation && NavesEnFormacion > 0)
+	{
+		FTimerHandle DelayTimer;
+		GetWorld()->GetTimerManager().SetTimer(DelayTimer, [this]()
+		{
+			EnableFrontLineAttack();
+			bSwarmForming = false;
+			UE_LOG(LogTemp, Warning, TEXT("¡ENJAMBRE FORMADO! Habilitando ataque de primera línea"));
+		}, 1.5f, false);
+	}
+}
+
+void AAventuraManager::EnableFrontLineAttack()
+{
+	for (int32 i = 0; i < CurrentSwarmShips.Num(); i++)
+	{
+		AShip_X* Ship = CurrentSwarmShips[i];
+		if (!Ship || !IsValid(Ship)) continue;
+		
+		bool bIsFrontLine = (i < SwarmColumns);
+		
+		if (bIsFrontLine)
+		{
+			Ship->EnableFire(true);
+			Ship->SetAttackState(true);
+			Ship->StartAutoFire();
+		}
+		else
+		{
+			Ship->EnableFire(false);
+			Ship->SetAttackState(false);
+		}
+	}
 }
 
 
@@ -288,8 +460,49 @@ void AAventuraManager::ComprobarOleadaGeneral()
 	TArray<AActor*> Enemigos;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip_X::StaticClass(), Enemigos);
 
+	if (bUseSwarmFormation && CurrentSwarmShips.Num() > 0)
+	{
+		for (int32 i = CurrentSwarmShips.Num() - 1; i >= 0; i--)
+		{
+			if (!CurrentSwarmShips[i] || !IsValid(CurrentSwarmShips[i]))
+			{
+				CurrentSwarmShips.RemoveAt(i);
+			}
+		}
+
+		bool bHasFrontLineShips = false;
+		for (int32 i = 0; i < FMath::Min(SwarmColumns, CurrentSwarmShips.Num()); i++)
+		{
+			if (CurrentSwarmShips[i] && IsValid(CurrentSwarmShips[i]))
+			{
+				bHasFrontLineShips = true;
+				break;
+			}
+		}
+
+		if (!bHasFrontLineShips && CurrentSwarmShips.Num() > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Primera línea destruida! Promoviendo nuevas naves al frente"));
+			
+			TArray<AShip_X*> SurvivingShips;
+			for (AShip_X* Ship : CurrentSwarmShips)
+			{
+				if (Ship && IsValid(Ship))
+				{
+					SurvivingShips.Add(Ship);
+				}
+			}
+			CurrentSwarmShips = SurvivingShips;
+			
+			EnableFrontLineAttack();
+		}
+	}
+
 	if (Enemigos.Num() == 0 && !bOleadasCompletadas)
 	{
+		CurrentSwarmShips.Empty();
+		bSwarmForming = false;
+		
 		if (OleadaActual < OleadasTotales)
 		{
 			GenerarOleada();
