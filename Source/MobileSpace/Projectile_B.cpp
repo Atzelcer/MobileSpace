@@ -27,9 +27,6 @@ AProjectile_B::AProjectile_B()
 	Damage = 20.0f; 
 	ProjectileSpeed = 0.0f; 
 	
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> HitFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Magic01_Purple.P_Hit_Magic01_Purple'"));
-	if (HitFX.Succeeded())
-		HitEffect = HitFX.Object;
 }
 
 void AProjectile_B::BeginPlay()
