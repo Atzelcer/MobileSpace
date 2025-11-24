@@ -25,17 +25,17 @@ void UModoJuegoC::NativeConstruct()
 void UModoJuegoC::OnAventuraClicked()
 {
 
-    APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-    if (PC)
-    {
-        AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-        if (HUD)
-        {
-			HUD->MostrarPantallaCarga();
-            HUD->OcultarModoJuego();
-			HUD->OcultarPanelPrincipal();
-        }
-    }
+   // APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+   // if (PC)
+   // {
+   //     AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+   //     if (HUD)
+   //     {
+			//HUD->MostrarPantallaCarga();
+   //         HUD->OcultarModoJuego();
+			//HUD->OcultarPanelPrincipal();
+   //     }
+   // }
 }
 
 

@@ -26,13 +26,15 @@ void UPanelPrincipalC::NativeConstruct()
 
 void UPanelPrincipalC::OnJugarClicked()
 {
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PlayerController)
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
 	{
-		AHUDmain* HUD = Cast<AHUDmain>(PlayerController->GetHUD());
+		AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 		if (HUD)
 		{
-			HUD->MostrarModoJuego();
+			HUD->MostrarPantallaCarga();
+			HUD->OcultarModoJuego();
+			HUD->OcultarPanelPrincipal();
 		}
 	}
 }

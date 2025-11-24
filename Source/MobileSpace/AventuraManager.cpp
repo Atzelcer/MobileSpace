@@ -512,11 +512,13 @@ void AAventuraManager::ComprobarOleadaGeneral()
 			bOleadasCompletadas = true;
 
 			GetWorldTimerManager().SetTimer(BossTimerHandle, this, &AAventuraManager::SpawnJefeDelNivel, 5.0f, false);
+
+			ComprobarJefe();
 		}
 	}
 	else if (bOleadasCompletadas && !bJefeEliminado)
 	{
-		ComprobarJefe();
+
 		
 		if (bJefeActivo && !bJefeEliminado)
 		{
@@ -527,6 +529,21 @@ void AAventuraManager::ComprobarOleadaGeneral()
 			{
 				bJefeEliminado = true;
 				bJefeActivo = false;
+
+				if (NivelActual == 7)
+				{
+					APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+					if (PC)
+					{
+						AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
+						if (HUD)
+						{
+							HUD->MostrarAjustes();
+						}
+					}
+
+					return;
+				}
 								
 				GetWorldTimerManager().ClearTimer(WaveTimerHandle);
 				GetWorldTimerManager().SetTimer(WaveTimerHandle, this, &AAventuraManager::SpawnPortalFinal, 1.0f, false);

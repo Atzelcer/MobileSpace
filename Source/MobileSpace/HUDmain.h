@@ -124,6 +124,12 @@ public:
 	UPROPERTY(Transient)
 	class UWidgetMegaBoss* WidgetMegaBossInstance;
 
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	TSubclassOf<class UWidgetVictory> WidgetVictoryClass;
+
+	UPROPERTY(Transient)
+	class UWidgetVictory* WidgetVictoryInstance;
+
 
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void ReproducirMusicaInicio();
@@ -221,6 +227,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OcultarNivel();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void MostrarVictory();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OcultarVictory();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void OcultarTodo();

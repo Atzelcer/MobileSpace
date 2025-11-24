@@ -26,6 +26,7 @@
 #include "Widget_Indicar_level.h"
 #include "WidgetGameOver.h"
 #include "WidgetMegaBoss.h"
+#include "WidgetVictory.h"
 
 AHUDmain::AHUDmain()
 {
@@ -96,6 +97,11 @@ AHUDmain::AHUDmain()
 	static ConstructorHelpers::FObjectFinder<USoundBase> MusicaAsset(TEXT("SoundWave'/Game/BOSS_SOUNDS/Sound_TrackOFICIAL.Sound_TrackOFICIAL'"));
 	if (MusicaAsset.Succeeded())
 		MusicaInicio = MusicaAsset.Object;
+
+	static ConstructorHelpers::FClassFinder<UWidgetVictory> VictoryBPClass(TEXT("/Game/WIDGETS/Victory.Victory_C"));
+	if (VictoryBPClass.Succeeded())
+		WidgetVictoryClass = VictoryBPClass.Class;
+
 
 	// Inicializar instancia del widget
 	WidgetMegaBossInstance = nullptr;
@@ -524,6 +530,29 @@ void AHUDmain::OcultarNivel()
 	if (WidgetLevelInstance && WidgetLevelInstance->IsInViewport())
 	{
 		WidgetLevelInstance->RemoveFromParent();
+	}
+}
+
+void AHUDmain::MostrarVictory()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC || !WidgetVictoryClass) return;
+
+	WidgetVictoryInstance = CreateWidget<UWidgetVictory>(PC, WidgetVictoryClass);
+	if (WidgetVictoryInstance)
+	{
+		WidgetVictoryInstance->AddToViewport(9999);
+	}
+}
+
+void AHUDmain::OcultarVictory()
+{
+	if (WidgetVictoryInstance)
+	{
+		WidgetVictoryInstance->OnSalirClicked();
+		OcultarTodo();
+		WidgetVictoryInstance->RemoveFromParent();
+		WidgetVictoryInstance = nullptr;
 	}
 }
 
