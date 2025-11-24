@@ -18,7 +18,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Button_volver;
 
-	// TextBlock que contiene los créditos
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* V_Creditos_A;
 
@@ -28,4 +27,6 @@ public:
 private:
 	float ScrollSpeed;
 	float StartY;
+	float ResetOffset;
+	bool bInitialized;
 };
