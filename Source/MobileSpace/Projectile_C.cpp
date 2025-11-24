@@ -8,6 +8,7 @@ AProjectile_C::AProjectile_C()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Configurar malla específica para Projectile_C
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("StaticMesh'/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere'"));
 	if (ProjectileMeshAsset.Succeeded())
 	{
@@ -22,18 +23,30 @@ AProjectile_C::AProjectile_C()
 	{
 		P3->SetTemplate(ParticleSystemAsset.Object);
 	}
+	
+	Damage = 25.0f; 
+	ProjectileSpeed = 0.0f;  
+	
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> HitFX(TEXT("ParticleSystem'/Game/MagicProjectilesVol2/Particles/Hits/P_Hit_Fireball03_Orange.P_Hit_Fireball03_Orange'"));
+	if (HitFX.Succeeded())
+		HitEffect = HitFX.Object;
 }
 
 void AProjectile_C::BeginPlay()
 {
-	AActor::BeginPlay();
-	
+	Super::BeginPlay(); 
 	SetLifeSpan(LifeSpan);
 }
 
 void AProjectile_C::Tick(float DeltaTime)
 {
-	AActor::Tick(DeltaTime);
+	
 	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime;
 	SetActorLocation(NewLocation);
+	
+	if (NewLocation.X < -2000.0f || NewLocation.X > 2000.0f || 
+		FMath::Abs(NewLocation.Y) > 3000.0f)
+	{
+		Destroy();
+	}
 }

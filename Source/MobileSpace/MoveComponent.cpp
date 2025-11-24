@@ -280,6 +280,71 @@ void UMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		}
 		break;
 
+	case EArcadeMovement::SwarmEntry:
+		{
+			if (SwarmPhase == 0)
+			{
+				NewLocation.X -= SwarmEntrySpeed * t;
+				NewLocation.Y += FMath::Sin(t * 3.0f) * 50.0f; 
+				
+				if (SwarmTargetPosition != FVector::ZeroVector)
+				{
+					float DistanceToTarget = FVector::Dist(NewLocation, SwarmTargetPosition);
+					if (DistanceToTarget < 200.0f)
+					{
+						SwarmPhase = 1;
+						Origin = NewLocation; 
+						Elapsed = 0.0f;
+					}
+				}
+			}
+			// Fase 1: Movimiento hacia posición de formación
+			else if (SwarmPhase == 1)
+			{
+				if (SwarmTargetPosition != FVector::ZeroVector)
+				{
+					NewLocation = FMath::VInterpTo(GetOwner()->GetActorLocation(), SwarmTargetPosition, DeltaTime, SwarmFormationSpeed / 100.0f);
+					
+					// Cambiar a fase de avance cuando esté en posición
+					float DistanceToTarget = FVector::Dist(NewLocation, SwarmTargetPosition);
+					if (DistanceToTarget < 50.0f)
+					{
+						SwarmPhase = 2;
+						Elapsed = 0.0f;
+					}
+				}
+			}
+			// Fase 2: Avance coordinado hacia el jugador
+			else if (SwarmPhase == 2)
+			{
+				NewLocation.X -= SwarmAdvanceSpeed * t;
+				NewLocation.Y += FMath::Sin(t * 2.0f) * 30.0f; // Movimiento suave en Y
+			}
+		}
+		break;
+
+	case EArcadeMovement::SwarmFormation:
+		{
+			// Mantener posición de formación con ligero movimiento
+			if (SwarmTargetPosition != FVector::ZeroVector)
+			{
+				FVector TargetWithMovement = SwarmTargetPosition;
+				TargetWithMovement.X -= t * 30.0f; // Avance muy lento
+				TargetWithMovement.Y += FMath::Sin(t * 1.5f) * 20.0f; // Ondulación suave
+				
+				NewLocation = FMath::VInterpTo(GetOwner()->GetActorLocation(), TargetWithMovement, DeltaTime, 2.0f);
+			}
+		}
+		break;
+
+	case EArcadeMovement::SwarmAdvance:
+		{
+			// Avance agresivo manteniendo formación
+			NewLocation.X -= SwarmAdvanceSpeed * t;
+			NewLocation.Y += FMath::Sin(t * 2.5f + Origin.Y * 0.01f) * 40.0f; // Cada nave con ligera variación
+		}
+		break;
+
 	default:
 		NewLocation.X -= Speed * t;
 		break;
@@ -290,4 +355,15 @@ void UMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	NewLocation.Y = FMath::Clamp(NewLocation.Y, MovementMin.Y, MovementMax.Y);
 
 	GetOwner()->SetActorLocation(NewLocation);
+}
+
+void UMoveComponent::SetSwarmTargetPosition(FVector NewTarget)
+{
+	SwarmTargetPosition = NewTarget;
+}
+
+void UMoveComponent::SetSwarmPhase(int32 NewPhase)
+{
+	SwarmPhase = NewPhase;
+	Elapsed = 0.0f; // Reiniciar tiempo para nueva fase
 }

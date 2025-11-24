@@ -13,7 +13,7 @@ ABoss_5::ABoss_5()
 	if (BossMeshAsset.Succeeded() && BossMesh)
 	{
 		BossMesh->SetStaticMesh(BossMeshAsset.Object);
-		BossMesh->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+		BossMesh->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
 		BossMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f)); 
 	}
 

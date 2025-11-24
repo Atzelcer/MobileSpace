@@ -86,7 +86,35 @@ private:
     int32 OleadaActual;
     TArray<ENaveTipo> TiposActuales;
 
+    // Sistema de enjambres
+    UPROPERTY(EditAnywhere, Category = "Swarm")
+    bool bUseSwarmFormation = true;
+    
+    UPROPERTY(EditAnywhere, Category = "Swarm")
+    int32 SwarmRows = 2;
+    
+    UPROPERTY(EditAnywhere, Category = "Swarm")
+    int32 SwarmColumns = 3;
+    
+    UPROPERTY(EditAnywhere, Category = "Swarm")
+    float ShipSpacing = 800.0f;  // MUY SEPARADAS
+    
+    UPROPERTY(EditAnywhere, Category = "Swarm")
+    float RowSpacing = 600.0f;   // MUY SEPARADAS
+    
+    UPROPERTY(EditAnywhere, Category = "Swarm")
+    float EntryDelay = 0.8f;
+    
+    // Datos de naves en formación
+    TArray<AShip_X*> CurrentSwarmShips;
+    int32 NextShipToEnter = 0;
+    float SwarmEntryTimer = 0.0f;
+    bool bSwarmForming = false;
+
     void GenerarOleada();
+    void GenerarEnjambre();
+    void UpdateSwarmFormation(float DeltaTime);
+    void EnableFrontLineAttack();
     void ComprobarOleadaGeneral();
     void SpawnPortalFinal();
     
