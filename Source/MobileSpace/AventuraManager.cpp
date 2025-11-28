@@ -144,7 +144,6 @@ void AAventuraManager::Tick(float DeltaTime)
 			
 			
 			GetWorldTimerManager().ClearTimer(WaveTimerHandle);
-			SpawnPortalFinal();
 		}
 	}
 }
@@ -538,15 +537,13 @@ void AAventuraManager::ComprobarOleadaGeneral()
 						AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
 						if (HUD)
 						{
-							HUD->MostrarAjustes();
+							HUD->MostrarVictory();
 						}
 					}
 
 					return;
 				}
 								
-				GetWorldTimerManager().ClearTimer(WaveTimerHandle);
-				GetWorldTimerManager().SetTimer(WaveTimerHandle, this, &AAventuraManager::SpawnPortalFinal, 1.0f, false);
 			}
 		}
 		
