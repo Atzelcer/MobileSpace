@@ -40,11 +40,6 @@ ABoss::ABoss()
 	BossAudioComponent->SetupAttachment(BossMesh);
 	BossAudioComponent->bAutoActivate = false;
 
-	ForceFieldComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ForceFieldComponent"));
-	ForceFieldComponent->SetupAttachment(BossMesh); 
-	ForceFieldComponent->SetRelativeLocation(FVector::ZeroVector);
-	ForceFieldComponent->SetRelativeScale3D(ForceFieldScale);
-	ForceFieldComponent->bAutoActivate = false; 
 
 
 	CurrentHealth = BossHealth;
@@ -92,12 +87,6 @@ ABoss::ABoss()
 		}
 	}
 
-	if (ForceFieldComponent && ForceFieldSystem)
-	{
-		ForceFieldComponent->SetAsset(ForceFieldSystem); 
-		ForceFieldComponent->SetRelativeScale3D(ForceFieldScale);
-		ForceFieldComponent->ActivateSystem(); 
-	}
 	StartEpicEntrance();
 }void ABoss::Tick(float DeltaTime)
 {
@@ -124,7 +113,6 @@ ABoss::ABoss()
 
 void ABoss::AutoFire()
 {
-	// No disparar durante la entrada épica
 	if (bIsEntering) return;
 
 	if (AttackComp)

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "NiagaraComponent.h"
+// #include "NiagaraComponent.h" // REMOVIDO para Android
 #include "Sound/SoundWave.h"
 #include "Particles/ParticleSystem.h"
 #include "Components/CapsuleComponent.h"
@@ -105,7 +105,7 @@ public:
 	class UParticleSystemComponent* ParticleTrail;
 
 	UPROPERTY(VisibleAnywhere, Category = "Componentes|Efectos", BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UNiagaraComponent* EscudoNiagara;
+	class UParticleSystemComponent* EscudoParticles;
 
 	// ------------------------------------------------------------
 	// Recursos visuales y de audio
@@ -144,8 +144,8 @@ public:
 	// ------------------------------------------------------------
 	// Referencias externas
 	// ------------------------------------------------------------
-	UPROPERTY()
-	class UNiagaraSystem* EscudoSystem;
+	UPROPERTY(EditDefaultsOnly, Category = "Efectos|Escudo")
+	class UParticleSystem* EscudoSystem;
 
 	UPROPERTY()
 	class UWidget_ON_GAME* HUDWidget;
@@ -176,7 +176,7 @@ public:
 	float TasaSobrecarga = 15.f; 
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
-	float TasaEnfriamiento = 80.f; // enfría más rápido
+	float TasaEnfriamiento = 80.f; // enfrï¿½a mï¿½s rï¿½pido
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay|Sobrecarga")
 	bool bEstaSobrecargado = false;

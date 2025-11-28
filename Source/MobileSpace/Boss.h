@@ -7,9 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Particles/ParticleSystem.h"
-#include "Particles/ParticleSystemComponent.h"
-#include "NiagaraComponent.h"
-#include "NiagaraSystem.h" 
+#include "Particles/ParticleSystemComponent.h" 
 #include "Sound/SoundBase.h"
 #include "MoveComponent.h"
 #include "AtackComponent.h"
@@ -65,14 +63,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
 	FVector DestructionEffectScale = FVector(2.0f, 2.0f, 2.0f);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UNiagaraComponent* ForceFieldComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|ForceField")
-	UNiagaraSystem* ForceFieldSystem;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX|ForceField")
-	FVector ForceFieldScale = FVector(2.f, 2.f, 2.f);
 
 	
 
