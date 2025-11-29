@@ -20,34 +20,11 @@ void UWidgetGameOver::NativeConstruct()
 
 void UWidgetGameOver::OnVolverEmpezarClicked()
 {
-	//Eliminar todo y entrar a la pantalla de carga 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
-	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (HUD)
-	{
-		HUD->OcultarOnGame();
-		HUD->OcultarGameOver();
-		FName NivelActual = *UGameplayStatics::GetCurrentLevelName(GetWorld());
-		UGameplayStatics::OpenLevel(GetWorld(), NivelActual);
-		UGameplayStatics::SetGamePaused(GetWorld(), false);
-		HUD->OcultarPanelPrincipal();
-		HUD->MostrarPantallaCarga();
-	}
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), true);
 }
 
 void UWidgetGameOver::OnSalirPanelPrincipalClicked()
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), true);
 
-	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (HUD)
-	{
-		HUD->OcultarOnGame();
-		FName NivelActual = *UGameplayStatics::GetCurrentLevelName(GetWorld());
-		UGameplayStatics::OpenLevel(GetWorld(), NivelActual);
-		UGameplayStatics::SetGamePaused(GetWorld(), false);
-		HUD->MostrarPanelPrincipal();
-	}
 }

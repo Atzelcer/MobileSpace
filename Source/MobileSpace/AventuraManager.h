@@ -126,13 +126,18 @@ private:
     void ComprobarJefe();
     int32 GetTipoJefeParaNivel(int32 Nivel);
     
-    // Función de debug para verificar estado manualmente
-    UFUNCTION(BlueprintCallable, Category = "Debug")
-    void DebugEstadoJefe();
-    
-    // Función para forzar eliminación de jefe manualmente
-    UFUNCTION(BlueprintCallable, Category = "Debug") 
-    void ForzarEliminacionJefe();
+    UFUNCTION()
+    void NotificarBossMuerto();
+
+    bool bJefeDerrotadoNotificado;
+
+    UFUNCTION()
+    void RegistrarEventosBoss(class ABoss* Boss);
+
+    UFUNCTION()
+    void OnBossDestroyed(AActor* DestroyedActor);
+
+
 
     void GenerarOleadaObstaculos();
     void ComprobarOleadaObstaculos();

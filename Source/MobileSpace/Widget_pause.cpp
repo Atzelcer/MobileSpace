@@ -39,18 +39,6 @@ void UWidget_pause::OnAjustesClicked()
 
 void UWidget_pause::OnMenuPrincipalClicked()
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC) return;
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), true);
 
-	AHUDmain* HUD = Cast<AHUDmain>(PC->GetHUD());
-	if (HUD)
-	{
-		HUD->OcultarOnGame();
-		HUD->OcultarPause();
-		//HUD->OcultarTodo();
-		FName NivelActual = *UGameplayStatics::GetCurrentLevelName(GetWorld());
-		UGameplayStatics::OpenLevel(GetWorld(), NivelActual);
-		UGameplayStatics::SetGamePaused(GetWorld(), false);
-		HUD->MostrarPanelPrincipal();
-	}
 }

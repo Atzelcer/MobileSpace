@@ -16,5 +16,5 @@ void UWidgetVictory::NativeConstruct()
 
 void UWidgetVictory::OnSalirClicked()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMenu"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), true);
 }
